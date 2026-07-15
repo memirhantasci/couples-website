@@ -16,6 +16,7 @@ export interface Photo {
   taken_time: string | null;
   uploaded_at: string;
   exif_found: boolean;
+  file_size?: number | null;
   uploader?: { username: string; display_name?: string };
 }
 

@@ -74,6 +74,7 @@ export async function uploadPhotoAction(
     taken_date: takenDate,
     taken_time: takenTime || null,
     exif_found: exifFound,
+    file_size: file.size,
   });
 
   if (dbError) {

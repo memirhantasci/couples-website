@@ -45,7 +45,7 @@ export default async function CalendarPage() {
       .from("photo_archive")
       .select(`
         id, user_id, image_url, storage_path, title, description,
-        taken_date, taken_time, uploaded_at, exif_found,
+        taken_date, taken_time, uploaded_at, exif_found, file_size,
         uploader:users(username, display_name)
       `)
       .order("taken_date", { ascending: false })

@@ -25,7 +25,7 @@ export default async function AdminPhotosPage() {
       .from("photo_archive")
       .select(`
         id, user_id, image_url, storage_path, title, description,
-        taken_date, taken_time, uploaded_at, exif_found,
+        taken_date, taken_time, uploaded_at, exif_found, file_size,
         uploader:users(username, display_name)
       `)
       .order("uploaded_at", { ascending: false }),

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Camera, Clock, User, ZoomIn, ZoomOut } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Camera, Clock, User, ZoomIn, ZoomOut, HardDrive } from "lucide-react";
 import type { Photo } from "./PhotoCard";
 
 interface LightboxProps {
@@ -23,6 +23,15 @@ function formatDate(dateStr: string): string {
 function formatTime(timeStr: string | null): string | null {
   if (!timeStr) return null;
   return timeStr.substring(0, 5);
+}
+
+function formatBytes(bytes?: number | null): string | null {
+  if (bytes === undefined || bytes === null || isNaN(bytes)) return null;
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 }
 
 export function Lightbox({ photos, initialIndex, onClose }: LightboxProps) {
@@ -245,6 +254,14 @@ export function Lightbox({ photos, initialIndex, onClose }: LightboxProps) {
                 <div className="flex items-center gap-1.5">
                   <Clock size={13} style={{ color: "rgba(255,255,255,0.35)" }} />
                   <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>{time}</span>
+                </div>
+              )}
+              {photo.file_size != null && (
+                <div className="flex items-center gap-1.5">
+                  <HardDrive size={13} style={{ color: "rgba(255,255,255,0.35)" }} />
+                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
+                    {formatBytes(photo.file_size)}
+                  </span>
                 </div>
               )}
               <div className="flex items-center gap-1.5">
