@@ -49,7 +49,7 @@ export default async function MedicinePage() {
   const today = dayjs().format("YYYY-MM-DD");
   const fourteenDaysAgo = dayjs().subtract(14, "day").format("YYYY-MM-DD");
 
-  const [medicinesResult, todayLogsResult, historicalLogsResult] = await Promise.all([
+  const [medicinesResult, todayLogsResult, historicalLogsResult, usersResult] = await Promise.all([
     supabase
       .from("medicines")
       .select("id, name, time, start_date, end_date, is_active, user_id")
@@ -70,11 +70,16 @@ export default async function MedicinePage() {
       .gte("date", fourteenDaysAgo)
       .lt("date", today)
       .order("date", { ascending: false }),
+    supabase
+      .from("users")
+      .select("id, username")
+      .order("username"),
   ]);
 
   const medicines = medicinesResult.data ?? [];
   const todayLogs = todayLogsResult.data ?? [];
   const historicalLogs = historicalLogsResult.data ?? [];
+  const users = usersResult?.data ?? [];
   const medIds = medicines.map((m) => m.id);
   const streakValue = await calculateStreak(supabase, session.userId, medIds);
 
@@ -125,7 +130,7 @@ export default async function MedicinePage() {
 
       {/* Admin: Add Medicine */}
       {session.role === "ADMIN" && (
-        <AddMedicineForm />
+        <AddMedicineForm users={users} />
       )}
 
       {/* Today's Medicines */}
