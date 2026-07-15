@@ -69,9 +69,10 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
   }
 
   return (
-    <div className="glass-card p-4 relative">
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
+    <>
+      <div className="glass-card p-4 relative">
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         locale="tr"
         events={events}
@@ -142,6 +143,6 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }

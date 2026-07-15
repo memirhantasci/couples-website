@@ -138,9 +138,10 @@ export function CalendarView({ notes, moods, currentUsername, photoDates = [], d
   const isOwner = !existingNote || existingNote.user?.username === currentUsername;
 
   return (
-    <div className="glass-card p-4">
-      <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
+    <>
+      <div className="glass-card p-4">
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
         locale="tr"
         events={allEvents}
@@ -250,6 +251,6 @@ export function CalendarView({ notes, moods, currentUsername, photoDates = [], d
           </>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
