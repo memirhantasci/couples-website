@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import { AddMemoryForm } from "@/components/memories/AddMemoryForm";
 import { ArrowLeft, Camera } from "lucide-react";
 import Link from "next/link";
+import { createServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
-  title: "Anı Yönetimi — Admin",
+  title: "Özel Günler Yönetimi — Admin",
 };
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminMemoriesPage() {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") redirect("/home");
+
+  const supabase = createServerClient();
+  const { data: memories } = await supabase
+    .from("memories")
+    .select("id, date, title, description, image_url, is_default")
+    .order("date", { ascending: false });
 
   return (
     <div className="px-4 py-6 flex flex-col gap-6 max-w-lg mx-auto">
@@ -26,8 +33,8 @@ export default async function AdminMemoriesPage() {
           <ArrowLeft size={18} />
         </Link>
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Camera size={20} style={{ color: "var(--gs-gold)" }} />
-          Anı Yönetimi
+          <Camera size={20} style={{ color: "var(--gs-red)" }} />
+          Özel Günler Yönetimi
         </h1>
       </div>
 

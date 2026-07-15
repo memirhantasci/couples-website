@@ -30,9 +30,6 @@ export async function createMeetingAction(
 
   const supabase = createServerClient();
 
-  // Deactivate all existing active meetings first
-  await supabase.from("meetings").update({ is_active: false }).eq("is_active", true);
-
   // Create new meeting
   const { error } = await supabase.from("meetings").insert({
     meeting_datetime: parsed.data.meeting_datetime,
@@ -102,12 +99,13 @@ export async function upsertCalendarNoteAction(
   if (existing) {
     await supabase
       .from("calendar_notes")
-      .update({ note: parsed.data.note })
+      .update({ note: parsed.data.note, user_id: session.userId })
       .eq("id", existing.id);
   } else {
     await supabase.from("calendar_notes").insert({
       date: parsed.data.date,
       note: parsed.data.note,
+      user_id: session.userId,
     });
   }
 

@@ -20,15 +20,19 @@ export default async function AdminMedicinesPage() {
 
   const supabase = createServerClient();
 
-  const [medicinesResult, logsResult] = await Promise.all([
+  const [medicinesResult, logsResult, usersResult] = await Promise.all([
     supabase
       .from("medicines")
-      .select("*")
+      .select("*, user:users(username)")
       .order("created_at", { ascending: false }),
     supabase
       .from("medicine_logs")
       .select("*")
-      .order("taken_at", { ascending: false })
+      .order("date", { ascending: false }), // Fixed order to use date since taken_at doesn't exist
+    supabase
+      .from("users")
+      .select("id, username")
+      .eq("role", "USER")
   ]);
 
   return (
@@ -47,7 +51,7 @@ export default async function AdminMedicinesPage() {
         </h1>
       </div>
 
-      <AddMedicineForm />
+      <AddMedicineForm users={usersResult.data || []} />
 
       <div className="glass-card p-5">
         <h2 className="font-bold text-white text-base mb-4">Tüm İlaçlar ve Kayıtlar</h2>

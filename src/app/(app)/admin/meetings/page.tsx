@@ -18,13 +18,11 @@ export default async function AdminMeetingsPage() {
 
   const supabase = createServerClient();
 
-  const { data: activeMeeting } = await supabase
+  const { data: activeMeetings } = await supabase
     .from("meetings")
     .select("id, meeting_datetime, title, is_active")
     .eq("is_active", true)
-    .order("meeting_datetime", { ascending: true })
-    .limit(1)
-    .single();
+    .order("meeting_datetime", { ascending: true });
 
   return (
     <div className="px-4 py-6 flex flex-col gap-5 max-w-lg mx-auto">
@@ -42,7 +40,7 @@ export default async function AdminMeetingsPage() {
         </h1>
       </div>
 
-      <MeetingManager activeMeeting={activeMeeting ?? null} />
+      <MeetingManager activeMeetings={activeMeetings || []} />
     </div>
   );
 }

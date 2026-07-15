@@ -23,8 +23,8 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
 
   if (!letters.length) {
     return (
-      <div className="p-4 rounded-xl text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px dotted rgba(255,255,255,0.1)" }}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+      <div className="p-4 rounded-xl text-center" style={{ background: "#ffffff", border: "1px dashed #cccccc" }}>
+        <p style={{ color: "#666666", fontSize: 14 }}>
           Sistemde henüz hiç mektup yok.
         </p>
       </div>
@@ -42,8 +42,9 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
             key={letter.id} 
             className="rounded-xl overflow-hidden transition-all"
             style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.1)"
+              background: "#ffffff",
+              border: "1px solid #e0e0e0",
+              color: "#000000"
             }}
           >
             {/* Header (Always Clickable) */}
@@ -54,15 +55,15 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
               <div className="flex items-center gap-3">
                 <div 
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: "rgba(255,255,255,0.1)", color: "white" }}
+                  style={{ background: "#f0f0f0", color: "#666666" }}
                 >
                   <MailOpen size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-white text-base">
+                  <h4 className="font-bold text-black text-base">
                     {letter.title}
                   </h4>
-                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginTop: 2 }}>
+                  <p style={{ color: "#666666", fontSize: 13, marginTop: 2 }}>
                     {senderName} ➔ {receiverName}
                   </p>
                 </div>
@@ -70,10 +71,10 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
 
               <div className="flex items-center gap-3">
                 <div className="text-right mr-2 hidden sm:block">
-                  <p className="text-xs text-white/50 mb-1">Açılış Tarihi</p>
-                  <p className="text-xs text-white/80 font-mono">{dayjs(letter.unlock_date).format("DD MMM YYYY")}</p>
+                  <p className="text-xs text-[#888888] mb-1">Açılış Tarihi</p>
+                  <p className="text-xs text-[#555555] font-mono">{dayjs(letter.unlock_date).format("DD MMM YYYY")}</p>
                 </div>
-                <div style={{ color: "rgba(255,255,255,0.4)", transform: openLetterId === letter.id ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
+                <div style={{ color: "#888888", transform: openLetterId === letter.id ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
                   <ChevronDown size={20} />
                 </div>
               </div>
@@ -81,14 +82,14 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
 
             {/* Content Body */}
             {openLetterId === letter.id && (
-              <div className="p-4 pt-2 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-                <div className="p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.3)" }}>
-                  <p className="whitespace-pre-wrap text-white leading-relaxed text-sm" style={{ opacity: 0.9 }}>
+              <div className="p-4 pt-2 border-t" style={{ borderColor: "#f0f0f0" }}>
+                <div className="p-4 rounded-xl" style={{ background: "#f9f9f9" }}>
+                  <p className="whitespace-pre-wrap text-black leading-relaxed text-sm" style={{ opacity: 0.9 }}>
                     {letter.content}
                   </p>
                 </div>
                 <div className="mt-3 text-right">
-                  <span className="text-xs italic" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  <span className="text-xs italic" style={{ color: "#888888" }}>
                     Yazılma Tarihi: {dayjs(letter.created_at).format("DD MMMM YYYY HH:mm")}
                   </span>
                 </div>

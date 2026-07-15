@@ -7,11 +7,12 @@ import { getSession } from "@/lib/auth/session";
 import { todayString } from "@/lib/date";
 
 // ─── Create Medicine (Admin only) ─────────────────────────────────────────────
-const createMedicineSchema = z.object({
-  name: z.string().min(1, "İlaç adı gerekli"),
-  start_date: z.string().min(1, "Başlangıç tarihi gerekli"),
-  end_date: z.string().min(1, "Bitiş tarihi gerekli"),
-  time: z.string().min(1, "Saat gerekli"),
+const medicineSchema = z.object({
+  name: z.string().min(2, "İlaç adı en az 2 karakter olmalı."),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Geçersiz tarih formatı."),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Geçersiz tarih formatı."),
+  time: z.string().regex(/^\d{2}:\d{2}$/, "Geçersiz saat formatı."),
+  user_id: z.number().positive("Lütfen bir kullanıcı seçin."),
 });
 
 export async function createMedicineAction(
@@ -19,24 +20,28 @@ export async function createMedicineAction(
   formData: FormData
 ) {
   const session = await getSession();
-  if (!session || session.role !== "ADMIN") {
-    return { error: "Bu işlem için yetkiniz yok." };
-  }
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
 
-  const parsed = createMedicineSchema.safeParse({
+  const rawData = {
     name: formData.get("name"),
     start_date: formData.get("start_date"),
     end_date: formData.get("end_date"),
     time: formData.get("time"),
-  });
+    user_id: Number(formData.get("user_id")),
+  };
 
+  const parsed = medicineSchema.safeParse(rawData);
   if (!parsed.success) {
     return { error: parsed.error.errors[0].message };
   }
 
   const supabase = createServerClient();
   const { error } = await supabase.from("medicines").insert({
-    ...parsed.data,
+    name: parsed.data.name,
+    start_date: parsed.data.start_date,
+    end_date: parsed.data.end_date,
+    time: parsed.data.time,
+    user_id: parsed.data.user_id,
     is_active: true,
   });
 

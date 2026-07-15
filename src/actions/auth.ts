@@ -100,7 +100,11 @@ export async function loginAction(
     loginLogId: loginLog?.id ?? 0,
   });
 
-  redirect("/home");
+  if (user.role === "ADMIN") {
+    redirect("/admin");
+  } else {
+    redirect("/home");
+  }
 }
 
 export async function logoutAction(): Promise<void> {

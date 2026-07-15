@@ -144,72 +144,72 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
                 transition: "all 0.3s ease",
               }}
             >
-              <div className="flex items-center gap-3 p-4">
-                {/* Icon */}
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                  style={{
-                    background: isDrank ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)",
-                  }}
-                >
-                  {isDrank ? "✅" : isMissed ? "❌" : "💊"}
-                </div>
+              <div className="flex flex-col p-4">
+                <div className="flex items-center gap-3 mb-3 pb-3 border-b border-white/5">
+                  {/* Icon */}
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                    style={{
+                      background: isDrank ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)",
+                    }}
+                  >
+                    {isDrank ? "✅" : isMissed ? "❌" : "💊"}
+                  </div>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-white text-sm">{medicine.name}</p>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <Clock size={11} style={{ color: "rgba(255,255,255,0.35)" }} />
-                    <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11 }}>{medicine.time}</span>
-                    {isLocked && (
-                      <>
-                        <span style={{ color: "rgba(255,255,255,0.2)" }}>·</span>
-                        <Lock size={10} style={{ color: "rgba(34,197,94,0.6)" }} />
-                        <span style={{ color: "rgba(34,197,94,0.6)", fontSize: 10, fontWeight: 600 }}>Kilitli</span>
-                      </>
-                    )}
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-white text-base">{medicine.name}</p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock size={12} style={{ color: "rgba(255,255,255,0.4)" }} />
+                      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500 }}>{medicine.time}</span>
+                      {isLocked && (
+                        <>
+                          <span style={{ color: "rgba(255,255,255,0.2)", margin: "0 4px" }}>•</span>
+                          <Lock size={12} style={{ color: "rgba(34,197,94,0.7)" }} />
+                          <span style={{ color: "rgba(34,197,94,0.7)", fontSize: 11, fontWeight: 700 }}>Kilitli</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Action buttons */}
-                <div className="flex gap-2 flex-shrink-0">
+                {/* Action buttons as big cards */}
+                <div className="grid grid-cols-2 gap-3 w-full">
                   {isLoading ? (
-                    <div className="w-8 h-8 flex items-center justify-center">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ color: "var(--gs-gold)" }} />
+                    <div className="col-span-2 py-4 flex items-center justify-center bg-white/5 rounded-2xl border border-white/5">
+                      <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ color: "var(--gs-gold)" }} />
                     </div>
                   ) : isDrank ? (
-                    <div
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl"
-                      style={{ background: "rgba(34,197,94,0.12)", color: "#4ade80" }}
-                    >
-                      <Check size={14} />
-                      <span className="font-semibold text-xs">Alındı</span>
+                    <div className="col-span-2 flex items-center justify-center gap-2 py-4 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400">
+                      <Check size={20} strokeWidth={3} />
+                      <span className="font-bold text-sm tracking-wide">İLAÇ ALINDI</span>
+                    </div>
+                  ) : isMissed ? (
+                    <div className="col-span-2 flex items-center justify-center gap-2 py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400">
+                      <X size={20} strokeWidth={3} />
+                      <span className="font-bold text-sm tracking-wide">İLAÇ ATLANDI</span>
                     </div>
                   ) : (
                     <>
                       <button
                         onClick={() => handleMarkDrank(medicine.id)}
-                        className="flex items-center gap-1 px-3 py-2 rounded-xl font-semibold text-xs transition-all"
-                        style={{
-                          background: "rgba(34,197,94,0.12)",
-                          color: "#4ade80",
-                          border: "1px solid rgba(34,197,94,0.2)",
-                        }}
+                        className="flex flex-col items-center justify-center gap-2 py-3 rounded-2xl transition-all hover:bg-green-500/20 active:scale-95"
+                        style={{ background: "rgba(34,197,94,0.12)", border: "1.5px solid rgba(34,197,94,0.25)" }}
                       >
-                        <Check size={13} />
-                        Aldım
+                        <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 shadow-sm">
+                          <Check size={22} strokeWidth={3} />
+                        </div>
+                        <span className="font-bold text-sm text-green-400">İçtim</span>
                       </button>
                       <button
                         onClick={() => handleMarkMissed(medicine.id)}
-                        className="flex items-center gap-1 px-3 py-2 rounded-xl font-semibold text-xs transition-all"
-                        style={{
-                          background: "rgba(248,113,113,0.10)",
-                          color: "#f87171",
-                          border: "1px solid rgba(248,113,113,0.18)",
-                        }}
+                        className="flex flex-col items-center justify-center gap-2 py-3 rounded-2xl transition-all hover:bg-red-500/20 active:scale-95"
+                        style={{ background: "rgba(248,113,113,0.10)", border: "1.5px solid rgba(248,113,113,0.2)" }}
                       >
-                        <X size={13} />
-                        Almadım
+                        <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 shadow-sm">
+                          <X size={22} strokeWidth={3} />
+                        </div>
+                        <span className="font-bold text-sm text-red-400">Atladım</span>
                       </button>
                     </>
                   )}

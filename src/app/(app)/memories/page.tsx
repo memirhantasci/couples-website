@@ -7,7 +7,7 @@ import { Camera } from "lucide-react";
 import dayjs from "dayjs";
 
 export const metadata: Metadata = {
-  title: "Anılarımız — Emirhan & Öykü 💕",
+  title: "Özel Günlerimiz — Emirhan & Öykü 💕",
 };
 
 export const dynamic = "force-dynamic";
@@ -29,10 +29,10 @@ export default async function MemoriesPage() {
       <div>
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
           <Camera size={22} style={{ color: "var(--gs-red)" }} />
-          Anılarımız
+          Özel Günlerimiz
         </h1>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
-          {(memories ?? []).length} anı • birlikte yaşananlar ❤️
+          {(memories ?? []).length} özel gün • birlikte yaşananlar ❤️
         </p>
       </div>
 

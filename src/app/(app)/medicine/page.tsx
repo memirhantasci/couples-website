@@ -52,8 +52,9 @@ export default async function MedicinePage() {
   const [medicinesResult, todayLogsResult, historicalLogsResult] = await Promise.all([
     supabase
       .from("medicines")
-      .select("id, name, time, start_date, end_date, is_active")
+      .select("id, name, time, start_date, end_date, is_active, user_id")
       .eq("is_active", true)
+      .eq("user_id", session.userId)
       .lte("start_date", today)
       .gte("end_date", today)
       .order("time"),

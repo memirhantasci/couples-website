@@ -13,6 +13,7 @@ interface CalendarNote {
   id: number;
   date: string;
   note: string;
+  user?: { username: string };
 }
 
 interface Mood {
@@ -32,15 +33,18 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
   const [loading, setLoading] = useState(false);
 
   // Build events from notes and moods
-  const noteEvents = notes.map((n) => ({
-    id: `note-${n.id}`,
-    date: n.date,
-    title: "📝 " + n.note.substring(0, 20) + (n.note.length > 20 ? "…" : ""),
-    backgroundColor: "rgba(232, 0, 45, 0.15)",
-    borderColor: "rgba(232, 0, 45, 0.3)",
-    textColor: "#ff6b6b",
-    extendedProps: { type: "note", noteId: n.id },
-  }));
+  const noteEvents = notes.map((n) => {
+    const username = n.user?.username ? `(${n.user.username}) ` : "";
+    return {
+      id: `note-${n.id}`,
+      date: n.date,
+      title: "📝 " + username + n.note.substring(0, 20) + (n.note.length > 20 ? "…" : ""),
+      backgroundColor: "rgba(232, 0, 45, 0.15)",
+      borderColor: "rgba(232, 0, 45, 0.3)",
+      textColor: "#ff6b6b",
+      extendedProps: { type: "note", noteId: n.id },
+    };
+  });
 
   const moodEvents = moods.map((m) => ({
     id: `mood-${m.date}`,

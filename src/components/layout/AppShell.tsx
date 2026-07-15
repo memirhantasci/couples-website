@@ -9,7 +9,12 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const displayName = session.username === "emirhan" ? "Emirhan" : "Öykü";
+  const displayName =
+    session.username === "emirhan"
+      ? "Emirhan"
+      : session.username === "admin"
+      ? "Admin"
+      : "Öykü";
 
   return (
     <div className="min-h-dvh">

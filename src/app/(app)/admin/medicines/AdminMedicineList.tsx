@@ -36,6 +36,8 @@ export function AdminMedicineList({ medicines, logs }: { medicines: any[], logs:
     <div className="flex flex-col gap-5">
       {medicines.map(med => {
         const medLogs = logs.filter(l => l.medicine_id === med.id);
+        const todayStr = dayjs().format("YYYY-MM-DD");
+        const todayLog = medLogs.find(l => l.date === todayStr);
         
         return (
           <div
@@ -47,6 +49,7 @@ export function AdminMedicineList({ medicines, logs }: { medicines: any[], logs:
               opacity: med.is_active ? 1 : 0.6,
             }}
           >
+            {/* Header / Info */}
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-bold text-white text-lg">{med.name}</p>
@@ -54,50 +57,66 @@ export function AdminMedicineList({ medicines, logs }: { medicines: any[], logs:
                   {med.time} • {med.start_date} / {med.end_date}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-2">
                 <button
                   onClick={() => handleToggle(med.id, med.is_active)}
                   disabled={loading === med.id}
-                  className="px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2"
+                  className="px-3 py-1.5 rounded-lg font-bold text-xs transition-colors flex items-center justify-center gap-2"
                   style={{
                     background: med.is_active ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.1)",
                     color: med.is_active ? "#4ade80" : "rgba(255,255,255,0.6)",
                   }}
                 >
-                  <Power size={18} />
+                  <Power size={14} />
                   {med.is_active ? "Aktif" : "Pasif"}
                 </button>
                 <button
                   onClick={() => handleDelete(med.id)}
                   disabled={loading === med.id}
-                  className="px-4 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2"
+                  className="px-3 py-1.5 rounded-lg font-bold text-xs transition-colors flex items-center justify-center gap-2"
                   style={{ background: "rgba(248,113,113,0.15)", color: "#f87171" }}
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={14} />
                   Sil
                 </button>
               </div>
             </div>
 
+            {/* Today's Status Box */}
+            <div className="p-3 rounded-lg flex items-center justify-between" style={{ background: "rgba(0,0,0,0.2)" }}>
+              <span className="text-sm font-semibold text-white/70">Bugünün Durumu:</span>
+              {todayLog ? (
+                <div className="flex items-center gap-2">
+                  {todayLog.status === "DRANK" ? (
+                    <span className="text-green-400 font-bold text-xs bg-green-400/10 px-2 py-1 rounded-md">Alındı</span>
+                  ) : todayLog.status === "MISSED" ? (
+                    <span className="text-red-400 font-bold text-xs bg-red-400/10 px-2 py-1 rounded-md">Atlandı</span>
+                  ) : (
+                    <span className="text-yellow-400 font-bold text-xs bg-yellow-400/10 px-2 py-1 rounded-md">Bekliyor</span>
+                  )}
+                </div>
+              ) : (
+                <span className="text-white/40 font-bold text-xs bg-white/5 px-2 py-1 rounded-md">Henüz İşlem Yok</span>
+              )}
+            </div>
+
+            {/* History Logs */}
             {medLogs.length > 0 && (
               <div className="pt-3 border-t border-white/10">
                 <p className="text-xs font-semibold mb-2" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  İlaç Alım Geçmişi:
+                  Son Kayıtlar:
                 </p>
-                <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
-                  {medLogs.map(log => (
-                    <div key={log.id} className="flex items-center gap-2 text-sm">
+                <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+                  {medLogs.slice(0, 7).map(log => (
+                    <div key={log.id} className="flex items-center gap-2 p-2 rounded-lg" style={{ background: "rgba(255,255,255,0.02)" }}>
                       <Clock size={14} style={{ color: "var(--gs-gold)" }} />
-                      <span className="font-medium text-white/90">
-                        {dayjs(log.taken_at).format("DD MMMM YYYY")}
+                      <span className="font-medium text-white/90 text-xs">
+                        {dayjs(log.date).format("DD MMM YYYY")}
                       </span>
-                      <span className="text-white/50">
-                        saat {dayjs(log.taken_at).format("HH:mm")}
-                      </span>
-                      {log.status === "drank" ? (
-                        <span className="text-green-400 font-semibold text-xs ml-auto bg-green-400/10 px-2 py-0.5 rounded-md">Alındı</span>
+                      {log.status === "DRANK" ? (
+                        <span className="text-green-400 font-bold text-[10px] ml-auto uppercase tracking-wider">İçildi</span>
                       ) : (
-                        <span className="text-red-400 font-semibold text-xs ml-auto bg-red-400/10 px-2 py-0.5 rounded-md">Alınmadı</span>
+                        <span className="text-red-400 font-bold text-[10px] ml-auto uppercase tracking-wider">Atlandı</span>
                       )}
                     </div>
                   ))}

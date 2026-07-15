@@ -25,8 +25,8 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
 
   if (!letters.length) {
     return (
-      <div className="p-4 rounded-xl text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px dotted rgba(255,255,255,0.1)" }}>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+      <div className="p-4 rounded-xl text-center" style={{ background: "#ffffff", border: "1px dashed #cccccc" }}>
+        <p style={{ color: "#666666", fontSize: 14 }}>
           {type === "received" ? "Henüz sana yazılmış bir mektup yok." : "Henüz kimseye mektup göndermedin."}
         </p>
       </div>
@@ -51,8 +51,9 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
             key={letter.id} 
             className="rounded-xl overflow-hidden transition-all"
             style={{
-              background: !canOpen ? "rgba(255,255,255,0.02)" : "rgba(255,215,0,0.05)",
-              border: `1px solid ${!canOpen ? "rgba(255,255,255,0.05)" : "rgba(255,215,0,0.2)"}`
+              background: "#ffffff",
+              border: "1px solid #e0e0e0",
+              color: "#000000"
             }}
           >
             {/* Header (Clickable if unlocked) */}
@@ -68,17 +69,17 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
                 <div 
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{ 
-                    background: !canOpen ? "rgba(255,255,255,0.05)" : "rgba(255,215,0,0.15)",
-                    color: !canOpen ? "rgba(255,255,255,0.4)" : "var(--gs-gold)"
+                    background: !canOpen ? "#f0f0f0" : "rgba(255,215,0,0.15)",
+                    color: !canOpen ? "#888888" : "var(--gs-gold)"
                   }}
                 >
                   {!canOpen ? <Lock size={18} /> : <MailOpen size={18} />}
                 </div>
                 <div>
-                  <h4 className="font-bold text-white text-base">
+                  <h4 className="font-bold text-black text-base">
                     {letter.title}
                   </h4>
-                  <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginTop: 2 }}>
+                  <p style={{ color: "#666666", fontSize: 13, marginTop: 2 }}>
                     {type === "received" ? `Kimden: ${senderName}` : `Kime: ${receiverName}`}
                   </p>
                 </div>
@@ -87,7 +88,7 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
               {!canOpen ? (
                 <div className="flex flex-col items-end">
                   <span className="text-xs font-semibold mb-1" style={{ color: "var(--gs-red)" }}>Kilitli</span>
-                  <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  <span className="flex items-center gap-1 text-xs" style={{ color: "#888888" }}>
                     <CalendarClock size={12} />
                     {unlockDate.format("DD MMM YYYY")}
                   </span>
@@ -97,13 +98,13 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
                   {type === "sent" && isLockedDate && (
                     <div className="flex flex-col items-end mr-2 hidden sm:flex">
                       <span className="text-xs font-semibold mb-1" style={{ color: "var(--gs-gold)" }}>Alıcıya Kilitli</span>
-                      <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                      <span className="flex items-center gap-1 text-xs" style={{ color: "#888888" }}>
                         <CalendarClock size={12} />
                         {unlockDate.format("DD MMM")}
                       </span>
                     </div>
                   )}
-                  <div style={{ color: "rgba(255,255,255,0.4)", transform: openLetterId === letter.id ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
+                  <div style={{ color: "#888888", transform: openLetterId === letter.id ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
                     <ChevronDown size={20} />
                   </div>
                 </div>
@@ -112,14 +113,14 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
 
             {/* Content Body */}
             {canOpen && openLetterId === letter.id && (
-              <div className="p-4 pt-2 border-t" style={{ borderColor: "rgba(255,215,0,0.1)" }}>
-                <div className="p-4 rounded-xl" style={{ background: "rgba(0,0,0,0.2)" }}>
-                  <p className="whitespace-pre-wrap text-white leading-relaxed text-sm" style={{ opacity: 0.9 }}>
+              <div className="p-4 pt-2 border-t" style={{ borderColor: "#f0f0f0" }}>
+                <div className="p-4 rounded-xl" style={{ background: "#f9f9f9" }}>
+                  <p className="whitespace-pre-wrap text-black leading-relaxed text-sm" style={{ opacity: 0.9 }}>
                     {letter.content}
                   </p>
                 </div>
                 <div className="mt-3 text-right">
-                  <span className="text-xs italic" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  <span className="text-xs italic" style={{ color: "#888888" }}>
                     {type === "received" ? "Yazılma Tarihi:" : "Gönderilme Tarihi:"} {dayjs(letter.created_at).format("DD MMMM YYYY")}
                   </span>
                 </div>

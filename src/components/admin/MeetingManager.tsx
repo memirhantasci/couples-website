@@ -13,10 +13,10 @@ interface Meeting {
 }
 
 interface MeetingManagerProps {
-  activeMeeting: Meeting | null;
+  activeMeetings: Meeting[];
 }
 
-export function MeetingManager({ activeMeeting }: MeetingManagerProps) {
+export function MeetingManager({ activeMeetings }: MeetingManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const initialState: { error?: string; success?: boolean } = {};
   
@@ -34,11 +34,10 @@ export function MeetingManager({ activeMeeting }: MeetingManagerProps) {
     initialState
   );
 
-  async function handleDeactivate() {
-    if (!activeMeeting) return;
+  async function handleDeactivate(id: number) {
     if (!confirm("Buluşmayı iptal etmek istediğine emin misin?")) return;
     
-    const result = await deactivateMeetingAction(activeMeeting.id);
+    const result = await deactivateMeetingAction(id);
     if (result?.error) toast.error(result.error);
     else toast.success("Buluşma iptal edildi.");
   }
@@ -53,43 +52,48 @@ export function MeetingManager({ activeMeeting }: MeetingManagerProps) {
       <div className="glass-card p-5">
         <div className="flex items-center gap-2 mb-4">
           <CalendarClock size={20} style={{ color: "var(--gs-gold)" }} />
-          <h3 className="font-bold text-white text-base">Aktif Buluşma</h3>
+          <h3 className="font-bold text-white text-base">Aktif Buluşmalar</h3>
         </div>
 
-        {activeMeeting ? (
-          <div
-            className="flex items-center justify-between p-4 rounded-xl"
-            style={{
-              background: "rgba(255,215,0,0.08)",
-              border: "1px solid rgba(255,215,0,0.15)",
-            }}
-          >
-            <div>
-              <p className="font-bold text-white text-lg">
-                {activeMeeting.title || "Buluşma"}
-              </p>
-              <p style={{ color: "rgba(255,215,0,0.9)", fontSize: 14, marginTop: 4 }}>
-                {new Date(activeMeeting.meeting_datetime).toLocaleString("tr-TR", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-            <button
-              onClick={handleDeactivate}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-80"
-              style={{
-                background: "rgba(232,0,45,0.15)",
-                color: "#ff4d4d",
-                border: "1px solid rgba(232,0,45,0.2)",
-              }}
-            >
-              <Trash2 size={16} />
-              İptal
-            </button>
+        {activeMeetings.length > 0 ? (
+          <div className="flex flex-col gap-3">
+            {activeMeetings.map((meeting) => (
+              <div
+                key={meeting.id}
+                className="flex items-center justify-between p-4 rounded-xl"
+                style={{
+                  background: "rgba(255,215,0,0.08)",
+                  border: "1px solid rgba(255,215,0,0.15)",
+                }}
+              >
+                <div>
+                  <p className="font-bold text-white text-lg">
+                    {meeting.title || "Buluşma"}
+                  </p>
+                  <p style={{ color: "rgba(255,215,0,0.9)", fontSize: 14, marginTop: 4 }}>
+                    {new Date(meeting.meeting_datetime).toLocaleString("tr-TR", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDeactivate(meeting.id)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-80"
+                  style={{
+                    background: "rgba(232,0,45,0.15)",
+                    color: "#ff4d4d",
+                    border: "1px solid rgba(232,0,45,0.2)",
+                  }}
+                >
+                  <Trash2 size={16} />
+                  İptal
+                </button>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px dotted rgba(255,255,255,0.1)" }}>

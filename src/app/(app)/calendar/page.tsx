@@ -29,19 +29,20 @@ export default async function CalendarPage() {
   const [notesResult, moodsResult] = await Promise.all([
     supabase
       .from("calendar_notes")
-      .select("id, date, note")
+      .select("id, date, note, user:users(username)")
       .gte("date", threeMonthsAgo)
       .lte("date", twoMonthsLater)
       .order("date"),
     supabase
       .from("moods")
       .select("date, mood_type")
+      .eq("user_id", session.userId)
       .gte("date", threeMonthsAgo)
       .lte("date", twoMonthsLater)
       .order("date"),
   ]);
 
-  const notes = notesResult.data ?? [];
+  const notes = (notesResult.data as any) ?? [];
   const moods = moodsResult.data ?? [];
 
   return (
@@ -87,7 +88,7 @@ export default async function CalendarPage() {
           >
             Son Notlar
           </h2>
-          {notes.slice(-5).reverse().map((note) => (
+          {notes.slice(-5).reverse().map((note: any) => (
             <div
               key={note.id}
               className="flex gap-3 p-3 rounded-xl"

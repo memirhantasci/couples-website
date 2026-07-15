@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { LayoutDashboard, Pill, Users, LineChart, CalendarDays, ChevronRight, Camera, Mail } from "lucide-react";
+import { LayoutDashboard, Pill, Users, LineChart, CalendarDays, ChevronRight, Camera, Mail, BookOpen } from "lucide-react";
 import Link from "next/link";
 import dayjs from "dayjs";
 
@@ -23,9 +23,7 @@ export default async function AdminDashboardPage() {
     supabase
       .from("meetings")
       .select("title")
-      .eq("is_active", true)
-      .limit(1)
-      .single(),
+      .eq("is_active", true),
     supabase
       .from("medicines")
       .select("id")
@@ -38,7 +36,7 @@ export default async function AdminDashboardPage() {
       .gte("login_at", today + "T00:00:00Z"),
   ]);
 
-  const activeMeeting = activeMeetingResult.data?.title || "Yok";
+  const activeMeeting = activeMeetingResult.data?.map(m => m.title).join(", ") || "Yok";
   const activeMedsCount = activeMedsResult.data?.length || 0;
   const todayLogins = todayLoginsResult.count || 0;
 
@@ -46,50 +44,66 @@ export default async function AdminDashboardPage() {
     {
       title: "Buluşma Planla",
       description: `Aktif: ${activeMeeting}`,
-      icon: <CalendarDays size={24} style={{ color: "var(--gs-red)" }} />,
+      icon: <CalendarDays size={24} style={{ color: "#ffffff" }} />,
       href: "/admin/meetings",
-      gradient: "linear-gradient(135deg, rgba(232,0,45,0.15) 0%, rgba(232,0,45,0.05) 100%)",
-      borderColor: "rgba(232,0,45,0.2)",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
     },
     {
       title: "Ruh Hali İstatistikleri",
       description: "Son 30 günün grafikleri",
-      icon: <LineChart size={24} style={{ color: "var(--gs-gold)" }} />,
+      icon: <LineChart size={24} style={{ color: "#ffffff" }} />,
       href: "/admin/moods",
-      gradient: "linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,215,0,0.05) 100%)",
-      borderColor: "rgba(255,215,0,0.2)",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
     },
     {
       title: "İlaç Yönetimi",
       description: `Aktif İlaç: ${activeMedsCount}`,
-      icon: <Pill size={24} style={{ color: "#4ade80" }} />,
+      icon: <Pill size={24} style={{ color: "#ffffff" }} />,
       href: "/admin/medicines",
-      gradient: "linear-gradient(135deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 100%)",
-      borderColor: "rgba(34,197,94,0.2)",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
     },
     {
       title: "Giriş Geçmişi",
       description: `Bugün ${todayLogins} giriş`,
-      icon: <Users size={24} style={{ color: "#818cf8" }} />,
+      icon: <Users size={24} style={{ color: "#ffffff" }} />,
       href: "/admin/logs",
-      gradient: "linear-gradient(135deg, rgba(129,140,248,0.15) 0%, rgba(129,140,248,0.05) 100%)",
-      borderColor: "rgba(129,140,248,0.2)",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
     },
     {
-      title: "Anı Yönetimi",
-      description: "Yeni anı ekle",
-      icon: <Camera size={24} style={{ color: "#ec4899" }} />,
+      title: "Özel Günler Yönetimi",
+      description: "Yeni özel gün ekle",
+      icon: <Camera size={24} style={{ color: "#ffffff" }} />,
       href: "/admin/memories",
-      gradient: "linear-gradient(135deg, rgba(236,72,153,0.15) 0%, rgba(236,72,153,0.05) 100%)",
-      borderColor: "rgba(236,72,153,0.2)",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
+    },
+    {
+      title: "Kullanıcı Takvimi",
+      description: "Kullanıcıların ekledikleri",
+      icon: <CalendarDays size={24} style={{ color: "#ffffff" }} />,
+      href: "/admin/calendar-events",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
+    },
+    {
+      title: "Günlük Notlar",
+      description: "Kullanıcıların gün sonu notları",
+      icon: <BookOpen size={24} style={{ color: "#ffffff" }} />,
+      href: "/admin/daily-notes",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
     },
     {
       title: "Tüm Mektuplar",
       description: "Sistemdeki mektuplar",
-      icon: <Mail size={24} style={{ color: "#fcd34d" }} />,
+      icon: <Mail size={24} style={{ color: "#ffffff" }} />,
       href: "/admin/letters",
-      gradient: "linear-gradient(135deg, rgba(252,211,77,0.15) 0%, rgba(252,211,77,0.05) 100%)",
-      borderColor: "rgba(252,211,77,0.2)",
+      gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+      borderColor: "rgba(255,255,255,0.2)",
     },
   ];
 

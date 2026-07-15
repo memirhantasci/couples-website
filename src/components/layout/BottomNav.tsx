@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
   },
   {
     href: "/memories",
-    label: "Anılar",
+    label: "Özel Günler",
     icon: <Camera size={20} strokeWidth={2} />,
   },
   {
@@ -59,7 +59,8 @@ export function BottomNav({ role }: BottomNavProps) {
   );
 
   // Admin rotalarında alt menüyü tamamen gizle
-  if (pathname.startsWith("/admin")) {
+  // Ayrıca admin kullanıcısı için hiçbir zaman alt menü gösterme
+  if (role === "ADMIN" || pathname.startsWith("/admin")) {
     return null;
   }
 
