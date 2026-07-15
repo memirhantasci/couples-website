@@ -25,41 +25,15 @@ const navItems: NavItem[] = [
     icon: <Pill size={20} strokeWidth={2} />,
   },
   {
-    href: "/memories",
-    label: "Özel Günler",
-    icon: <Camera size={20} strokeWidth={2} />,
-  },
-  {
     href: "/calendar",
     label: "Takvim",
     icon: <Calendar size={20} strokeWidth={2} />,
   },
   {
-    href: "/daily-notes-user",
-    label: "Günlük",
-    icon: <BookText size={20} strokeWidth={2} />,
-  },
-  {
     href: "/letters",
     label: "Mektuplar",
     icon: <Mail size={20} strokeWidth={2} />,
-  },
-  {
-    href: "/photos",
-    label: "Fotoğraflar",
-    icon: <Images size={20} strokeWidth={2} />,
-  },
-  {
-    href: "/photos/upload",
-    label: "Yükle",
-    icon: <Upload size={20} strokeWidth={2} />,
-  },
-  {
-    href: "/admin",
-    label: "Admin",
-    icon: <LayoutDashboard size={20} strokeWidth={2} />,
-    adminOnly: true,
-  },
+  }
 ];
 
 interface BottomNavProps {

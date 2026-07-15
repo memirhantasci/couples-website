@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { CalendarView } from "@/components/calendar/CalendarView";
+import { CalendarPageClient } from "@/components/calendar/CalendarPageClient";
 import { Calendar } from "lucide-react";
+import Link from "next/link";
 import dayjs from "dayjs";
 
 export const metadata: Metadata = {
@@ -42,9 +43,13 @@ export default async function CalendarPage() {
       .order("date"),
     supabase
       .from("photo_archive")
-      .select("taken_date")
-      .gte("taken_date", threeMonthsAgo)
-      .lte("taken_date", twoMonthsLater),
+      .select(`
+        id, user_id, image_url, storage_path, title, description,
+        taken_date, taken_time, uploaded_at, exif_found,
+        uploader:users(username, display_name)
+      `)
+      .order("taken_date", { ascending: false })
+      .order("taken_time", { ascending: false }),
   ]);
 
   const notes = (notesResult.data as any) ?? [];
@@ -55,14 +60,26 @@ export default async function CalendarPage() {
   return (
     <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Calendar size={22} style={{ color: "var(--gs-red)" }} />
-          Takvim
-        </h1>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
-          Günlere not eklemek için üzerine dokun
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+            <Calendar size={22} style={{ color: "var(--gs-red)" }} />
+            Takvim & Fotoğraflar
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
+            Notlar, ruh halleri ve fotoğraflar tek bir yerde
+          </p>
+        </div>
+        <Link
+          href="/photos/upload"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all"
+          style={{
+            background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
+            color: "white",
+          }}
+        >
+          + Yükle
+        </Link>
       </div>
 
       {/* Legend */}
@@ -90,41 +107,49 @@ export default async function CalendarPage() {
         </div>
       </div>
 
-      {/* Calendar */}
-      <CalendarView notes={notes} moods={moods} currentUsername={session.username} photoDates={photoDates} />
-
+      {/* Client Component for View Toggling */}
+      <CalendarPageClient
+        notes={notes}
+        moods={moods}
+        photos={(photosResult.data as any[]) ?? []}
+        currentUserId={session.userId}
+        currentUsername={session.username}
+      />
+      
       {/* Recent notes list */}
       {notes.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 mt-4">
           <h2
             className="font-semibold text-sm"
-            style={{ color: "rgba(255,255,255,0.5)" }}
+            style={{ color: "rgba(255,255,255,0.85)" }}
           >
-            Son Notlar
+            Yaklaşan Notlar
           </h2>
-          {notes.slice(-5).reverse().map((note: any) => (
-            <div
-              key={note.id}
-              className="flex gap-3 p-3 rounded-xl"
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              <span
-                className="badge badge-red flex-shrink-0 self-start"
-                style={{ marginTop: 2 }}
-              >
-                {new Date(note.date + "T00:00:00").toLocaleDateString("tr-TR", {
-                  day: "numeric",
-                  month: "short",
-                })}
-              </span>
-              <p className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
-                {note.note}
-              </p>
-            </div>
-          ))}
+          <div className="flex flex-col gap-2">
+            {notes.map((n: any) => {
+              const dateObj = dayjs(n.date).locale("tr");
+              const isOwner = n.user?.username === session.username;
+              return (
+                <div key={n.id} className="glass-card p-3 flex flex-col gap-1 relative overflow-hidden">
+                  <div
+                    className="absolute left-0 top-0 bottom-0 w-1"
+                    style={{ background: isOwner ? "var(--gs-red)" : "rgba(255,255,255,0.2)" }}
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs opacity-50">
+                      {dateObj.format("DD MMMM YYYY, dddd")}
+                    </span>
+                    {!isOwner && (
+                      <span className="text-xs" style={{ color: "var(--gs-gold)" }}>
+                        {n.user?.display_name || n.user?.username}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium">{n.note}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
