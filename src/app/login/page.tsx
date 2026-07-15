@@ -1,16 +1,19 @@
 "use client";
 
 import { useActionState } from "react";
-import { loginAction, type LoginState } from "@/actions/auth";
-import { Heart, Lock, User, Eye, EyeOff } from "lucide-react";
-import { motion } from "framer-motion";
+import { loginAction, changePasswordAction, type LoginState } from "@/actions/auth";
+import { Heart, Lock, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
 const initialState: LoginState = {};
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
+  const [forgotState, forgotAction, isForgotPending] = useActionState(changePasswordAction, initialState);
+  
   const [showPassword, setShowPassword] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   return (
     <div
@@ -57,154 +60,314 @@ export default function LoginPage() {
         ))}
       </div>
 
-      {/* Login Card */}
+      {/* Login / Forgot Password Card */}
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="glass-card relative w-full mx-4"
+        className="glass-card relative w-full mx-4 overflow-hidden"
         style={{ maxWidth: 420, padding: "40px 32px" }}
       >
-        {/* Logo / Header */}
-        <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="w-20 h-20 rounded-3xl mx-auto mb-5 flex items-center justify-center glow-red"
-            style={{
-              background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
-            }}
-          >
-            <Heart size={36} fill="white" color="white" />
-          </motion.div>
-
-          <h1 className="font-display text-gradient text-3xl font-bold mb-2">
-            Emirhan & Öykü
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 14 }}>
-            Özel platformunuza hoş geldiniz 💕
-          </p>
-        </div>
-
-        {/* Form */}
-        <form action={formAction} className="flex flex-col gap-4">
-          {/* Username */}
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="username"
-              className="text-sm font-semibold"
-              style={{ color: "rgba(255,255,255,0.65)" }}
-            >
-              Kullanıcı Adı
-            </label>
-            <div className="relative">
-              <div
-                className="absolute left-4 top-1/2 -translate-y-1/2"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-              >
-                <User size={17} />
-              </div>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                placeholder="kullanıcı adınız"
-                required
-                className="input-glass"
-                style={{ paddingLeft: 44 }}
-                autoComplete="username"
-                autoCapitalize="none"
-              />
-            </div>
-          </div>
-
-          {/* Password */}
-          <div className="flex flex-col gap-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-semibold"
-              style={{ color: "rgba(255,255,255,0.65)" }}
-            >
-              Şifre
-            </label>
-            <div className="relative">
-              <div
-                className="absolute left-4 top-1/2 -translate-y-1/2"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-              >
-                <Lock size={17} />
-              </div>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                required
-                className="input-glass"
-                style={{ paddingLeft: 44, paddingRight: 48 }}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 transition-opacity"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Error message */}
-          {state?.error && (
+        <AnimatePresence mode="wait">
+          {!isForgotPassword ? (
             <motion.div
-              initial={{ opacity: 0, x: -10 }}
+              key="login"
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm"
-              style={{
-                background: "rgba(232, 0, 45, 0.1)",
-                border: "1px solid rgba(232, 0, 45, 0.25)",
-                color: "#FF4D6D",
-              }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
             >
-              <span>⚠️</span>
-              <span>{state.error}</span>
+              {/* Logo / Header */}
+              <div className="text-center mb-8">
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  className="w-20 h-20 rounded-3xl mx-auto mb-5 flex items-center justify-center glow-red"
+                  style={{
+                    background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
+                  }}
+                >
+                  <Heart size={36} fill="white" color="white" />
+                </motion.div>
+
+                <h1 className="font-display text-gradient text-3xl font-bold mb-2">
+                  Emirhan & Öykü
+                </h1>
+                <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 14 }}>
+                  Özel platformunuza hoş geldiniz 💕
+                </p>
+              </div>
+
+              {/* Form */}
+              <form action={formAction} className="flex flex-col gap-4">
+                {/* Username */}
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="username"
+                    className="text-sm font-semibold"
+                    style={{ color: "rgba(255,255,255,0.65)" }}
+                  >
+                    Kullanıcı Adı
+                  </label>
+                  <div className="relative">
+                    <div
+                      className="absolute left-4 top-1/2 -translate-y-1/2"
+                      style={{ color: "rgba(255,255,255,0.3)" }}
+                    >
+                      <User size={17} />
+                    </div>
+                    <input
+                      id="username"
+                      name="username"
+                      type="text"
+                      placeholder="kullanıcı adınız"
+                      required
+                      className="input-glass"
+                      style={{ paddingLeft: 44 }}
+                      autoComplete="username"
+                      autoCapitalize="none"
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <label
+                      htmlFor="password"
+                      className="text-sm font-semibold"
+                      style={{ color: "rgba(255,255,255,0.65)" }}
+                    >
+                      Şifre
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsForgotPassword(true)}
+                      className="text-xs font-medium hover:underline transition-all"
+                      style={{ color: "var(--gs-gold)" }}
+                      tabIndex={-1}
+                    >
+                      Şifremi Unuttum
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <div
+                      className="absolute left-4 top-1/2 -translate-y-1/2"
+                      style={{ color: "rgba(255,255,255,0.3)" }}
+                    >
+                      <Lock size={17} />
+                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      required
+                      className="input-glass"
+                      style={{ paddingLeft: 44, paddingRight: 48 }}
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 transition-opacity"
+                      style={{ color: "rgba(255,255,255,0.3)" }}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Error message */}
+                {state?.error && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm"
+                    style={{
+                      background: "rgba(232, 0, 45, 0.1)",
+                      border: "1px solid rgba(232, 0, 45, 0.25)",
+                      color: "#FF4D6D",
+                    }}
+                  >
+                    <span>⚠️</span>
+                    <span>{state.error}</span>
+                  </motion.div>
+                )}
+
+                {/* Submit */}
+                <motion.button
+                  type="submit"
+                  disabled={isPending}
+                  className="btn-primary w-full mt-2"
+                  whileHover={{ scale: isPending ? 1 : 1.02 }}
+                  whileTap={{ scale: isPending ? 1 : 0.98 }}
+                >
+                  {isPending ? (
+                    <>
+                      <div
+                        className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"
+                      />
+                      Giriş yapılıyor...
+                    </>
+                  ) : (
+                    <>
+                      <Heart size={16} />
+                      Giriş Yap
+                    </>
+                  )}
+                </motion.button>
+              </form>
+
+              {/* Footer note */}
+              <p
+                className="text-center mt-6 text-xs"
+                style={{ color: "rgba(255,255,255,0.2)" }}
+              >
+                Sadece Emirhan & Öykü için 💕
+              </p>
+            </motion.div>
+          ) : forgotState?.success ? (
+            /* Success state for forgot password */
+            <motion.div
+              key="forgot-success"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              className="text-center"
+            >
+              <div
+                className="w-20 h-20 rounded-full mx-auto mb-5 flex items-center justify-center glow-gold"
+                style={{
+                  background: "linear-gradient(135deg, var(--gs-gold) 0%, #E6A800 100%)",
+                }}
+              >
+                <Heart size={36} fill="#080811" color="#080811" />
+              </div>
+              <h2 className="text-2xl font-bold mb-3 text-gradient-gold">Şifre Değiştirildi</h2>
+              <p className="mb-8 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
+                Yeni şifreniz başarıyla kaydedildi. Artık giriş yapabilirsiniz.
+              </p>
+              <button
+                onClick={() => {
+                  setIsForgotPassword(false);
+                  // Refresh the page or simply allow login with the new credentials
+                }}
+                className="btn-gold w-full"
+              >
+                Giriş Ekranına Dön
+              </button>
+            </motion.div>
+          ) : (
+            /* Forgot Password Form */
+            <motion.div
+              key="forgot-form"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <button
+                onClick={() => setIsForgotPassword(false)}
+                className="flex items-center gap-2 mb-6 text-sm hover:opacity-70 transition-opacity"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
+                <ArrowLeft size={16} /> Geri Dön
+              </button>
+              
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">Şifremi Unuttum</h2>
+                <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  Kullanıcı adınızı ve yeni şifrenizi girerek şifrenizi sıfırlayabilirsiniz.
+                </p>
+              </div>
+
+              <form action={forgotAction} className="flex flex-col gap-4">
+                {/* Username */}
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="forgot-username" className="text-sm font-semibold text-white/70">
+                    Kullanıcı Adı
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
+                      <User size={17} />
+                    </div>
+                    <input
+                      id="forgot-username"
+                      name="username"
+                      type="text"
+                      placeholder="kullanıcı adınız"
+                      required
+                      className="input-glass"
+                      style={{ paddingLeft: 44 }}
+                      autoComplete="username"
+                      autoCapitalize="none"
+                    />
+                  </div>
+                </div>
+
+                {/* New Password */}
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="new-password" className="text-sm font-semibold text-white/70">
+                    Yeni Şifre
+                  </label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
+                      <Lock size={17} />
+                    </div>
+                    <input
+                      id="new-password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="yeni şifreniz"
+                      required
+                      className="input-glass"
+                      style={{ paddingLeft: 44, paddingRight: 48 }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 transition-opacity"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Error message */}
+                {forgotState?.error && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm"
+                    style={{
+                      background: "rgba(232, 0, 45, 0.1)",
+                      border: "1px solid rgba(232, 0, 45, 0.25)",
+                      color: "#FF4D6D",
+                    }}
+                  >
+                    <span>⚠️</span>
+                    <span>{forgotState.error}</span>
+                  </motion.div>
+                )}
+
+                <motion.button
+                  type="submit"
+                  disabled={isForgotPending}
+                  className="btn-primary w-full mt-2"
+                  whileHover={{ scale: isForgotPending ? 1 : 1.02 }}
+                  whileTap={{ scale: isForgotPending ? 1 : 0.98 }}
+                >
+                  {isForgotPending ? "Şifre Güncelleniyor..." : "Şifreyi Değiştir"}
+                </motion.button>
+              </form>
             </motion.div>
           )}
-
-          {/* Submit */}
-          <motion.button
-            type="submit"
-            disabled={isPending}
-            className="btn-primary w-full mt-2"
-            whileHover={{ scale: isPending ? 1 : 1.02 }}
-            whileTap={{ scale: isPending ? 1 : 0.98 }}
-          >
-            {isPending ? (
-              <>
-                <div
-                  className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"
-                />
-                Giriş yapılıyor...
-              </>
-            ) : (
-              <>
-                <Heart size={16} />
-                Giriş Yap
-              </>
-            )}
-          </motion.button>
-        </form>
-
-        {/* Footer note */}
-        <p
-          className="text-center mt-6 text-xs"
-          style={{ color: "rgba(255,255,255,0.2)" }}
-        >
-          Sadece Emirhan & Öykü için 💕
-        </p>
+        </AnimatePresence>
       </motion.div>
     </div>
   );

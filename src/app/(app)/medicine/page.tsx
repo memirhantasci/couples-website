@@ -4,8 +4,9 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { MedicineTracker } from "@/components/medicine/MedicineTracker";
 import { AddMedicineForm } from "@/components/medicine/AddMedicineForm";
-import { Pill, Flame, Trophy } from "lucide-react";
+import { Flame, Trophy, Pill } from "lucide-react";
 import dayjs from "dayjs";
+import "dayjs/locale/tr";
 
 export const metadata: Metadata = {
   title: "İlaç Takibi — Emirhan & Öykü 💕",
@@ -13,46 +14,30 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-// Calculate streak for active medicines only
 async function calculateStreak(
   supabase: ReturnType<typeof createServerClient>,
-  userId: number
+  userId: number,
+  medIds: number[]
 ): Promise<number> {
-  const { data: activeMeds } = await supabase
-    .from("medicines")
-    .select("id")
-    .eq("is_active", true);
-
-  if (!activeMeds || activeMeds.length === 0) return 0;
-
-  const medIds = activeMeds.map((m) => m.id);
-
-  // Go back from today and check each day
+  if (medIds.length === 0) return 0;
   let streak = 0;
-  let checkDate = dayjs().startOf("day");
-
-  for (let i = 0; i < 365; i++) {
+  let checkDate = dayjs().subtract(1, "day").startOf("day");
+  for (let i = 0; i < 180; i++) {
     const dateStr = checkDate.format("YYYY-MM-DD");
-
     const { data: logs } = await supabase
       .from("medicine_logs")
       .select("medicine_id, status")
       .eq("user_id", userId)
       .eq("date", dateStr)
       .in("medicine_id", medIds);
-
     if (!logs || logs.length === 0) break;
-
     const allDrank = medIds.every((id) =>
       logs.some((l) => l.medicine_id === id && l.status === "DRANK")
     );
-
     if (!allDrank) break;
-
     streak++;
     checkDate = checkDate.subtract(1, "day");
   }
-
   return streak;
 }
 
@@ -62,8 +47,9 @@ export default async function MedicinePage() {
 
   const supabase = createServerClient();
   const today = dayjs().format("YYYY-MM-DD");
+  const fourteenDaysAgo = dayjs().subtract(14, "day").format("YYYY-MM-DD");
 
-  const [medicinesResult, todayLogsResult, streakValue] = await Promise.all([
+  const [medicinesResult, todayLogsResult, historicalLogsResult] = await Promise.all([
     supabase
       .from("medicines")
       .select("id, name, time, start_date, end_date, is_active")
@@ -73,84 +59,84 @@ export default async function MedicinePage() {
       .order("time"),
     supabase
       .from("medicine_logs")
-      .select("medicine_id, status")
+      .select("medicine_id, status, date")
       .eq("user_id", session.userId)
       .eq("date", today),
-    calculateStreak(supabase, session.userId),
+    supabase
+      .from("medicine_logs")
+      .select("medicine_id, status, date")
+      .eq("user_id", session.userId)
+      .gte("date", fourteenDaysAgo)
+      .lt("date", today)
+      .order("date", { ascending: false }),
   ]);
 
   const medicines = medicinesResult.data ?? [];
   const todayLogs = todayLogsResult.data ?? [];
-
-  // Streak badge
-  const streakBadge =
-    streakValue >= 100
-      ? { label: "💎 100 Gün Şampiyonu!", cls: "streak-badge-100" }
-      : streakValue >= 30
-      ? { label: "🌟 30 Gün Ustası!", cls: "streak-badge-30" }
-      : streakValue >= 7
-      ? { label: "🔥 7 Günlük Seri!", cls: "streak-badge-7" }
-      : null;
+  const historicalLogs = historicalLogsResult.data ?? [];
+  const medIds = medicines.map((m) => m.id);
+  const streakValue = await calculateStreak(supabase, session.userId, medIds);
 
   return (
-    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
+    <div className="px-4 py-6 flex flex-col gap-5 max-w-lg mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Pill size={22} style={{ color: "var(--gs-red)" }} />
-            İlaç Takibi
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
-            {dayjs().locale("tr").format("D MMMM YYYY")}
-          </p>
+      <div className="glass-card p-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Pill size={20} style={{ color: "var(--gs-red)" }} />
+              <h1 className="text-xl font-bold text-white">İlaç Takibi</h1>
+            </div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
+              {dayjs().locale("tr").format("D MMMM YYYY, dddd")}
+            </p>
+          </div>
+
+          {streakValue > 0 && (
+            <div
+              className="flex flex-col items-center gap-1 px-4 py-3 rounded-2xl"
+              style={{
+                background: "rgba(255,140,0,0.1)",
+                border: "1px solid rgba(255,140,0,0.2)",
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <Flame size={18} style={{ color: "#ff8c00" }} />
+                <span className="font-bold text-2xl" style={{ color: "#ff8c00" }}>{streakValue}</span>
+              </div>
+              <span style={{ color: "rgba(255,140,0,0.7)", fontSize: 11, fontWeight: 600 }}>günlük seri</span>
+            </div>
+          )}
         </div>
 
-        {/* Streak */}
-        {streakValue > 0 && (
-          <div
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl"
-            style={{
-              background: "rgba(255,165,0,0.1)",
-              border: "1px solid rgba(255,165,0,0.2)",
-            }}
-          >
-            <Flame size={16} style={{ color: "#ff8c00" }} />
+        {/* Streak Badge */}
+        {streakValue >= 7 && (
+          <div className="mt-3">
             <span
-              className="font-bold"
-              style={{ color: "#ff8c00", fontSize: 15 }}
+              className={`streak-badge ${streakValue >= 100 ? "streak-badge-100" : streakValue >= 30 ? "streak-badge-30" : "streak-badge-7"}`}
             >
-              {streakValue}
+              <Trophy size={13} />
+              {streakValue >= 100 ? "💎 100 Gün Şampiyonu!" : streakValue >= 30 ? "🌟 30 Gün Ustası!" : "🔥 7 Günlük Seri!"}
             </span>
           </div>
         )}
       </div>
 
-      {/* Streak Badge */}
-      {streakBadge && (
-        <div
-          className={`streak-badge ${streakBadge.cls}`}
-          style={{ alignSelf: "flex-start" }}
-        >
-          <Trophy size={14} />
-          {streakBadge.label}
-        </div>
+      {/* Admin: Add Medicine */}
+      {session.role === "ADMIN" && (
+        <AddMedicineForm />
       )}
 
-      {/* Admin: Add Medicine Form */}
-      {session.role === "ADMIN" && <AddMedicineForm />}
-
-      {/* Medicine Tracker */}
-      <div className="glass-card p-4">
-        <h2
-          className="font-semibold text-sm mb-4"
-          style={{ color: "rgba(255,255,255,0.6)" }}
-        >
+      {/* Today's Medicines */}
+      <div className="glass-card p-5">
+        <h2 className="font-bold text-white mb-4 flex items-center gap-2">
+          <span style={{ fontSize: 18 }}>💊</span>
           Bugünün İlaçları
         </h2>
         <MedicineTracker
           medicines={medicines}
           todayLogs={todayLogs}
+          historicalLogs={historicalLogs}
           userId={session.userId}
         />
       </div>

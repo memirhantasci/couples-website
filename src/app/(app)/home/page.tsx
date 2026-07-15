@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   title: "Ana Sayfa — Emirhan & Öykü 💕",
 };
 
-// Force dynamic rendering (for date-dependent content)
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
@@ -26,7 +25,6 @@ export default async function HomePage() {
   const today = dayjs().format("YYYY-MM-DD");
   const doy = dayOfYear();
 
-  // Fetch all data in parallel
   const [moodResult, noteResult, meetingResult] = await Promise.all([
     supabase
       .from("moods")
@@ -60,97 +58,111 @@ export default async function HomePage() {
   const currentNote = noteResult.data?.content ?? null;
   const activeMeeting = meetingResult.data;
 
-  const displayName = session.username === "emirhan" ? "Emirhan" : "Öykü";
+  const dateStr = new Date().toLocaleDateString("tr-TR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   return (
-    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
+    <div className="px-4 py-6 flex flex-col gap-6 max-w-lg mx-auto">
 
-      {/* Günaydın Card */}
+      {/* ── HERO CARD ─────────────────────────────────── */}
       <div
-        className="glass-card p-6 text-center relative overflow-hidden"
-        style={{ animationDelay: "0s" }}
+        className="glass-card overflow-hidden relative"
+        style={{
+          padding: "32px 24px 28px",
+          background: "linear-gradient(135deg, rgba(15,10,25,0.88) 0%, rgba(30,10,15,0.82) 100%)",
+        }}
       >
-        {/* Decorative hearts */}
+        {/* Decorative glow blobs */}
         <div
-          className="absolute top-3 left-4 text-2xl animate-float opacity-30"
-          style={{ animationDelay: "-1s" }}
-          aria-hidden="true"
-        >
-          💕
-        </div>
+          className="absolute pointer-events-none"
+          style={{
+            width: 200, height: 200,
+            top: -60, right: -60,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(232,0,45,0.35) 0%, transparent 70%)",
+            filter: "blur(30px)",
+          }}
+          aria-hidden
+        />
         <div
-          className="absolute top-4 right-5 text-xl animate-float opacity-20"
-          style={{ animationDelay: "-2s" }}
-          aria-hidden="true"
-        >
-          ✨
-        </div>
+          className="absolute pointer-events-none"
+          style={{
+            width: 150, height: 150,
+            bottom: -40, left: -30,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(255,215,0,0.25) 0%, transparent 70%)",
+            filter: "blur(24px)",
+          }}
+          aria-hidden
+        />
+
+        {/* Floating emojis */}
+        <span
+          className="absolute animate-float select-none"
+          style={{ top: 16, right: 24, fontSize: 28, opacity: 0.55, animationDelay: "-1s" }}
+          aria-hidden
+        >💕</span>
+        <span
+          className="absolute animate-float select-none"
+          style={{ top: 48, right: 64, fontSize: 18, opacity: 0.3, animationDelay: "-3s" }}
+          aria-hidden
+        >✨</span>
 
         <p
-          className="font-semibold mb-1 uppercase tracking-widest"
+          className="font-semibold uppercase tracking-widest mb-3"
           style={{ color: "var(--gs-gold)", fontSize: 11 }}
         >
-          {new Date().toLocaleDateString("tr-TR", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-          })}
+          {dateStr}
         </p>
 
-        <h2 className="font-display text-gradient text-3xl font-bold mb-1">
-          Günaydın,
-        </h2>
-        <h2 className="font-display text-white text-2xl font-semibold mb-4">
+        <h1 className="font-display text-4xl font-bold mb-1 leading-tight" style={{ lineHeight: 1.2 }}>
+          <span className="text-gradient">Günaydın,</span>
+        </h1>
+        <h2
+          className="font-display text-2xl font-semibold mb-6"
+          style={{ color: "rgba(255,255,255,0.90)" }}
+        >
           {hitap} 💕
         </h2>
 
         {/* Date counters */}
-        <div className="flex justify-center gap-4 mt-2">
+        <div className="flex gap-3">
           <div
-            className="flex flex-col items-center gap-1 px-4 py-3 rounded-2xl"
+            className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl"
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              minWidth: 100,
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.09)",
             }}
           >
-            <span className="text-2xl font-bold text-gradient">
-              {daysSinceMeeting}
-            </span>
-            <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600 }}>
-              gün tanışalı
+            <span className="text-3xl font-bold text-gradient">{daysSinceMeeting}</span>
+            <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600, textAlign: "center" }}>
+              gün tanışalı 💫
             </span>
           </div>
           <div
-            className="flex flex-col items-center gap-1 px-4 py-3 rounded-2xl"
+            className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl"
             style={{
-              background: "rgba(232,0,45,0.08)",
-              border: "1px solid rgba(232,0,45,0.15)",
-              minWidth: 100,
+              background: "rgba(232,0,45,0.1)",
+              border: "1px solid rgba(232,0,45,0.2)",
             }}
           >
-            <span className="text-2xl font-bold text-gradient">
-              {daysSinceTogether}
-            </span>
-            <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600 }}>
-              gün sevgili
+            <span className="text-3xl font-bold text-gradient">{daysSinceTogether}</span>
+            <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600, textAlign: "center" }}>
+              gün sevgili ❤️
             </span>
           </div>
         </div>
       </div>
 
-      {/* Daily Quote */}
+      {/* ── GÜNÜN SÖZÜ ────────────────────────────────── */}
       <div
-        className="glass-card p-5 flex gap-3"
-        style={{
-          borderLeft: "3px solid var(--gs-gold)",
-          borderRadius: "0 20px 20px 0",
-        }}
+        className="glass-card flex gap-4 items-start"
+        style={{ padding: "20px 22px", borderLeft: "3px solid var(--gs-gold)" }}
       >
-        <Sparkles
-          size={20}
-          style={{ color: "var(--gs-gold)", flexShrink: 0, marginTop: 2 }}
-        />
+        <Sparkles size={22} style={{ color: "var(--gs-gold)", flexShrink: 0, marginTop: 2 }} />
         <div>
           <p
             className="font-semibold text-xs uppercase tracking-wider mb-2"
@@ -167,10 +179,10 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Love Meter */}
+      {/* ── AŞK ÖLÇERİ ────────────────────────────────── */}
       <LoveMeter value={loveMeter} />
 
-      {/* Meeting Countdown (only if active meeting exists) */}
+      {/* ── BULUŞMA GERİ SAYIMI ────────────────────────── */}
       {activeMeeting && (
         <MeetingCountdown
           targetDate={activeMeeting.meeting_datetime}
@@ -178,12 +190,14 @@ export default async function HomePage() {
         />
       )}
 
-      {/* Mood Selector */}
-      <MoodSelector currentMood={currentMood} />
+      {/* ── RUH HALİ ──────────────────────────────────── */}
+      <MoodSelector currentMood={currentMood} moodLocked={!!currentMood} />
 
-      {/* Daily Note */}
+      {/* ── GÜNLÜK NOT ────────────────────────────────── */}
       <DailyNoteCard existingNote={currentNote} />
 
+      {/* Bottom spacer */}
+      <div style={{ height: 8 }} />
     </div>
   );
 }

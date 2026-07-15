@@ -8,72 +8,37 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const displayName =
-    session.username === "emirhan" ? "Emirhan" : "Öykü";
+  const displayName = session.username === "emirhan" ? "Emirhan" : "Öykü";
 
   return (
-    <div className="min-h-dvh bg-pattern" style={{ background: "var(--dark-950)" }}>
-      {/* Background gradient blobs */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 overflow-hidden"
-        style={{ zIndex: 0 }}
-      >
-        <div
-          className="absolute rounded-full opacity-20 blur-3xl animate-float"
-          style={{
-            width: 500,
-            height: 500,
-            top: -150,
-            right: -100,
-            background: "radial-gradient(circle, rgba(232,0,45,0.4) 0%, transparent 70%)",
-            animationDelay: "0s",
-          }}
-        />
-        <div
-          className="absolute rounded-full opacity-15 blur-3xl animate-float"
-          style={{
-            width: 400,
-            height: 400,
-            bottom: 100,
-            left: -100,
-            background: "radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%)",
-            animationDelay: "-3s",
-          }}
-        />
-      </div>
-
-      {/* Top Header */}
+    <div className="min-h-dvh">
+      {/* Top Header — bigger logout button, web-friendly */}
       <header
-        className="sticky top-0 z-50 flex items-center justify-between px-5 py-4"
+        className="sticky top-0 z-50 flex items-center justify-between px-5 py-3.5"
         style={{
-          background: "rgba(8, 8, 17, 0.85)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          background: "rgba(6, 6, 15, 0.88)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: "0 2px 20px rgba(0,0,0,0.4)",
         }}
       >
+        {/* Logo */}
         <div className="flex items-center gap-2">
-          <Heart size={18} className="text-gradient" fill="url(#heartGrad)" />
-          <svg width={0} height={0} aria-hidden="true">
-            <defs>
-              <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#E8002D" />
-                <stop offset="100%" stopColor="#FFD700" />
-              </linearGradient>
-            </defs>
-          </svg>
+          <Heart size={20} fill="#E8002D" color="#E8002D" />
           <span
             className="font-display text-gradient font-bold"
-            style={{ fontSize: 17 }}
+            style={{ fontSize: 18 }}
           >
             Emirhan & Öykü
           </span>
+          <span style={{ fontSize: 16 }}>💕</span>
         </div>
 
+        {/* Right: user + logout */}
         <div className="flex items-center gap-3">
           <span
-            className="text-sm font-medium"
+            className="text-sm font-semibold"
             style={{ color: "rgba(255,255,255,0.55)" }}
           >
             {displayName}
@@ -82,13 +47,16 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             <button
               type="submit"
               title="Çıkış Yap"
-              className="flex items-center justify-center w-8 h-8 rounded-full transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
               style={{
-                background: "rgba(232, 0, 45, 0.1)",
-                color: "rgba(232, 0, 45, 0.8)",
+                background: "rgba(232, 0, 45, 0.12)",
+                color: "rgba(232, 0, 45, 0.9)",
+                border: "1px solid rgba(232,0,45,0.2)",
+                minWidth: 80,
               }}
             >
               <LogOut size={15} />
+              <span>Çıkış</span>
             </button>
           </form>
         </div>
@@ -96,11 +64,9 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main
-        className="relative"
         style={{
-          zIndex: 1,
-          paddingBottom: "calc(72px + 16px)",
-          minHeight: "calc(100dvh - 64px)",
+          paddingBottom: "calc(72px + env(safe-area-inset-bottom) + 16px)",
+          minHeight: "calc(100dvh - 60px)",
         }}
       >
         {children}

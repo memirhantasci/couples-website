@@ -32,12 +32,47 @@ html {
 body {
   font-family: var(--font-inter);
   background-color: var(--dark-950);
+  background-image: url('/couple-bg.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: #ffffff;
   min-height: 100dvh;
   min-height: 100svh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dark overlay over background image */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 17, 0.82) 0%,
+    rgba(8, 8, 17, 0.75) 40%,
+    rgba(8, 8, 17, 0.88) 100%
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Ensure content is above overlay */
+#__next, main, .bottom-nav, [data-sonner-toaster] {
+  position: relative;
+  z-index: 1;
+}
+
+/* Desktop centering wrapper */
+@media (min-width: 768px) {
+  .page-wrapper {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
 }
 
 /* ─── Scrollbar Styling ───────────────────────────────────────────────────── */
@@ -69,12 +104,12 @@ body {
 }
 
 .glass-card {
-  background: linear-gradient(135deg, rgba(232, 0, 45, 0.08) 0%, rgba(255, 215, 0, 0.04) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: linear-gradient(135deg, rgba(15, 15, 30, 0.75) 0%, rgba(25, 15, 20, 0.70) 100%);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
 .glass-dark {
@@ -165,7 +200,6 @@ body {
 }
 
 .btn-gold {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;

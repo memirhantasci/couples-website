@@ -134,3 +134,47 @@ export async function logoutAction(): Promise<void> {
   await destroySession();
   redirect("/login");
 }
+
+export async function changePasswordAction(
+  prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
+  const parsed = loginSchema.safeParse({
+    username: formData.get("username"),
+    password: formData.get("password"),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.errors[0].message };
+  }
+
+  const username = parsed.data.username.trim().toLowerCase();
+  const password = parsed.data.password.trim();
+
+  if (username === "emirhan") {
+    return { error: "Admin şifresi sadece veritabanından değiştirilebilir." };
+  }
+
+  const supabase = createServerClient();
+  
+  const { data: user, error: checkError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("username", username)
+    .single();
+
+  if (checkError || !user) {
+    return { error: "Kullanıcı bulunamadı." };
+  }
+
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ password })
+    .eq("username", username);
+
+  if (updateError) {
+    return { error: "Şifre güncellenirken hata oluştu." };
+  }
+
+  return { success: true };
+}

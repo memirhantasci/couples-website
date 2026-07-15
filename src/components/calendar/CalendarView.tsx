@@ -134,7 +134,7 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
               }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-white">
+                <h3 className="font-bold text-white text-base">
                   {new Date(selectedDate + "T00:00:00").toLocaleDateString("tr-TR", {
                     day: "numeric",
                     month: "long",
@@ -143,10 +143,10 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
                 </h3>
                 <button
                   onClick={() => setSelectedDate(null)}
-                  className="w-7 h-7 flex items-center justify-center rounded-full"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl font-bold text-lg transition-all"
+                  style={{ background: "rgba(232,0,45,0.15)", color: "rgba(232,0,45,0.9)", border: "1px solid rgba(232,0,45,0.2)", minWidth: 40, minHeight: 40 }}
                 >
-                  <X size={14} style={{ color: "rgba(255,255,255,0.6)" }} />
+                  ✕
                 </button>
               </div>
 
@@ -155,8 +155,19 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
                 onChange={(e) => setNoteText(e.target.value)}
                 placeholder="Bu güne not ekle..."
                 rows={4}
-                className="input-glass resize-none mb-4"
+                className="resize-none mb-4"
                 maxLength={500}
+                style={{
+                  width: "100%",
+                  padding: "14px 16px",
+                  background: "rgba(255,255,255,0.10)",
+                  border: "1.5px solid rgba(255,255,255,0.22)",
+                  borderRadius: 14,
+                  color: "#ffffff",
+                  fontSize: 15,
+                  fontFamily: "inherit",
+                  outline: "none",
+                }}
               />
 
               <div className="flex gap-2">
