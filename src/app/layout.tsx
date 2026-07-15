@@ -1,0 +1,52 @@
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
+import { Toaster } from "sonner";
+
+export const metadata: Metadata = {
+  title: "Emirhan & Öykü 💕",
+  description: "Emirhan ve Öykü'nün özel platformu — anılar, ilaç takibi, takvim ve daha fazlası.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Emirhan & Öykü 💕",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#080811",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="tr" className="dark">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body>
+        {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "rgba(19, 19, 39, 0.95)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: "#ffffff",
+              borderRadius: "14px",
+              fontFamily: "Inter, sans-serif",
+            },
+          }}
+          richColors
+        />
+      </body>
+    </html>
+  );
+}
