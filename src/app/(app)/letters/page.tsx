@@ -41,13 +41,13 @@ export default async function LettersPage() {
   // Kullanıcıları çek (Kendisi hariç)
   const { data: users, error: usersError } = await supabase
     .from("users")
-    .select("id, username, role")
+    .select("id, username, role, display_name")
     .neq("id", session.userId);
   
   if (usersError) console.error("Kullanıcıları çekerken hata:", usersError);
   
-  // 'admin' isimli kullanıcıyı alıcı listesinden çıkarıyoruz
-  const availableUsers = (users || []).filter(u => u.username !== "admin");
+  // 'admin' ve 'adminadmin' isimli kullanıcıları alıcı listesinden çıkarıyoruz
+  const availableUsers = (users || []).filter(u => u.username !== "admin" && u.username !== "adminadmin");
 
   return (
     <div className="px-4 py-6 flex flex-col gap-6 max-w-lg mx-auto">

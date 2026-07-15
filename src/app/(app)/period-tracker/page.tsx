@@ -26,6 +26,7 @@ export default async function PeriodTrackerPage() {
   if (error) console.error("Period logs fetch error:", error);
 
   const safeLogs = (logs as any[]) ?? [];
+  const isOyku = session.username === "oyku" || session.displayName?.toLowerCase() === "öykü" || session.displayName?.toLowerCase() === "oyku";
 
   return (
     <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
@@ -36,13 +37,13 @@ export default async function PeriodTrackerPage() {
           Regl Takvimi
         </h1>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
-          {session.username === "oyku" 
+          {isOyku 
             ? "Tarihin üzerine tıklayarak yeni kayıt ekleyebilir veya silebilirsin."
             : "Bu tabloyu sadece Öykü güncelleyebilir."}
         </p>
       </div>
 
-      <PeriodTrackerClient logs={safeLogs} currentUsername={session.username} />
+      <PeriodTrackerClient logs={safeLogs} isOyku={isOyku} />
     </div>
   );
 }

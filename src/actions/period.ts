@@ -8,7 +8,8 @@ export async function togglePeriodLogAction(date: string) {
   const session = await getSession();
   if (!session) return { error: "Oturum bulunamadı." };
 
-  if (session.username !== "oyku") {
+  const isOyku = session.username === "oyku" || session.displayName?.toLowerCase() === "öykü" || session.displayName?.toLowerCase() === "oyku";
+  if (!isOyku) {
     return { error: "Bu işlemi sadece Öykü yapabilir." };
   }
 
@@ -30,6 +31,21 @@ export async function togglePeriodLogAction(date: string) {
       .eq("id", existing.id);
     if (error) return { error: "Kayıt silinirken hata oluştu: " + error.message };
   } else {
+    // Check limit before insert
+    const monthStart = date.substring(0, 8) + "01";
+    const monthEnd = date.substring(0, 8) + "31";
+    
+    const { count } = await supabase
+      .from("period_logs")
+      .select("id", { count: 'exact' })
+      .eq("user_id", session.userId)
+      .gte("date", monthStart)
+      .lte("date", monthEnd);
+
+    if (count && count >= 2) {
+      return { error: "Bir ay içerisinde en fazla 2 gün seçebilirsiniz." };
+    }
+
     // Insert
     const { error } = await supabase
       .from("period_logs")

@@ -8,6 +8,7 @@ import { Send, LockKeyhole } from "lucide-react";
 interface UserOption {
   id: number;
   username: string;
+  display_name?: string;
 }
 
 export function WriteLetterForm({ users }: { users: UserOption[] }) {
@@ -51,7 +52,7 @@ export function WriteLetterForm({ users }: { users: UserOption[] }) {
             <option value="" disabled>Alıcı seç...</option>
             {users.map(u => (
               <option key={u.id} value={u.id} className="text-black">
-                {u.username === "emirhan" ? "Emirhan" : u.username === "oyku" ? "Öykü" : u.username}
+                {u.display_name || (u.username.charAt(0).toUpperCase() + u.username.slice(1))}
               </option>
             ))}
           </select>

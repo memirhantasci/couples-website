@@ -17,10 +17,10 @@ interface PeriodLog {
 
 interface PeriodTrackerClientProps {
   logs: PeriodLog[];
-  currentUsername: string;
+  isOyku: boolean;
 }
 
-export function PeriodTrackerClient({ logs, currentUsername }: PeriodTrackerClientProps) {
+export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) {
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -36,12 +36,21 @@ export function PeriodTrackerClient({ logs, currentUsername }: PeriodTrackerClie
     }));
 
   function handleDateClick(info: { dateStr: string }) {
-    if (currentUsername !== "oyku") return;
+    if (!isOyku) return;
 
     const date = info.dateStr;
     const exists = logs.some((l) => l.date === date);
+    
+    if (!exists) {
+      const monthLogsCount = logs.filter(l => dayjs(l.date).isSame(dayjs(date), 'month')).length;
+      if (monthLogsCount >= 2) {
+        toast.error("Bir ay içerisinde en fazla 2 gün seçebilirsiniz.");
+        return;
+      }
+    }
+
     setSelectedDate(date);
-    setIsAdding(!exists); // if exists, clicking means they want to remove? Or maybe toggle.
+    setIsAdding(!exists);
   }
 
   async function handleToggle() {
@@ -101,7 +110,7 @@ export function PeriodTrackerClient({ logs, currentUsername }: PeriodTrackerClie
                   {dayjs(selectedDate).format("DD MMMM YYYY")}
                 </h3>
                 <p className="text-sm opacity-70">
-                  {isAdding ? "Bugün regl oldun mu?" : "Bu günkü kaydı silmek istediğine emin misin?"}
+                  {isAdding ? "Sıkıntılı günler başladı mı?" : "Bu günkü kaydı silmek istediğine emin misin?"}
                 </p>
               </div>
 
@@ -124,7 +133,7 @@ export function PeriodTrackerClient({ logs, currentUsername }: PeriodTrackerClie
                   ) : (
                     <>
                       <Check size={18} />
-                      {isAdding ? "Evet, Oldum" : "Kaydı Sil"}
+                      {isAdding ? "Evet" : "Kaydı Sil"}
                     </>
                   )}
                 </button>

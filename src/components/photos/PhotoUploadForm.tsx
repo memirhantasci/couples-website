@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useActionState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, Camera, Calendar, Clock, AlignLeft, Type, Info, AlertCircle, CheckCircle, X, Image as ImageIcon } from "lucide-react";
 import { uploadPhotoAction, type PhotoActionState } from "@/actions/photos";
+import { toast } from "sonner";
 
 const initialState: PhotoActionState = {};
 
@@ -20,6 +21,12 @@ export function PhotoUploadForm() {
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > 1 * 1024 * 1024) {
+      toast.error("Dosya boyutu çok büyük! Lütfen 1 MB'dan küçük bir fotoğraf seçin.");
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
 
     setFileName(file.name);
     setPreview(URL.createObjectURL(file));
