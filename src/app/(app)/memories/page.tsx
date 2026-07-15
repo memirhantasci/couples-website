@@ -3,7 +3,6 @@ import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { MemoryTimeline } from "@/components/memories/MemoryTimeline";
-import { AddMemoryForm } from "@/components/memories/AddMemoryForm";
 import { Camera } from "lucide-react";
 import dayjs from "dayjs";
 
@@ -36,9 +35,6 @@ export default async function MemoriesPage() {
           {(memories ?? []).length} anı • birlikte yaşananlar ❤️
         </p>
       </div>
-
-      {/* Admin: Add Memory */}
-      {session.role === "ADMIN" && <AddMemoryForm />}
 
       {/* Timeline */}
       <MemoryTimeline

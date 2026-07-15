@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useActionState } from "react";
+import { useActionState, useRef } from "react";
 import { createMeetingAction, deactivateMeetingAction } from "@/actions/meetings";
 import { toast } from "sonner";
-import { Plus, X, CalendarClock, Trash2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Plus, CalendarClock, Trash2 } from "lucide-react";
 
 interface Meeting {
   id: number;
@@ -19,16 +17,15 @@ interface MeetingManagerProps {
 }
 
 export function MeetingManager({ activeMeeting }: MeetingManagerProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [deactivating, setDeactivating] = useState(false);
-
+  const formRef = useRef<HTMLFormElement>(null);
   const initialState: { error?: string; success?: boolean } = {};
+  
   const [state, formAction, isPending] = useActionState(
     async (prev: { error?: string; success?: boolean }, formData: FormData) => {
       const result = await createMeetingAction(prev, formData);
       if (result.success) {
-        toast.success("Buluşma eklendi! 📍");
-        setIsOpen(false);
+        toast.success("Buluşma başarıyla planlandı! 📍");
+        formRef.current?.reset();
       } else if (result.error) {
         toast.error(result.error);
       }
@@ -39,9 +36,9 @@ export function MeetingManager({ activeMeeting }: MeetingManagerProps) {
 
   async function handleDeactivate() {
     if (!activeMeeting) return;
-    setDeactivating(true);
+    if (!confirm("Buluşmayı iptal etmek istediğine emin misin?")) return;
+    
     const result = await deactivateMeetingAction(activeMeeting.id);
-    setDeactivating(false);
     if (result?.error) toast.error(result.error);
     else toast.success("Buluşma iptal edildi.");
   }
@@ -52,105 +49,92 @@ export function MeetingManager({ activeMeeting }: MeetingManagerProps) {
   const minDateTime = now.toISOString().slice(0, 16);
 
   return (
-    <div className="glass-card p-5 flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <CalendarClock size={18} style={{ color: "var(--gs-gold)" }} />
-        <h3 className="font-bold text-white text-sm">Buluşma Yönetimi</h3>
-      </div>
+    <div className="flex flex-col gap-6">
+      <div className="glass-card p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <CalendarClock size={20} style={{ color: "var(--gs-gold)" }} />
+          <h3 className="font-bold text-white text-base">Aktif Buluşma</h3>
+        </div>
 
-      {activeMeeting ? (
-        <div
-          className="flex items-center justify-between p-3 rounded-xl"
-          style={{
-            background: "rgba(255,215,0,0.08)",
-            border: "1px solid rgba(255,215,0,0.15)",
-          }}
-        >
-          <div>
-            <p className="font-semibold text-white text-sm">
-              {activeMeeting.title || "Buluşma"}
-            </p>
-            <p style={{ color: "rgba(255,215,0,0.8)", fontSize: 12 }}>
-              {new Date(activeMeeting.meeting_datetime).toLocaleString("tr-TR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-          </div>
-          <button
-            onClick={handleDeactivate}
-            disabled={deactivating}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-semibold"
+        {activeMeeting ? (
+          <div
+            className="flex items-center justify-between p-4 rounded-xl"
             style={{
-              background: "rgba(232,0,45,0.12)",
-              color: "rgba(232,0,45,0.8)",
-              border: "1px solid rgba(232,0,45,0.2)",
+              background: "rgba(255,215,0,0.08)",
+              border: "1px solid rgba(255,215,0,0.15)",
             }}
           >
-            <Trash2 size={13} />
-            İptal
-          </button>
-        </div>
-      ) : (
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>
-          Aktif buluşma yok
-        </p>
-      )}
-
-      <button onClick={() => setIsOpen(true)} className="btn-gold w-full">
-        <Plus size={16} />
-        {activeMeeting ? "Yeni Buluşma Ekle" : "Buluşma Planla"}
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-40"
-              style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="fixed left-4 right-4 z-50 glass-card p-5"
-              style={{ top: "50%", transform: "translateY(-50%)", maxWidth: 440, margin: "0 auto" }}
+            <div>
+              <p className="font-bold text-white text-lg">
+                {activeMeeting.title || "Buluşma"}
+              </p>
+              <p style={{ color: "rgba(255,215,0,0.9)", fontSize: 14, marginTop: 4 }}>
+                {new Date(activeMeeting.meeting_datetime).toLocaleString("tr-TR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+            <button
+              onClick={handleDeactivate}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-80"
+              style={{
+                background: "rgba(232,0,45,0.15)",
+                color: "#ff4d4d",
+                border: "1px solid rgba(232,0,45,0.2)",
+              }}
             >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-white">Buluşma Planla</h3>
-                <button onClick={() => setIsOpen(false)} className="w-7 h-7 flex items-center justify-center rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
-                  <X size={14} style={{ color: "rgba(255,255,255,0.6)" }} />
-                </button>
-              </div>
-
-              <form action={formAction} className="flex flex-col gap-4">
-                <div>
-                  <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(255,255,255,0.55)" }}>
-                    Başlık (isteğe bağlı)
-                  </label>
-                  <input name="title" type="text" placeholder="ör: Akşam yemeği 🍕" className="input-glass" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1.5" style={{ color: "rgba(255,255,255,0.55)" }}>
-                    Tarih & Saat
-                  </label>
-                  <input name="meeting_datetime" type="datetime-local" min={minDateTime} required className="input-glass" />
-                </div>
-                <button type="submit" disabled={isPending} className="btn-gold w-full">
-                  {isPending ? <div className="w-4 h-4 border-2 border-dark-900/30 border-t-dark-900 rounded-full animate-spin" /> : <><Plus size={16} /> Ekle</>}
-                </button>
-              </form>
-            </motion.div>
-          </>
+              <Trash2 size={16} />
+              İptal
+            </button>
+          </div>
+        ) : (
+          <div className="p-4 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px dotted rgba(255,255,255,0.1)" }}>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center" }}>
+              Henüz aktif bir buluşma planlanmadı.
+            </p>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
+
+      <div className="glass-card p-5">
+        <h3 className="font-bold text-white text-base mb-4">Yeni Buluşma Planla</h3>
+        <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+              Başlık (isteğe bağlı)
+            </label>
+            <input 
+              name="title" 
+              type="text" 
+              placeholder="ör: Akşam yemeği 🍕" 
+              className="input-glass text-base py-3" 
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+              Tarih & Saat
+            </label>
+            <input 
+              name="meeting_datetime" 
+              type="datetime-local" 
+              min={minDateTime} 
+              required 
+              className="input-glass text-base py-3" 
+            />
+          </div>
+          <button type="submit" disabled={isPending} className="btn-gold w-full py-3.5 mt-2 text-base">
+            {isPending ? (
+              <div className="w-5 h-5 border-2 border-dark-900/30 border-t-dark-900 rounded-full animate-spin mx-auto" />
+            ) : (
+              <><Plus size={20} /> Planla</>
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

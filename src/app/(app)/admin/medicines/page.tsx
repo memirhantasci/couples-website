@@ -1,0 +1,61 @@
+import type { Metadata } from "next";
+import { getSession } from "@/lib/auth/session";
+import { createServerClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { AddMedicineForm } from "@/components/medicine/AddMedicineForm";
+import { ArrowLeft, Pill, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { deleteMedicineAction, toggleMedicineActiveAction } from "@/actions/medicine";
+import { AdminMedicineList } from "./AdminMedicineList";
+
+export const metadata: Metadata = {
+  title: "İlaç Yönetimi — Admin",
+};
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminMedicinesPage() {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") redirect("/home");
+
+  const supabase = createServerClient();
+
+  const [medicinesResult, logsResult] = await Promise.all([
+    supabase
+      .from("medicines")
+      .select("*")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("medicine_logs")
+      .select("*")
+      .order("taken_at", { ascending: false })
+  ]);
+
+  return (
+    <div className="px-4 py-6 flex flex-col gap-6 max-w-lg mx-auto">
+      <div className="flex items-center gap-3">
+        <Link
+          href="/admin"
+          className="w-10 h-10 flex items-center justify-center rounded-xl transition-all"
+          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)" }}
+        >
+          <ArrowLeft size={18} />
+        </Link>
+        <h1 className="text-xl font-bold text-white flex items-center gap-2">
+          <Pill size={20} style={{ color: "var(--gs-red)" }} />
+          İlaç Yönetimi
+        </h1>
+      </div>
+
+      <AddMedicineForm />
+
+      <div className="glass-card p-5">
+        <h2 className="font-bold text-white text-base mb-4">Tüm İlaçlar ve Kayıtlar</h2>
+        <AdminMedicineList 
+          medicines={medicinesResult.data || []} 
+          logs={logsResult.data || []} 
+        />
+      </div>
+    </div>
+  );
+}

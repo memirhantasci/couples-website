@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { BottomNav } from "./BottomNav";
 import { logoutAction } from "@/actions/auth";
 import { LogOut, Heart } from "lucide-react";
+import Link from "next/link";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -24,7 +25,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <Link href="/home" className="flex items-center gap-2 transition-opacity hover:opacity-80">
           <Heart size={20} fill="#E8002D" color="#E8002D" />
           <span
             className="font-display text-gradient font-bold"
@@ -33,7 +34,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             Emirhan & Öykü
           </span>
           <span style={{ fontSize: 16 }}>💕</span>
-        </div>
+        </Link>
 
         {/* Right: user + logout */}
         <div className="flex items-center gap-3">
@@ -47,12 +48,11 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             <button
               type="submit"
               title="Çıkış Yap"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md"
               style={{
-                background: "rgba(232, 0, 45, 0.12)",
-                color: "rgba(232, 0, 45, 0.9)",
-                border: "1px solid rgba(232,0,45,0.2)",
-                minWidth: 80,
+                background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
+                color: "#ffffff",
+                minWidth: 100,
               }}
             >
               <LogOut size={15} />

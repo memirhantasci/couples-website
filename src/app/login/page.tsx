@@ -17,9 +17,11 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-dvh flex items-center justify-center relative overflow-hidden"
-      style={{ background: "var(--dark-950)" }}
+      className="min-h-dvh flex items-center justify-center relative overflow-hidden bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: "url('/couple-bg.jpg')", backgroundColor: "var(--dark-950)" }}
     >
+      {/* Background Overlay to ensure readability */}
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: "rgba(8, 8, 17, 0.75)" }} />
       {/* Background effects */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
@@ -133,24 +135,13 @@ export default function LoginPage() {
 
                 {/* Password */}
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <label
-                      htmlFor="password"
-                      className="text-sm font-semibold"
-                      style={{ color: "rgba(255,255,255,0.65)" }}
-                    >
-                      Şifre
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setIsForgotPassword(true)}
-                      className="text-xs font-medium hover:underline transition-all"
-                      style={{ color: "var(--gs-gold)" }}
-                      tabIndex={-1}
-                    >
-                      Şifremi Unuttum
-                    </button>
-                  </div>
+                  <label
+                    htmlFor="password"
+                    className="text-sm font-semibold"
+                    style={{ color: "rgba(255,255,255,0.65)" }}
+                  >
+                    Şifre
+                  </label>
                   <div className="relative">
                     <div
                       className="absolute left-4 top-1/2 -translate-y-1/2"
@@ -171,11 +162,11 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 transition-opacity"
-                      style={{ color: "rgba(255,255,255,0.3)" }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all"
+                      style={{ background: "rgba(232,0,45,0.9)", color: "#ffffff" }}
                       tabIndex={-1}
                     >
-                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>
@@ -219,6 +210,19 @@ export default function LoginPage() {
                     </>
                   )}
                 </motion.button>
+                
+                {/* Forgot Password Link Below Login Button */}
+                <div className="text-center mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPassword(true)}
+                    className="text-xs font-bold px-4 py-2 rounded-xl transition-all"
+                    style={{ background: "rgba(232,0,45,0.9)", color: "#ffffff" }}
+                    tabIndex={-1}
+                  >
+                    Şifremi Unuttum
+                  </button>
+                </div>
               </form>
 
               {/* Footer note */}
@@ -330,10 +334,11 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 transition-opacity"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all"
+                      style={{ background: "rgba(232,0,45,0.9)", color: "#ffffff" }}
                       tabIndex={-1}
                     >
-                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </div>

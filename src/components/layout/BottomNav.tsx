@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Pill, Camera, Calendar, LayoutDashboard } from "lucide-react";
+import { Home, Pill, Camera, Calendar, LayoutDashboard, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,11 @@ const navItems: NavItem[] = [
     icon: <Calendar size={20} strokeWidth={2} />,
   },
   {
+    href: "/letters",
+    label: "Mektuplar",
+    icon: <Mail size={20} strokeWidth={2} />,
+  },
+  {
     href: "/admin",
     label: "Admin",
     icon: <LayoutDashboard size={20} strokeWidth={2} />,
@@ -52,6 +57,11 @@ export function BottomNav({ role }: BottomNavProps) {
   const visibleItems = navItems.filter(
     (item) => !item.adminOnly || role === "ADMIN"
   );
+
+  // Admin rotalarında alt menüyü tamamen gizle
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <nav className="bottom-nav">

@@ -62,6 +62,16 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
     setNoteText(existing?.note || "");
   }
 
+  function handleEventClick(info: { event: any }) {
+    if (info.event.extendedProps.type === "note") {
+      const date = info.event.startStr.split("T")[0]; // YYYY-MM-DD
+      setSelectedDate(date);
+      const existing = notes.find((n) => n.date === date);
+      setExistingNote(existing || null);
+      setNoteText(existing?.note || "");
+    }
+  }
+
   async function handleSave() {
     if (!selectedDate || !noteText.trim()) return;
     setLoading(true);
@@ -99,6 +109,7 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
         locale="tr"
         events={allEvents}
         dateClick={handleDateClick}
+        eventClick={handleEventClick}
         height="auto"
         headerToolbar={{
           left: "prev",

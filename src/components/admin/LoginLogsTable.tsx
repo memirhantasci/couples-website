@@ -98,50 +98,43 @@ export function LoginLogsTable({ logs }: LoginLogsTableProps) {
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-white text-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-bold text-white text-base">
                     {log.users?.username === "emirhan" ? "Emirhan" : "Öykü"}
                   </span>
                   <span
-                    className="text-xs"
-                    style={{ color: "rgba(255,255,255,0.35)" }}
+                    className="text-sm font-medium"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
                   >
-                    {dayjs(log.login_at).fromNow()}
+                    {dayjs(log.login_at).format("DD MMMM YYYY HH:mm")}
                   </span>
                 </div>
 
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                <div className="flex flex-col gap-1.5 mt-1">
                   {log.browser && (
                     <span
-                      className="flex items-center gap-1 text-xs"
-                      style={{ color: "rgba(255,255,255,0.4)" }}
+                      className="flex items-center gap-1.5 text-sm"
+                      style={{ color: "rgba(255,255,255,0.6)" }}
                     >
-                      <Globe size={10} />
+                      <Globe size={14} />
                       {log.browser}
-                    </span>
-                  )}
-                  {log.operating_system && (
-                    <span
-                      className="text-xs"
-                      style={{ color: "rgba(255,255,255,0.4)" }}
-                    >
-                      {log.operating_system}
+                      {log.operating_system && ` • ${log.operating_system}`}
                     </span>
                   )}
                   {log.ip_address && log.ip_address !== "unknown" && (
                     <span
-                      className="text-xs font-mono"
-                      style={{ color: "rgba(255,255,255,0.25)" }}
+                      className="text-sm font-mono font-medium"
+                      style={{ color: "var(--gs-gold)" }}
                     >
-                      {log.ip_address}
+                      IP: {log.ip_address}
                     </span>
                   )}
                   <span
-                    className="flex items-center gap-1 text-xs"
-                    style={{ color: "rgba(255,215,0,0.6)" }}
+                    className="flex items-center gap-1.5 text-sm mt-1"
+                    style={{ color: "rgba(255,255,255,0.4)" }}
                   >
-                    <Clock size={10} />
-                    {formatDuration(log.session_duration)}
+                    <Clock size={14} />
+                    Süre: {formatDuration(log.session_duration)}
                   </span>
                 </div>
               </div>
