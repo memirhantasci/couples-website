@@ -26,10 +26,10 @@ export default async function CalendarPage() {
   const threeMonthsAgo = dayjs().subtract(1, "month").startOf("month").format("YYYY-MM-DD");
   const twoMonthsLater = dayjs().add(2, "month").endOf("month").format("YYYY-MM-DD");
 
-  const [notesResult, moodsResult] = await Promise.all([
+  const [notesResult, moodsResult, photosResult] = await Promise.all([
     supabase
       .from("calendar_notes")
-      .select("id, date, note, user:users(username)")
+      .select("id, date, note, user:users(username, display_name)")
       .gte("date", threeMonthsAgo)
       .lte("date", twoMonthsLater)
       .order("date"),
@@ -40,10 +40,17 @@ export default async function CalendarPage() {
       .gte("date", threeMonthsAgo)
       .lte("date", twoMonthsLater)
       .order("date"),
+    supabase
+      .from("photo_archive")
+      .select("taken_date")
+      .gte("taken_date", threeMonthsAgo)
+      .lte("taken_date", twoMonthsLater),
   ]);
 
   const notes = (notesResult.data as any) ?? [];
   const moods = moodsResult.data ?? [];
+  // Unique set of dates that have photos
+  const photoDates = [...new Set((photosResult.data ?? []).map((p: any) => p.taken_date))] as string[];
 
   return (
     <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
@@ -59,7 +66,7 @@ export default async function CalendarPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-1.5">
           <div
             className="w-3 h-3 rounded-sm"
@@ -74,10 +81,17 @@ export default async function CalendarPage() {
           />
           <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>Ruh Hali</span>
         </div>
+        <div className="flex items-center gap-1.5">
+          <div
+            className="w-3 h-3 rounded-sm"
+            style={{ background: "rgba(34,197,94,0.25)" }}
+          />
+          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📷 Fotoğraf</span>
+        </div>
       </div>
 
       {/* Calendar */}
-      <CalendarView notes={notes} moods={moods} />
+      <CalendarView notes={notes} moods={moods} currentUsername={session.username} photoDates={photoDates} />
 
       {/* Recent notes list */}
       {notes.length > 0 && (

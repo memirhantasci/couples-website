@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getCountdown } from "@/lib/date";
 
+import dayjs from "dayjs";
+import "dayjs/locale/tr";
+
 interface CountdownProps {
   targetDate: string;
   title: string;
@@ -38,6 +41,8 @@ export function MeetingCountdown({ targetDate, title }: CountdownProps) {
     { label: "Saniye", value: countdown.seconds },
   ];
 
+  const formattedDate = dayjs(targetDate).locale("tr").format("D MMMM dddd, HH:mm");
+
   return (
     <div className="glass-card p-5">
       <div className="flex items-center gap-2 mb-4">
@@ -45,7 +50,7 @@ export function MeetingCountdown({ targetDate, title }: CountdownProps) {
         <div>
           <p className="font-bold text-white text-sm">{title}</p>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
-            Geri Sayım
+            {formattedDate}
           </p>
         </div>
       </div>

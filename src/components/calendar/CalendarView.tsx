@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -13,7 +14,7 @@ interface CalendarNote {
   id: number;
   date: string;
   note: string;
-  user?: { username: string };
+  user?: { username: string; display_name?: string };
 }
 
 interface Mood {
@@ -24,9 +25,13 @@ interface Mood {
 interface CalendarViewProps {
   notes: CalendarNote[];
   moods: Mood[];
+  currentUsername: string;
+  photoDates?: string[];
+  disableNotes?: boolean;
 }
 
-export function CalendarView({ notes, moods }: CalendarViewProps) {
+export function CalendarView({ notes, moods, currentUsername, photoDates = [], disableNotes = false }: CalendarViewProps) {
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
   const [existingNote, setExistingNote] = useState<CalendarNote | null>(null);
@@ -34,11 +39,12 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
 
   // Build events from notes and moods
   const noteEvents = notes.map((n) => {
-    const username = n.user?.username ? `(${n.user.username}) ` : "";
+    const displayName = n.user?.display_name || n.user?.username;
+    const namePrefix = displayName ? `(${displayName}) ` : "";
     return {
       id: `note-${n.id}`,
       date: n.date,
-      title: "📝 " + username + n.note.substring(0, 20) + (n.note.length > 20 ? "…" : ""),
+      title: "📝 " + namePrefix + n.note.substring(0, 20) + (n.note.length > 20 ? "…" : ""),
       backgroundColor: "rgba(232, 0, 45, 0.15)",
       borderColor: "rgba(232, 0, 45, 0.3)",
       textColor: "#ff6b6b",
@@ -56,10 +62,29 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
     extendedProps: { type: "mood" },
   }));
 
-  const allEvents = [...noteEvents, ...moodEvents];
+  const photoEvents = photoDates.map((date) => ({
+    id: `photo-${date}`,
+    date,
+    title: "📷",
+    backgroundColor: "rgba(34, 197, 94, 0.15)",
+    borderColor: "rgba(34, 197, 94, 0.3)",
+    textColor: "#22c55e",
+    extendedProps: { type: "photo", photoDate: date },
+  }));
+
+  const allEvents = [...noteEvents, ...moodEvents, ...photoEvents];
 
   function handleDateClick(info: { dateStr: string }) {
     const date = info.dateStr;
+
+    // If notes are disabled, clicking a date should just open its photo page if it has photos
+    if (disableNotes) {
+      if (photoDates.includes(date)) {
+        router.push(`/photos/${date}`);
+      }
+      return;
+    }
+
     setSelectedDate(date);
     const existing = notes.find((n) => n.date === date);
     setExistingNote(existing || null);
@@ -67,8 +92,13 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
   }
 
   function handleEventClick(info: { event: any }) {
+    if (info.event.extendedProps.type === "photo") {
+      // Navigate to photo day page
+      router.push(`/photos/${info.event.extendedProps.photoDate}`);
+      return;
+    }
     if (info.event.extendedProps.type === "note") {
-      const date = info.event.startStr.split("T")[0]; // YYYY-MM-DD
+      const date = info.event.startStr.split("T")[0];
       setSelectedDate(date);
       const existing = notes.find((n) => n.date === date);
       setExistingNote(existing || null);
@@ -104,6 +134,8 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
       setSelectedDate(null);
     }
   }
+
+  const isOwner = !existingNote || existingNote.user?.username === currentUsername;
 
   return (
     <div className="glass-card p-4">
@@ -168,49 +200,52 @@ export function CalendarView({ notes, moods }: CalendarViewProps) {
               <textarea
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
-                placeholder="Bu güne not ekle..."
+                placeholder={isOwner ? "Bu güne not ekle..." : "Bu notu değiştiremezsiniz."}
+                readOnly={!isOwner}
                 rows={4}
                 className="resize-none mb-4"
                 maxLength={500}
                 style={{
                   width: "100%",
                   padding: "14px 16px",
-                  background: "rgba(255,255,255,0.10)",
+                  background: isOwner ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.02)",
                   border: "1.5px solid rgba(255,255,255,0.22)",
                   borderRadius: 14,
-                  color: "#ffffff",
+                  color: isOwner ? "#ffffff" : "rgba(255,255,255,0.5)",
                   fontSize: 15,
                   fontFamily: "inherit",
                   outline: "none",
                 }}
               />
 
-              <div className="flex gap-2">
-                <button
-                  onClick={handleSave}
-                  disabled={loading || !noteText.trim()}
-                  className="btn-primary flex-1"
-                >
-                  {loading ? (
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <Save size={14} />
-                      Kaydet
-                    </>
-                  )}
-                </button>
-                {existingNote && (
+              {isOwner && (
+                <div className="flex gap-2">
                   <button
-                    onClick={handleDelete}
-                    disabled={loading}
-                    className="btn-secondary px-4"
-                    style={{ color: "#f87171", borderColor: "rgba(248,113,113,0.2)" }}
+                    onClick={handleSave}
+                    disabled={loading || !noteText.trim()}
+                    className="btn-primary flex-1"
                   >
-                    <Trash2 size={14} />
+                    {loading ? (
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <Save size={14} />
+                        Kaydet
+                      </>
+                    )}
                   </button>
-                )}
-              </div>
+                  {existingNote && (
+                    <button
+                      onClick={handleDelete}
+                      disabled={loading}
+                      className="btn-secondary px-4"
+                      style={{ color: "#f87171", borderColor: "rgba(248,113,113,0.2)" }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+              )}
             </motion.div>
           </>
         )}

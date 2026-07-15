@@ -1,6 +1,7 @@
 export interface SessionData {
   userId: number;
   username: string;
+  displayName: string;
   role: "ADMIN" | "USER";
   loginDate: string; // YYYY-MM-DD
   loginLogId: number;
@@ -9,6 +10,7 @@ export interface SessionData {
 export interface SessionCookie {
   userId: number;
   username: string;
+  displayName: string;
   role: "ADMIN" | "USER";
   loginDate: string;
   loginLogId: number;

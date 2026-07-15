@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { LayoutDashboard, Pill, Users, LineChart, CalendarDays, ChevronRight, Camera, Mail, BookOpen } from "lucide-react";
+import { LayoutDashboard, Pill, Users, LineChart, CalendarDays, ChevronRight, Camera, Mail, BookOpen, Images } from "lucide-react";
 import Link from "next/link";
 import dayjs from "dayjs";
 
@@ -104,6 +104,14 @@ export default async function AdminDashboardPage() {
       href: "/admin/letters",
       gradient: "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
       borderColor: "rgba(255,255,255,0.2)",
+    },
+    {
+      title: "Tüm Fotoğraflar",
+      description: "Fotoğraf arşivi yönetimi",
+      icon: <Images size={24} style={{ color: "#ffffff" }} />,
+      href: "/admin/photos",
+      gradient: "linear-gradient(135deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 100%)",
+      borderColor: "rgba(34,197,94,0.2)",
     },
   ];
 

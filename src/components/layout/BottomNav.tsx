@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Pill, Camera, Calendar, LayoutDashboard, Mail } from "lucide-react";
+import { Home, Pill, Camera, Calendar, LayoutDashboard, Mail, BookText, Images, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -35,9 +35,24 @@ const navItems: NavItem[] = [
     icon: <Calendar size={20} strokeWidth={2} />,
   },
   {
+    href: "/daily-notes-user",
+    label: "Günlük",
+    icon: <BookText size={20} strokeWidth={2} />,
+  },
+  {
     href: "/letters",
     label: "Mektuplar",
     icon: <Mail size={20} strokeWidth={2} />,
+  },
+  {
+    href: "/photos",
+    label: "Fotoğraflar",
+    icon: <Images size={20} strokeWidth={2} />,
+  },
+  {
+    href: "/photos/upload",
+    label: "Yükle",
+    icon: <Upload size={20} strokeWidth={2} />,
   },
   {
     href: "/admin",

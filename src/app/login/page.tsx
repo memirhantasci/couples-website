@@ -5,6 +5,7 @@ import { loginAction, changePasswordAction, type LoginState } from "@/actions/au
 import { Heart, Lock, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import Link from "next/link";
 
 const initialState: LoginState = {};
 
@@ -212,11 +213,17 @@ export default function LoginPage() {
                 </motion.button>
                 
                 {/* Forgot Password Link Below Login Button */}
-                <div className="text-center mt-3">
+                <div className="flex flex-col gap-3 mt-3">
+                  <Link
+                    href="/register"
+                    className="btn-gold w-full flex items-center justify-center text-sm font-bold py-2.5 rounded-xl transition-all"
+                  >
+                    Hesabın yok mu? Kayıt Ol
+                  </Link>
                   <button
                     type="button"
                     onClick={() => setIsForgotPassword(true)}
-                    className="text-xs font-bold px-4 py-2 rounded-xl transition-all"
+                    className="text-xs font-bold px-4 py-2 rounded-xl transition-all self-center"
                     style={{ background: "rgba(232,0,45,0.9)", color: "#ffffff" }}
                     tabIndex={-1}
                   >

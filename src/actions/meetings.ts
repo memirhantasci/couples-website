@@ -92,11 +92,14 @@ export async function upsertCalendarNoteAction(
   // Check if note exists for this date
   const { data: existing } = await supabase
     .from("calendar_notes")
-    .select("id")
+    .select("id, user_id")
     .eq("date", parsed.data.date)
     .single();
 
   if (existing) {
+    if (existing.user_id !== session.userId) {
+      return { error: "Bu not başkasına ait, değiştiremezsiniz." };
+    }
     await supabase
       .from("calendar_notes")
       .update({ note: parsed.data.note, user_id: session.userId })
@@ -118,6 +121,16 @@ export async function deleteCalendarNoteAction(id: number) {
   if (!session) return { error: "Oturum bulunamadı." };
 
   const supabase = createServerClient();
+  
+  const { data: existing } = await supabase
+    .from("calendar_notes")
+    .select("user_id")
+    .eq("id", id)
+    .single();
+
+  if (!existing) return { error: "Not bulunamadı." };
+  if (existing.user_id !== session.userId) return { error: "Bu notu sadece yazan silebilir." };
+
   const { error } = await supabase.from("calendar_notes").delete().eq("id", id);
 
   if (error) return { error: "Silme başarısız." };

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME, type SessionCookie } from "@/lib/auth/types";
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ["/home", "/medicine", "/memories", "/calendar", "/admin"];
+const PROTECTED_ROUTES = ["/home", "/medicine", "/memories", "/calendar", "/admin", "/photos"];
 // Routes that require ADMIN role
 const ADMIN_ROUTES = ["/admin"];
 
