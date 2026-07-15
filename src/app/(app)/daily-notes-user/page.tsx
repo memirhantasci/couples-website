@@ -59,11 +59,7 @@ export default async function DailyNotesUserPage() {
           notes.map((note) => {
             const dateObj = dayjs(note.date).locale("tr");
             return (
-              <div key={note.id} className="glass-card p-5 relative overflow-hidden">
-                <div
-                  className="absolute top-0 left-0 bottom-0 w-1"
-                  style={{ background: "var(--gs-gold)" }}
-                />
+              <div key={note.id} className="glass-card p-5 relative" style={{ borderLeft: "4px solid var(--gs-gold)" }}>
                 
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2">

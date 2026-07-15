@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
-import { BottomNav } from "./BottomNav";
+import { MobileMenu } from "./MobileMenu";
 import { logoutAction } from "@/actions/auth";
 import { LogOut, Heart } from "lucide-react";
 import Link from "next/link";
@@ -49,32 +49,30 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             <button
               type="submit"
               title="Çıkış Yap"
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md"
+              className="flex items-center justify-center p-2 rounded-xl transition-all shadow-md"
               style={{
                 background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
                 color: "#ffffff",
-                minWidth: 100,
               }}
             >
-              <LogOut size={15} />
-              <span>Çıkış</span>
+              <LogOut size={20} />
             </button>
           </form>
+
+          {/* Hamburger Menu */}
+          <MobileMenu role={session.role} />
         </div>
       </header>
 
       {/* Main Content */}
       <main
         style={{
-          paddingBottom: "calc(72px + env(safe-area-inset-bottom) + 16px)",
+          paddingBottom: "env(safe-area-inset-bottom)",
           minHeight: "calc(100dvh - 60px)",
         }}
       >
         {children}
       </main>
-
-      {/* Bottom Navigation */}
-      <BottomNav role={session.role} />
     </div>
   );
 }

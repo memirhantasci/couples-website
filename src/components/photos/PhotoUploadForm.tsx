@@ -78,7 +78,6 @@ export function PhotoUploadForm() {
           type="file"
           name="photo"
           accept="image/*"
-          capture="environment"
           onChange={handleFileChange}
           className="sr-only"
           required
