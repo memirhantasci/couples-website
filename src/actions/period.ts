@@ -8,7 +8,8 @@ export async function togglePeriodLogAction(date: string) {
   const session = await getSession();
   if (!session) return { error: "Oturum bulunamadı." };
 
-  const isOyku = session.username === "oyku" || session.displayName?.toLowerCase() === "öykü" || session.displayName?.toLowerCase() === "oyku";
+  const nameLower = session.displayName?.toLowerCase() || "";
+  const isOyku = session.username === "oyku" || nameLower.includes("öykü") || nameLower.includes("oyku");
   if (!isOyku) {
     return { error: "Bu işlemi sadece Öykü yapabilir." };
   }

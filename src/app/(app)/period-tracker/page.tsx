@@ -26,7 +26,8 @@ export default async function PeriodTrackerPage() {
   if (error) console.error("Period logs fetch error:", error);
 
   const safeLogs = (logs as any[]) ?? [];
-  const isOyku = session.username === "oyku" || session.displayName?.toLowerCase() === "öykü" || session.displayName?.toLowerCase() === "oyku";
+  const nameLower = session.displayName?.toLowerCase() || "";
+  const isOyku = session.username === "oyku" || nameLower.includes("öykü") || nameLower.includes("oyku");
 
   return (
     <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">

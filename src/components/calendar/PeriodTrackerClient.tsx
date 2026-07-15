@@ -5,12 +5,13 @@ import { createPortal } from "react-dom";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { motion, AnimatePresence } from "framer-motion";
 import { togglePeriodLogAction } from "@/actions/period";
 import { toast } from "sonner";
 import { X, Check } from "lucide-react";
 import dayjs from "dayjs";
+import "dayjs/locale/tr";
 
+dayjs.locale("tr");
 interface PeriodLog {
   id: string;
   date: string;
@@ -40,21 +41,38 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
     }));
 
   function handleDateClick(info: { dateStr: string }) {
-    if (!isOyku) return;
+    console.log("👉 handleDateClick tetiklendi! Gelen tarih:", info.dateStr);
+    console.log("👉 isOyku yetkisi açık mı? (Şu an iptal edildiği için her türlü geçmeli):", isOyku);
+    
+    if (!isOyku) {
+      toast.error("Bu tabloyu sadece Öykü güncelleyebilir.");
+      return;
+    }
 
     const date = info.dateStr;
     const exists = logs.some((l) => l.date === date);
+    console.log("👉 Bu tarihte kayıt var mı?", exists);
     
     if (!exists) {
       const monthLogsCount = logs.filter(l => dayjs(l.date).isSame(dayjs(date), 'month')).length;
+      console.log("👉 Bu ayki kayıt sayısı:", monthLogsCount);
+      
       if (monthLogsCount >= 2) {
+        console.log("🚫 Ayda 2'den fazla kayıt eklenemez, işlem iptal ediliyor.");
         toast.error("Bir ay içerisinde en fazla 2 gün seçebilirsiniz.");
         return;
       }
     }
 
+    console.log("✅ Her şey tamam, setSelectedDate çalıştırılıyor:", date);
     setSelectedDate(date);
     setIsAdding(!exists);
+  }
+
+  function handleEventClick(info: any) {
+    const dateStr = info.event.startStr.split('T')[0] || info.event.startStr;
+    console.log("👉 handleEventClick tetiklendi! Gelen tarih:", dateStr);
+    handleDateClick({ dateStr });
   }
 
   async function handleToggle() {
@@ -77,78 +95,144 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
       <div className="glass-card p-4 relative">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        locale="tr"
-        events={events}
-        dateClick={handleDateClick}
-        height="auto"
-        headerToolbar={{
-          left: "prev,next",
-          center: "title",
-          right: "today",
-        }}
-      />
+          initialView="dayGridMonth"
+          locale="tr"
+          events={events}
+          dateClick={handleDateClick}
+          eventClick={handleEventClick}
+          height="auto"
+          headerToolbar={{
+            left: "prev,next",
+            center: "title",
+            right: "today",
+          }}
+        />
       </div>
 
-      {mounted && createPortal(
-        <AnimatePresence>
-          {selectedDate && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={() => setSelectedDate(null)}
-              />
-              
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="relative w-full max-w-sm glass-card p-6 flex flex-col gap-5 text-center"
+      {mounted && typeof document !== 'undefined' && createPortal(
+        selectedDate ? (
+          <div 
+            style={{ 
+              position: "fixed", 
+              top: 0, 
+              left: 0, 
+              width: "100vw", 
+              height: "100vh", 
+              zIndex: 999999, 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center",
+              padding: "1rem"
+            }}
+          >
+            {/* Backdrop */}
+            <div
+              onClick={() => setSelectedDate(null)}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(0,0,0,0.7)",
+                backdropFilter: "blur(2px)",
+                cursor: "pointer"
+              }}
+            />
+            
+            {/* Modal Box */}
+            <div
+              className="glass-card"
+              style={{ 
+                position: "relative",
+                width: "100%",
+                maxWidth: "24rem",
+                padding: "1.5rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1.25rem",
+                textAlign: "center",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: "1rem"
+              }}
+            >
+              <div 
+                style={{ 
+                  width: "4rem", 
+                  height: "4rem", 
+                  borderRadius: "9999px", 
+                  margin: "0 auto", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
+                  background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)" 
+                }}
               >
-                <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)" }}>
-                  <span className="text-2xl">🩸</span>
-                </div>
-                
-                <div>
-                  <h3 className="text-xl font-bold mb-1">
-                    {dayjs(selectedDate).format("DD MMMM YYYY")}
-                  </h3>
-                  <p className="text-sm opacity-70">
-                    {isAdding ? "Sıkıntılı günler başladı mı?" : "Bu günkü kaydı silmek istediğine emin misin?"}
-                  </p>
-                </div>
+                <span style={{ fontSize: "1.5rem" }}>🩸</span>
+              </div>
+              
+              <div>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "0.25rem", color: "white" }}>
+                  {dayjs(selectedDate).format("DD MMMM YYYY")}
+                </h3>
+                <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.7)" }}>
+                  {isAdding ? "Sıkıntılı günler başladı mı?" : "Bu günkü kaydı silmek istediğine emin misin?"}
+                </p>
+              </div>
 
-                <div className="flex gap-3 mt-2">
-                  <button
-                    disabled={loading}
-                    onClick={() => setSelectedDate(null)}
-                    className="flex-1 py-3 rounded-xl font-semibold bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white/70"
-                  >
-                    <X size={18} className="mx-auto" />
-                  </button>
-                  <button
-                    disabled={loading}
-                    onClick={handleToggle}
-                    className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white transition-all"
-                    style={{ background: "var(--gs-red)" }}
-                  >
-                    {loading ? (
-                      <span className="opacity-50">İşleniyor...</span>
-                    ) : (
-                      <>
-                        <Check size={18} />
-                        {isAdding ? "Evet" : "Kaydı Sil"}
-                      </>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
+              <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+                <button
+                  disabled={loading}
+                  onClick={() => setSelectedDate(null)}
+                  style={{
+                    flex: "1",
+                    padding: "0.75rem",
+                    borderRadius: "0.75rem",
+                    fontWeight: "600",
+                    backgroundColor: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(255,255,255,0.7)",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
+                  <X size={18} />
+                </button>
+                <button
+                  disabled={loading}
+                  onClick={handleToggle}
+                  style={{
+                    flex: "2",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    padding: "0.75rem",
+                    borderRadius: "0.75rem",
+                    fontWeight: "bold",
+                    color: "white",
+                    backgroundColor: "var(--gs-red)",
+                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
+                    cursor: "pointer"
+                  }}
+                >
+                  {loading ? (
+                    <span style={{ opacity: 0.5 }}>İşleniyor...</span>
+                  ) : (
+                    <>
+                      <Check size={18} />
+                      {isAdding ? "Evet" : "Kaydı Sil"}
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-          )}
-        </AnimatePresence>,
+          </div>
+        ) : null,
         document.body
       )}
     </>

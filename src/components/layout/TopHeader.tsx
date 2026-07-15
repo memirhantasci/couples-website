@@ -19,47 +19,47 @@ const navItems: NavItem[] = [
   {
     href: "/home",
     label: "Ana Sayfa",
-    icon: <Home size={20} strokeWidth={2} />,
+    icon: <Home size={35} strokeWidth={2} />,
   },
   {
     href: "/medicine",
     label: "İlaçlar",
-    icon: <Pill size={20} strokeWidth={2} />,
+    icon: <Pill size={35} strokeWidth={2} />,
   },
   {
     href: "/memories",
     label: "Özel Günler",
-    icon: <Camera size={20} strokeWidth={2} />,
+    icon: <Camera size={35} strokeWidth={2} />,
   },
   {
     href: "/calendar",
     label: "Takvim",
-    icon: <Calendar size={20} strokeWidth={2} />,
+    icon: <Calendar size={35} strokeWidth={2} />,
   },
   {
     href: "/daily-notes-user",
     label: "Günlük",
-    icon: <BookText size={20} strokeWidth={2} />,
+    icon: <BookText size={35} strokeWidth={2} />,
   },
   {
     href: "/letters",
     label: "Mektuplar",
-    icon: <Mail size={20} strokeWidth={2} />,
+    icon: <Mail size={35} strokeWidth={2} />,
   },
   {
     href: "/period-tracker",
     label: "Regl Takvimi",
-    icon: <Activity size={20} strokeWidth={2} />,
+    icon: <Activity size={35} strokeWidth={2} />,
   },
   {
     href: "/photos/upload",
     label: "Fotoğraf Yükle",
-    icon: <Upload size={20} strokeWidth={2} />,
+    icon: <Upload size={35} strokeWidth={2} />,
   },
   {
     href: "/admin",
     label: "Admin Paneli",
-    icon: <LayoutDashboard size={20} strokeWidth={2} />,
+    icon: <LayoutDashboard size={35} strokeWidth={2} />,
     adminOnly: true,
   },
 ];
@@ -116,10 +116,10 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
           
           <button
             onClick={() => setIsOpen(true)}
-            className="p-2 rounded-xl transition-all hover:bg-white/10"
+            className="p-5 rounded-2xl transition-all hover:bg-white/10"
             style={{ background: "rgba(255,255,255,0.06)", color: "white" }}
           >
-            <Menu size={22} />
+            <Menu size={44} strokeWidth={2.5} />
           </button>
         </div>
       </header>
@@ -144,7 +144,7 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[280px] z-[101] flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-[90vw] sm:w-[450px] z-[101] flex flex-col"
               style={{
                 background: "rgba(13, 13, 26, 0.98)",
                 borderLeft: "1px solid rgba(255,255,255,0.08)",
@@ -152,29 +152,29 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               }}
             >
               {/* Drawer Header */}
-              <div className="flex items-center justify-between p-5 border-b border-white/10">
-                <span className="font-bold text-white text-lg">Menü</span>
+              <div className="flex items-center justify-between p-7 border-b border-white/10">
+                <span className="font-bold text-white text-4xl">Menü</span>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 rounded-xl transition-all hover:bg-white/10 text-white/70 hover:text-white"
+                  className="p-4 rounded-xl transition-all hover:bg-white/10 text-white/70 hover:text-white"
                 >
-                  <X size={20} />
+                  <X size={35} strokeWidth={2.5} />
                 </button>
               </div>
 
               {/* Drawer Links */}
-              <div className="flex flex-col p-4 gap-2 flex-1 overflow-y-auto">
+              <div className="flex flex-col p-6 gap-4 flex-1 overflow-y-auto">
                 {visibleItems.map((item) => {
                   const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-3 p-3.5 rounded-xl font-semibold transition-all"
+                      className="flex items-center gap-5 p-6 rounded-[24px] font-bold transition-all text-2xl"
                       style={{
-                        background: isActive ? "rgba(232, 0, 45, 0.15)" : "transparent",
-                        color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.7)",
-                        border: isActive ? "1px solid rgba(232, 0, 45, 0.3)" : "1px solid transparent",
+                        background: isActive ? "rgba(232, 0, 45, 0.15)" : "rgba(255,255,255,0.03)",
+                        color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.85)",
+                        border: isActive ? "2px solid rgba(232, 0, 45, 0.3)" : "2px solid transparent",
                       }}
                     >
                       {item.icon}
@@ -185,17 +185,17 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               </div>
 
               {/* Logout Button in Drawer Footer */}
-              <div className="p-5 border-t border-white/10 mt-auto">
+              <div className="p-7 border-t border-white/10 mt-auto">
                 <form action={logoutAction}>
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all shadow-md"
+                    className="w-full flex items-center justify-center gap-4 py-7 rounded-[24px] font-bold text-2xl transition-all shadow-md"
                     style={{
                       background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
                       color: "#ffffff",
                     }}
                   >
-                    <LogOut size={18} />
+                    <LogOut size={35} />
                     <span>Çıkış Yap</span>
                   </button>
                 </form>
