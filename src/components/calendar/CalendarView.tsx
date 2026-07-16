@@ -21,6 +21,7 @@ interface CalendarNote {
 interface Mood {
   date: string;
   mood_type: string;
+  user?: { username: string; display_name?: string };
 }
 
 interface CalendarViewProps {
