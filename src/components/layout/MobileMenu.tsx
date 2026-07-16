@@ -18,47 +18,47 @@ const navItems: NavItem[] = [
   {
     href: "/home",
     label: "Ana Sayfa",
-    icon: <Home size={20} strokeWidth={2} />,
+    icon: <Home size={34} strokeWidth={2} />,
   },
   {
     href: "/medicine",
     label: "İlaçlar",
-    icon: <Pill size={20} strokeWidth={2} />,
+    icon: <Pill size={34} strokeWidth={2} />,
   },
   {
     href: "/memories",
     label: "Özel Günler",
-    icon: <Camera size={20} strokeWidth={2} />,
+    icon: <Camera size={34} strokeWidth={2} />,
   },
   {
     href: "/calendar",
     label: "Takvim",
-    icon: <Calendar size={20} strokeWidth={2} />,
+    icon: <Calendar size={34} strokeWidth={2} />,
   },
   {
     href: "/daily-notes-user",
     label: "Günlük",
-    icon: <BookText size={20} strokeWidth={2} />,
+    icon: <BookText size={34} strokeWidth={2} />,
   },
   {
     href: "/letters",
     label: "Mektuplar",
-    icon: <Mail size={20} strokeWidth={2} />,
+    icon: <Mail size={34} strokeWidth={2} />,
   },
   {
     href: "/photos",
     label: "Fotoğraflar",
-    icon: <Images size={20} strokeWidth={2} />,
+    icon: <Images size={34} strokeWidth={2} />,
   },
   {
     href: "/photos/upload",
     label: "Fotoğraf Yükle",
-    icon: <Upload size={20} strokeWidth={2} />,
+    icon: <Upload size={34} strokeWidth={2} />,
   },
   {
     href: "/admin",
     label: "Admin Paneli",
-    icon: <LayoutDashboard size={20} strokeWidth={2} />,
+    icon: <LayoutDashboard size={34} strokeWidth={2} />,
     adminOnly: true,
   },
 ];
@@ -87,7 +87,7 @@ export function MobileMenu({ role }: MobileMenuProps) {
         className="p-2 rounded-xl transition-all"
         style={{ background: "rgba(255,255,255,0.06)", color: "white" }}
       >
-        <Menu size={22} />
+        <Menu size={44} />
       </button>
 
       <AnimatePresence>
@@ -109,7 +109,7 @@ export function MobileMenu({ role }: MobileMenuProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[280px] z-[101] flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-[340px] z-[101] flex flex-col"
               style={{
                 background: "#18181b",
                 borderLeft: "1px solid rgba(255,255,255,0.08)",
@@ -118,12 +118,12 @@ export function MobileMenu({ role }: MobileMenuProps) {
             >
               {/* Header */}
               <div className="flex items-center justify-between p-5 border-b border-white/10">
-                <span className="font-bold text-white text-lg">Menü</span>
+                <span className="font-bold text-white text-[32px]">Menü</span>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 rounded-xl transition-all hover:bg-white/10 text-white/70 hover:text-white"
                 >
-                  <X size={20} />
+                  <X size={32} />
                 </button>
               </div>
 
@@ -135,7 +135,7 @@ export function MobileMenu({ role }: MobileMenuProps) {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-3 p-3.5 rounded-xl font-semibold transition-all"
+                      className="flex items-center gap-4 p-4 rounded-xl font-semibold transition-all text-[28px]"
                       style={{
                         background: isActive ? "rgba(232, 0, 45, 0.15)" : "transparent",
                         color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.7)",
