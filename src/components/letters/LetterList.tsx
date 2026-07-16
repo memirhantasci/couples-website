@@ -44,9 +44,8 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
         const canOpen = type === "sent" || !isLockedDate;
         const isOpen = openLetterId === letter.id;
 
-        const actualSenderName = letter.sender?.display_name || letter.sender?.username || "Gizli Biri";
-        const senderName = (type === "received" && !canOpen) ? "Gizli Biri" : actualSenderName;
-        const receiverName = letter.receiver?.display_name || letter.receiver?.username || "Gizli Biri";
+        const senderName = letter.sender?.display_name || letter.sender?.username || "Bilinmeyen";
+        const receiverName = letter.receiver?.display_name || letter.receiver?.username || "Bilinmeyen";
 
         return (
           <div
