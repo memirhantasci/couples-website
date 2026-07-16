@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-import { Camera, ArrowLeft } from "lucide-react";
 import { PhotoGrid } from "@/components/photos/PhotoGrid";
-import Link from "next/link";
+import { BackButton } from "@/components/ui/BackButton";
 
 interface Props {
   params: Promise<{ date: string }>;
@@ -49,17 +48,10 @@ export default async function PhotoDayPage({ params }: Props) {
   return (
     <div className="px-4 py-5 flex flex-col gap-5 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link
-          href="/photos"
-          className="p-2 rounded-xl transition-all"
-          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
-        >
-          <ArrowLeft size={18} />
-        </Link>
+      <div className="flex items-center gap-4">
+        <BackButton />
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Camera size={22} style={{ color: "#22c55e" }} />
             {label}
           </h1>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>

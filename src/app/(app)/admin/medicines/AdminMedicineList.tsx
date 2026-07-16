@@ -52,7 +52,15 @@ export function AdminMedicineList({ medicines, logs }: { medicines: any[], logs:
             {/* Header / Info */}
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-bold text-white text-lg">{med.name}</p>
+                <p className="font-bold text-white text-lg flex items-center gap-2">
+                  {med.name}
+                  <span className="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider" style={{ background: "rgba(255,215,0,0.15)", color: "var(--gs-gold)" }}>
+                    {(() => {
+                      const u = Array.isArray(med.user) ? med.user[0] : med.user;
+                      return u?.display_name || u?.username || "Bilinmeyen";
+                    })()}
+                  </span>
+                </p>
                 <p className="font-medium mt-1" style={{ color: "var(--gs-gold)", fontSize: 14 }}>
                   {med.time} • {med.start_date} / {med.end_date}
                 </p>
@@ -88,7 +96,14 @@ export function AdminMedicineList({ medicines, logs }: { medicines: any[], logs:
               {todayLog ? (
                 <div className="flex items-center gap-2">
                   {todayLog.status === "DRANK" ? (
-                    <span className="text-green-400 font-bold text-xs bg-green-400/10 px-2 py-1 rounded-md">Alındı</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-400 font-bold text-xs bg-green-400/10 px-2 py-1 rounded-md">Alındı</span>
+                      {todayLog.taken_at && (
+                        <span className="text-xs text-white/50">
+                          {dayjs(todayLog.taken_at).format("HH:mm:ss")}
+                        </span>
+                      )}
+                    </div>
                   ) : todayLog.status === "MISSED" ? (
                     <span className="text-red-400 font-bold text-xs bg-red-400/10 px-2 py-1 rounded-md">Atlandı</span>
                   ) : (
@@ -114,7 +129,12 @@ export function AdminMedicineList({ medicines, logs }: { medicines: any[], logs:
                         {dayjs(log.date).format("DD MMM YYYY")}
                       </span>
                       {log.status === "DRANK" ? (
-                        <span className="text-green-400 font-bold text-[10px] ml-auto uppercase tracking-wider">İçildi</span>
+                        <div className="flex items-center gap-1.5 ml-auto">
+                          {log.taken_at && (
+                            <span className="text-[10px] text-white/40">{dayjs(log.taken_at).format("HH:mm:ss")}</span>
+                          )}
+                          <span className="text-green-400 font-bold text-[10px] uppercase tracking-wider">İçildi</span>
+                        </div>
                       ) : (
                         <span className="text-red-400 font-bold text-[10px] ml-auto uppercase tracking-wider">Atlandı</span>
                       )}

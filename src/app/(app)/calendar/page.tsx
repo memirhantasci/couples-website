@@ -116,42 +116,7 @@ export default async function CalendarPage() {
         currentUsername={session.username}
       />
       
-      {/* Recent notes list */}
-      {notes.length > 0 && (
-        <div className="flex flex-col gap-2 mt-4">
-          <h2
-            className="font-semibold text-sm"
-            style={{ color: "rgba(255,255,255,0.85)" }}
-          >
-            Yaklaşan Notlar
-          </h2>
-          <div className="flex flex-col gap-2">
-            {notes.map((n: any) => {
-              const dateObj = dayjs(n.date).locale("tr");
-              const isOwner = n.user?.username === session.username;
-              return (
-                <div key={n.id} className="glass-card p-3 flex flex-col gap-1 relative overflow-hidden">
-                  <div
-                    className="absolute left-0 top-0 bottom-0 w-1"
-                    style={{ background: isOwner ? "var(--gs-red)" : "rgba(255,255,255,0.2)" }}
-                  />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs opacity-50">
-                      {dateObj.format("DD MMMM YYYY, dddd")}
-                    </span>
-                    {!isOwner && (
-                      <span className="text-xs" style={{ color: "var(--gs-gold)" }}>
-                        {n.user?.display_name || n.user?.username}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-sm font-medium">{n.note}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

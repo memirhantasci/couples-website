@@ -42,6 +42,7 @@ export function CalendarView({
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
   const [existingNote, setExistingNote] = useState<CalendarNote | null>(null);
+  const [partnerNote, setPartnerNote] = useState<CalendarNote | null>(null);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -93,10 +94,16 @@ export function CalendarView({
       }
       return;
     }
-    const existing = notes.find(
-      (n) => n.date === date && n.user?.username === currentUsername
-    );
+    const existing = notes.find((n) => {
+      const u = Array.isArray(n.user) ? n.user[0] : n.user;
+      return n.date === date && u?.username?.toLowerCase() === currentUsername?.toLowerCase();
+    });
+    const partner = notes.find((n) => {
+      const u = Array.isArray(n.user) ? n.user[0] : n.user;
+      return n.date === date && u?.username?.toLowerCase() !== currentUsername?.toLowerCase();
+    });
     setExistingNote(existing || null);
+    setPartnerNote(partner || null);
     setNoteText(existing?.note || "");
     setSelectedDate(date);
   }
@@ -120,6 +127,7 @@ export function CalendarView({
     setSelectedDate(null);
     setNoteText("");
     setExistingNote(null);
+    setPartnerNote(null);
   }
 
   async function handleSave() {
@@ -153,9 +161,172 @@ export function CalendarView({
     }
   }
 
-  // If no existingNote, the current user is always the "owner" (can write)
-  // If there IS an existing note, only the owner can edit
-  const isOwner = !existingNote || existingNote.user?.username === currentUsername;
+  const existingUser = existingNote ? (Array.isArray(existingNote.user) ? existingNote.user[0] : existingNote.user) : null;
+  const isOwner = !existingNote || existingUser?.username?.toLowerCase() === currentUsername?.toLowerCase();
+
+  const modal = selectedDate ? (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.6)",
+        backdropFilter: "blur(4px)",
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+      }}
+      onClick={closeModal}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          backgroundColor: "var(--gs-bg)",
+          borderRadius: "24px",
+          padding: "24px",
+          border: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
+          position: "relative",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={closeModal}
+          style={{
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            background: "transparent",
+            border: "none",
+            color: "rgba(255,255,255,0.5)",
+            cursor: "pointer",
+            padding: "4px",
+          }}
+        >
+          <X size={16} />
+        </button>
+
+        <h3
+          style={{
+            color: "white",
+            fontSize: "18px",
+            fontWeight: 700,
+            marginBottom: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <CalendarIcon size={20} style={{ color: "var(--gs-red)" }} />
+          {new Date(selectedDate + "T00:00:00").toLocaleDateString("tr-TR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </h3>
+
+        {partnerNote && (() => {
+          const pu = Array.isArray(partnerNote.user) ? partnerNote.user[0] : partnerNote.user;
+          return (
+            <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "4px" }}>
+              <span style={{ fontSize: "12px", fontWeight: "bold", color: "var(--gs-gold)" }}>
+                {pu?.display_name || pu?.username}
+              </span>
+              <div
+                style={{
+                  width: "100%",
+                  padding: "16px",
+                  borderRadius: "12px",
+                  background: "rgba(255,215,0,0.05)",
+                  border: "1px solid rgba(255,215,0,0.15)",
+                  color: "rgba(255,255,255,0.9)",
+                  fontSize: "14px",
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {partnerNote.note}
+              </div>
+            </div>
+          );
+        })()}
+
+        <textarea
+          value={noteText}
+          onChange={(e) => setNoteText(e.target.value)}
+          placeholder={isOwner ? "Bu güne dair bir not bırak..." : "Not..."}
+          readOnly={!isOwner}
+          autoFocus
+          style={{
+            width: "100%",
+            minHeight: "120px",
+            padding: "14px",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            color: "white",
+            fontSize: "14px",
+            resize: "none",
+            outline: "none",
+            fontFamily: "inherit",
+            boxSizing: "border-box",
+          }}
+        />
+
+        {isOwner && (
+          <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+            {existingNote && (
+              <button
+                onClick={handleDelete}
+                disabled={loading}
+                style={{
+                  padding: "12px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "rgba(255,100,100,0.8)",
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+                title="Notu Sil"
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
+            <button
+              onClick={handleSave}
+              disabled={loading || !noteText.trim()}
+              style={{
+                flex: 1,
+                padding: "12px",
+                borderRadius: "12px",
+                background:
+                  loading || !noteText.trim()
+                    ? "rgba(255,255,255,0.1)"
+                    : "var(--gs-red)",
+                color:
+                  loading || !noteText.trim() ? "rgba(255,255,255,0.3)" : "white",
+                border: "none",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: loading || !noteText.trim() ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
+            >
+              <Save size={18} />
+              {loading ? "Kaydediliyor..." : existingNote ? "Güncelle" : "Kaydet"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
 
   return (
     <>
@@ -178,114 +349,7 @@ export function CalendarView({
         />
       </div>
 
-      {mounted &&
-        createPortal(
-          <AnimatePresence>
-            {selectedDate && (
-              <>
-                {/* Backdrop */}
-                <motion.div
-                  key="backdrop"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-                  style={{ zIndex: 9998 }}
-                  onClick={closeModal}
-                />
-
-                {/* Modal */}
-                <div
-                  className="fixed inset-0 flex items-center justify-center p-4 pointer-events-none"
-                  style={{ zIndex: 9999 }}
-                >
-                  <motion.div
-                    key="modal"
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    className="w-full max-w-md glass-card p-5 relative pointer-events-auto"
-                  >
-                    {/* Close button */}
-                    <button
-                      onClick={closeModal}
-                      className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-all text-white/50 hover:text-white"
-                    >
-                      <X size={16} />
-                    </button>
-
-                    {/* Title */}
-                    <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                      <CalendarIcon size={20} style={{ color: "var(--gs-red)" }} />
-                      {new Date(selectedDate + "T00:00:00").toLocaleDateString("tr-TR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </h3>
-
-                    <div className="flex flex-col gap-4">
-                      <textarea
-                        value={noteText}
-                        onChange={(e) => setNoteText(e.target.value)}
-                        placeholder={isOwner ? "Bu güne dair bir not bırak..." : "Not..."}
-                        className="w-full p-4 rounded-xl text-sm resize-none h-32"
-                        style={{
-                          background: "rgba(255,255,255,0.05)",
-                          border: "1px solid rgba(255,255,255,0.15)",
-                          color: "white",
-                          outline: "none",
-                        }}
-                        readOnly={!isOwner}
-                        autoFocus
-                      />
-
-                      {isOwner && (
-                        <div className="flex gap-3">
-                          {existingNote && (
-                            <button
-                              onClick={handleDelete}
-                              disabled={loading}
-                              className="p-3 rounded-xl hover:bg-white/10 transition-all text-white/50 hover:text-red-400"
-                              title="Notu Sil"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          )}
-                          <button
-                            onClick={handleSave}
-                            disabled={loading || !noteText.trim()}
-                            className="flex-1 p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
-                            style={{
-                              background:
-                                loading || !noteText.trim()
-                                  ? "rgba(255,255,255,0.1)"
-                                  : "var(--gs-red)",
-                              color:
-                                loading || !noteText.trim()
-                                  ? "rgba(255,255,255,0.3)"
-                                  : "white",
-                            }}
-                          >
-                            {loading ? (
-                              "Kaydediliyor..."
-                            ) : (
-                              <>
-                                <Save size={18} />
-                                {existingNote ? "Güncelle" : "Kaydet"}
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                </div>
-              </>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
+      {mounted && createPortal(modal, document.body)}
     </>
   );
 }

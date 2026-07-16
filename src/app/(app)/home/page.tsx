@@ -8,6 +8,7 @@ import { MeetingCountdown } from "@/components/home/MeetingCountdown";
 import { LoveMeter } from "@/components/home/LoveMeter";
 import { MoodSelector } from "@/components/home/MoodSelector";
 import { DailyNoteCard } from "@/components/home/DailyNoteCard";
+import { PendingLettersCard } from "@/components/home/PendingLettersCard";
 import { Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export default async function HomePage() {
   const today = todayString();
   const doy = dayOfYear();
 
-  const [moodResult, noteResult, meetingResult] = await Promise.all([
+  const [moodResult, noteResult, meetingResult, pendingLettersResult] = await Promise.all([
     supabase
       .from("moods")
       .select("mood_type")
@@ -44,6 +45,12 @@ export default async function HomePage() {
       .order("meeting_datetime", { ascending: true })
       .limit(1)
       .single(),
+    supabase
+      .from("letters")
+      .select("id, unlock_date, sender:users!letters_sender_id_fkey(username, display_name)")
+      .eq("receiver_id", session.userId)
+      .gt("unlock_date", today)
+      .order("unlock_date", { ascending: true }),
   ]);
 
   const hitap = getTodayHitap();
@@ -56,6 +63,7 @@ export default async function HomePage() {
   const currentMood = moodResult.data?.mood_type ?? null;
   const currentNote = noteResult.data?.content ?? null;
   const activeMeeting = meetingResult.data;
+  const pendingLetters = (pendingLettersResult.data as any[]) ?? [];
 
   const dateStr = new Date().toLocaleDateString("tr-TR", {
     weekday: "long",
@@ -194,6 +202,9 @@ export default async function HomePage() {
 
       {/* ── GÜNLÜK NOT ────────────────────────────────── */}
       <DailyNoteCard existingNote={currentNote} />
+
+      {/* ── BEKLEYEN MEKTUPLAR ─────────────────────────── */}
+      <PendingLettersCard letters={pendingLetters} />
 
       {/* Bottom spacer */}
       <div style={{ height: 8 }} />

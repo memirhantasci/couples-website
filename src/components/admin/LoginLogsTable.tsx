@@ -18,7 +18,7 @@ interface LoginLog {
   browser: string | null;
   operating_system: string | null;
   device_type: string | null;
-  users?: { username: string };
+  users?: { username: string; display_name?: string };
 }
 
 interface LoginLogsTableProps {
@@ -43,7 +43,8 @@ export function LoginLogsTable({ logs }: LoginLogsTableProps) {
 
   const filtered = logs.filter((log) => {
     if (filter === "all") return true;
-    return log.users?.username === filter;
+    const u = Array.isArray(log.users) ? log.users[0] : log.users;
+    return u?.username?.toLowerCase() === filter;
   });
 
   return (
@@ -100,7 +101,10 @@ export function LoginLogsTable({ logs }: LoginLogsTableProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="font-bold text-white text-base">
-                    {log.users?.username === "emirhan" ? "Emirhan" : "Öykü"}
+                    {(() => {
+                      const u = Array.isArray(log.users) ? log.users[0] : log.users;
+                      return u?.display_name || u?.username || "Bilinmeyen";
+                    })()}
                   </span>
                   <span
                     className="text-sm font-medium"

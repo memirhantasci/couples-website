@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { LayoutGrid, Calendar as CalendarIcon } from "lucide-react";
 import { PhotoGrid } from "@/components/photos/PhotoGrid";
-import { CalendarView } from "@/components/calendar/CalendarView";
+import dynamic from "next/dynamic";
+const CalendarView = dynamic(
+  () => import("@/components/calendar/CalendarView").then((mod) => mod.CalendarView),
+  { ssr: false }
+);
 import type { Photo } from "@/components/photos/PhotoCard";
 
 interface CalendarPageClientProps {

@@ -71,6 +71,7 @@ export async function updateMedicineLogAction(
       medicine_id: medicineId,
       date: today,
       status,
+      taken_at: status === "DRANK" ? new Date().toISOString() : null,
     },
     {
       onConflict: "medicine_id,date,user_id",

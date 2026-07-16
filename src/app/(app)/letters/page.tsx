@@ -23,7 +23,7 @@ export default async function LettersPage() {
     .from("letters")
     .select(`
       *,
-      sender:users!letters_sender_id_fkey(username)
+      sender:users!letters_sender_id_fkey(username, display_name)
     `)
     .eq("receiver_id", session.userId)
     .order("created_at", { ascending: false });
@@ -33,7 +33,7 @@ export default async function LettersPage() {
     .from("letters")
     .select(`
       *,
-      receiver:users!letters_receiver_id_fkey(username)
+      receiver:users!letters_receiver_id_fkey(username, display_name)
     `)
     .eq("sender_id", session.userId)
     .order("created_at", { ascending: false });

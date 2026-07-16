@@ -14,8 +14,8 @@ interface Letter {
   content: string;
   unlock_date: string;
   created_at: string;
-  sender?: { username: string };
-  receiver?: { username: string };
+  sender?: { username: string; display_name?: string };
+  receiver?: { username: string; display_name?: string };
 }
 
 export function LetterList({ letters, type = "received" }: { letters: Letter[], type?: "received" | "sent" }) {
@@ -43,8 +43,9 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
         // Gönderilen mektuplar her zaman açılabilir
         const canOpen = type === "sent" || !isLockedDate;
         
-        const senderName = letter.sender?.username === "emirhan" ? "Emirhan" : letter.sender?.username === "oyku" ? "Öykü" : "Gizli Biri";
-        const receiverName = letter.receiver?.username === "emirhan" ? "Emirhan" : letter.receiver?.username === "oyku" ? "Öykü" : "Gizli Biri";
+        const actualSenderName = letter.sender?.display_name || letter.sender?.username || "Gizli Biri";
+        const senderName = (type === "received" && !canOpen) ? "Gizli Biri" : actualSenderName;
+        const receiverName = letter.receiver?.display_name || letter.receiver?.username || "Gizli Biri";
         
         return (
           <div 

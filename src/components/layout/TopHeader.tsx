@@ -108,7 +108,7 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
         {/* Right side */}
         <div className="flex items-center gap-3">
           <span
-            className="text-sm font-semibold hidden sm:inline-block"
+            className="text-sm font-semibold"
             style={{ color: "rgba(255,255,255,0.55)" }}
           >
             {displayName}
