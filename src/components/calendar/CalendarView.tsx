@@ -54,7 +54,7 @@ export function CalendarView({
   // Build events from notes and moods
   const noteEvents = notes.map((n) => {
     const displayName = n.user?.display_name || n.user?.username;
-    const namePrefix = displayName ? `(${displayName}) ` : "";
+    const namePrefix = displayName ? `${displayName.charAt(0)}: ` : "";
     return {
       id: `note-${n.id}`,
       date: n.date,
@@ -69,7 +69,7 @@ export function CalendarView({
   const moodEvents = moods.map((m) => {
     const u = Array.isArray(m.user) ? m.user[0] : m.user;
     const displayName = u?.display_name || u?.username || "";
-    const namePrefix = displayName ? `(${displayName}) ` : "";
+    const namePrefix = displayName ? `${displayName.charAt(0)}: ` : "";
     return {
       id: `mood-${m.date}-${displayName}`,
       date: m.date,
