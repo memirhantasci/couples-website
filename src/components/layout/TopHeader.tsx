@@ -20,15 +20,15 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: "/home",       label: "Ana Sayfa",     icon: <Home size={22} strokeWidth={2} /> },
-  { href: "/medicine",   label: "İlaçlar",        icon: <Pill size={22} strokeWidth={2} /> },
-  { href: "/memories",   label: "Özel Günler",    icon: <Camera size={22} strokeWidth={2} /> },
-  { href: "/calendar",   label: "Takvim",         icon: <Calendar size={22} strokeWidth={2} /> },
-  { href: "/daily-notes-user", label: "Günlük",   icon: <BookText size={22} strokeWidth={2} /> },
-  { href: "/letters",    label: "Mektuplar",      icon: <Mail size={22} strokeWidth={2} /> },
-  { href: "/period-tracker", label: "Regl Takvimi", icon: <Activity size={22} strokeWidth={2} /> },
-  { href: "/photos/upload", label: "Fotoğraf Yükle", icon: <Upload size={22} strokeWidth={2} /> },
-  { href: "/admin",      label: "Admin Paneli",   icon: <LayoutDashboard size={22} strokeWidth={2} />, adminOnly: true },
+  { href: "/home",       label: "Ana Sayfa",     icon: <Home size={38} strokeWidth={2} /> },
+  { href: "/medicine",   label: "İlaçlar",        icon: <Pill size={38} strokeWidth={2} /> },
+  { href: "/memories",   label: "Özel Günler",    icon: <Camera size={38} strokeWidth={2} /> },
+  { href: "/calendar",   label: "Takvim",         icon: <Calendar size={38} strokeWidth={2} /> },
+  { href: "/daily-notes-user", label: "Günlük",   icon: <BookText size={38} strokeWidth={2} /> },
+  { href: "/letters",    label: "Mektuplar",      icon: <Mail size={38} strokeWidth={2} /> },
+  { href: "/period-tracker", label: "Regl Takvimi", icon: <Activity size={38} strokeWidth={2} /> },
+  { href: "/photos/upload", label: "Fotoğraf Yükle", icon: <Upload size={38} strokeWidth={2} /> },
+  { href: "/admin",      label: "Admin Paneli",   icon: <LayoutDashboard size={38} strokeWidth={2} />, adminOnly: true },
 ];
 
 interface TopHeaderProps {
@@ -91,17 +91,17 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
 
           <button
             onClick={() => setIsOpen(true)}
-            className="flex items-center justify-center rounded-[12px] transition-all"
+            className="flex items-center justify-center rounded-[14px] transition-all"
             style={{
-              width: 40,
-              height: 40,
+              width: 56,
+              height: 56,
               background: "rgba(255,255,255,0.07)",
               border: "1px solid rgba(255,255,255,0.09)",
               color: "rgba(255,255,255,0.8)",
             }}
             aria-label="Menüyü aç"
           >
-            <Menu size={20} strokeWidth={2} />
+            <Menu size={40} strokeWidth={2} />
           </button>
         </div>
       </header>
@@ -127,26 +127,25 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 220 }}
-              className="fixed top-0 right-0 bottom-0 w-[85vw] sm:w-[380px] z-[101] flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-[90vw] sm:w-[460px] z-[101] flex flex-col"
               style={{
                 background: "#1a1a1e",
                 borderLeft: "1px solid rgba(255,255,255,0.08)",
                 boxShadow: "-16px 0 48px rgba(0,0,0,0.55)",
               }}
             >
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between px-6 py-5 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                <span className="font-bold text-white text-lg">Menü</span>
+              <div className="flex items-center justify-between px-6 py-6 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                <span className="font-bold text-white text-[32px]">Menü</span>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center rounded-[10px] transition-all hover:bg-white/10"
+                  className="flex items-center justify-center rounded-[14px] transition-all hover:bg-white/10"
                   style={{
-                    width: 36,
-                    height: 36,
+                    width: 48,
+                    height: 48,
                     color: "rgba(255,255,255,0.55)",
                   }}
                 >
-                  <X size={20} strokeWidth={2} />
+                  <X size={32} strokeWidth={2} />
                 </button>
               </div>
 
@@ -158,7 +157,7 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-4 px-4 py-3.5 rounded-[14px] font-semibold transition-all text-base"
+                      className="flex items-center gap-5 px-5 py-4 rounded-[16px] font-semibold transition-all text-[28px]"
                       style={{
                         background: isActive ? "rgba(232, 0, 45, 0.12)" : "transparent",
                         color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.75)",
@@ -177,14 +176,14 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
                 <form action={logoutAction}>
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center gap-3 py-3.5 rounded-[14px] font-bold text-base transition-all"
+                    className="w-full flex items-center justify-center gap-4 py-4 rounded-[16px] font-bold text-[28px] transition-all"
                     style={{
                       background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
                       color: "#ffffff",
                       boxShadow: "0 4px 16px rgba(232, 0, 45, 0.3)",
                     }}
                   >
-                    <LogOut size={18} />
+                    <LogOut size={32} />
                     <span>Çıkış Yap</span>
                   </button>
                 </form>
