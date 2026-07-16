@@ -14,7 +14,8 @@ export interface SessionCookie {
   role: "ADMIN" | "USER";
   loginDate: string;
   loginLogId: number;
+  expiresAt?: number;
 }
 
 export const SESSION_COOKIE_NAME = "couples_session";
-export const SESSION_MAX_AGE = 60 * 60 * 24 * 2; // 2 days (midnight check handles daily reset)
+export const SESSION_MAX_AGE = 60 * 60 * 24 * 365; // 1 year, expiration handled internally

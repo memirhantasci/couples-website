@@ -6,7 +6,7 @@ const PROTECTED_ROUTES = ["/home", "/medicine", "/memories", "/calendar", "/admi
 // Routes that require ADMIN role
 const ADMIN_ROUTES = ["/admin"];
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public routes and static assets
@@ -46,13 +46,10 @@ export function proxy(request: NextRequest) {
     return response;
   }
 
-  // ─── MIDNIGHT LOGOUT CHECK ─────────────────────────────────────────────────
-  // Compare loginDate (YYYY-MM-DD) with today (UTC+3 / Turkey time)
-  const nowTR = new Date(Date.now() + 3 * 60 * 60 * 1000);
-  const today = nowTR.toISOString().slice(0, 10);
-  if (session.loginDate !== today) {
-    // Day has changed — invalidate session and redirect to login
-    const response = NextResponse.redirect(new URL("/login", request.url));
+  // ─── 10-MINUTE LOGOUT CHECK ────────────────────────────────────────────────
+  if (session.expiresAt && Date.now() > session.expiresAt) {
+    // Session expired — invalidate and redirect to login with query param
+    const response = NextResponse.redirect(new URL("/login?expired=true", request.url));
     response.cookies.delete(SESSION_COOKIE_NAME);
     return response;
   }

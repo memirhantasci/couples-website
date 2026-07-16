@@ -4,9 +4,13 @@ import { SESSION_COOKIE_NAME, SESSION_MAX_AGE, type SessionCookie } from "./type
 /**
  * Creates a session cookie with the given session data
  */
-export async function createSession(data: SessionCookie): Promise<void> {
+export async function createSession(data: Omit<SessionCookie, "expiresAt">): Promise<void> {
   const cookieStore = await cookies();
-  const payload = JSON.stringify(data);
+  const sessionData: SessionCookie = {
+    ...data,
+    expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes from now
+  };
+  const payload = JSON.stringify(sessionData);
   // Simple base64 encoding (not encryption — security through HttpOnly)
   const encoded = Buffer.from(payload).toString("base64");
 
@@ -33,6 +37,10 @@ export async function getSession(): Promise<SessionCookie | null> {
     const data = JSON.parse(decoded) as SessionCookie;
 
     if (!data.userId || !data.role || !data.loginDate) return null;
+
+    if (data.expiresAt && Date.now() > data.expiresAt) {
+      return null; // Session expired
+    }
 
     return data;
   } catch {

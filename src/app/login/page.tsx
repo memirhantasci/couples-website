@@ -4,17 +4,31 @@ import { useActionState } from "react";
 import { loginAction, changePasswordAction, type LoginState } from "@/actions/auth";
 import { Heart, Lock, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 const initialState: LoginState = {};
 
-export default function LoginPage() {
+function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
   const [forgotState, forgotAction, isForgotPending] = useActionState(changePasswordAction, initialState);
   
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("expired") === "true") {
+      toast.error("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
+      
+      // Optional: remove the query param so it doesn't show again on refresh
+      const url = new URL(window.location.href);
+      url.searchParams.delete("expired");
+      window.history.replaceState({}, "", url);
+    }
+  }, [searchParams]);
 
   return (
     <div
@@ -382,5 +396,13 @@ export default function LoginPage() {
         </AnimatePresence>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-dvh flex items-center justify-center" style={{ backgroundColor: "var(--dark-950)" }}>Yükleniyor...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
