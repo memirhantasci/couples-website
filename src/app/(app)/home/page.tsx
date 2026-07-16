@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { getTodayHitap, daysSince, getLoveMeter, dayOfYear } from "@/lib/date";
+import { getTodayHitap, daysSince, getLoveMeter, dayOfYear, todayString, dayjs } from "@/lib/date";
 import { getQuoteForDay } from "@/lib/quotes";
 import { MeetingCountdown } from "@/components/home/MeetingCountdown";
 import { LoveMeter } from "@/components/home/LoveMeter";
 import { MoodSelector } from "@/components/home/MoodSelector";
 import { DailyNoteCard } from "@/components/home/DailyNoteCard";
-import dayjs from "dayjs";
 import { Sparkles } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -22,7 +21,7 @@ export default async function HomePage() {
   if (!session) redirect("/login");
 
   const supabase = createServerClient();
-  const today = dayjs().format("YYYY-MM-DD");
+  const today = todayString();
   const doy = dayOfYear();
 
   const [moodResult, noteResult, meetingResult] = await Promise.all([

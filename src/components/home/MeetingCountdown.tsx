@@ -2,10 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { getCountdown } from "@/lib/date";
-
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
+import { getCountdown, dayjs } from "@/lib/date";
 
 interface CountdownProps {
   targetDate: string;

@@ -4,12 +4,19 @@ import isBetween from "dayjs/plugin/isBetween";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dayOfYearPlugin from "dayjs/plugin/dayOfYear";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 dayjs.extend(isBetween);
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(dayOfYearPlugin);
+dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.locale("tr");
+
+// Varsayılan olarak Türkiye saatini kullan
+dayjs.tz.setDefault("Europe/Istanbul");
 
 export { dayjs };
 
@@ -21,23 +28,29 @@ export const TOGETHER_DATE = dayjs("2026-01-26"); // Sevgili olma
  * Returns the number of days since a given date (0 if in the future)
  */
 export function daysSince(date: dayjs.Dayjs): number {
-  const today = dayjs().startOf("day");
-  const diff = today.diff(date.startOf("day"), "day");
+  const today = dayjs().tz("Europe/Istanbul").startOf("day");
+  const diff = today.diff(date.tz("Europe/Istanbul").startOf("day"), "day");
   return Math.max(0, diff);
 }
 
 /**
  * Returns day of year (1-indexed)
  */
-export function dayOfYear(date: dayjs.Dayjs = dayjs()): number {
+/**
+ * Returns day of year (1-indexed)
+ */
+export function dayOfYear(date: dayjs.Dayjs = dayjs().tz("Europe/Istanbul")): number {
   return (date as any).dayOfYear() as number;
 }
 
 /**
  * Returns today's date as YYYY-MM-DD string
  */
+/**
+ * Returns today's date as YYYY-MM-DD string
+ */
 export function todayString(): string {
-  return dayjs().format("YYYY-MM-DD");
+  return dayjs().tz("Europe/Istanbul").format("YYYY-MM-DD");
 }
 
 /**
@@ -60,8 +73,12 @@ export function seededRandom(seed: number, min: number, max: number): number {
 /**
  * Returns today's love meter value (80-100, stable within the same day)
  */
+/**
+ * Returns today's love meter value (80-100, stable within the same day)
+ */
 export function getLoveMeter(): number {
-  const seed = dayjs().diff(dayjs("2020-01-01"), "day");
+  const today = dayjs().tz("Europe/Istanbul").startOf("day");
+  const seed = today.diff(dayjs("2020-01-01").tz("Europe/Istanbul"), "day");
   return seededRandom(seed, 80, 100);
 }
 
@@ -93,8 +110,8 @@ export function getTodayHitap(): string {
  * Returns a countdown object from now to a future datetime
  */
 export function getCountdown(targetDate: string | Date) {
-  const target = dayjs(targetDate);
-  const now = dayjs();
+  const target = dayjs(targetDate).tz("Europe/Istanbul");
+  const now = dayjs().tz("Europe/Istanbul");
   const diff = target.diff(now, "second");
 
   if (diff <= 0) {
