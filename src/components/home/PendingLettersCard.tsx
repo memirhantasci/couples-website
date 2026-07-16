@@ -18,7 +18,7 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
 
   const pendingLetters = letters.filter(letter => {
     const unlockDate = dayjs(letter.unlock_date);
-    return unlockDate.isAfter(today);
+    return !unlockDate.isBefore(today, "day");
   });
 
   if (pendingLetters.length === 0) return null;
