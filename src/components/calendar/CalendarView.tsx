@@ -65,15 +65,20 @@ export function CalendarView({
     };
   });
 
-  const moodEvents = moods.map((m) => ({
-    id: `mood-${m.date}`,
-    date: m.date,
-    title: m.mood_type,
-    backgroundColor: "rgba(255, 215, 0, 0.1)",
-    borderColor: "rgba(255, 215, 0, 0.2)",
-    textColor: "#FFD700",
-    extendedProps: { type: "mood" },
-  }));
+  const moodEvents = moods.map((m) => {
+    const u = Array.isArray(m.user) ? m.user[0] : m.user;
+    const displayName = u?.display_name || u?.username || "";
+    const namePrefix = displayName ? `(${displayName}) ` : "";
+    return {
+      id: `mood-${m.date}-${displayName}`,
+      date: m.date,
+      title: namePrefix + m.mood_type,
+      backgroundColor: "rgba(255, 215, 0, 0.1)",
+      borderColor: "rgba(255, 215, 0, 0.2)",
+      textColor: "#FFD700",
+      extendedProps: { type: "mood" },
+    };
+  });
 
   const photoEvents = photoDates.map((date) => ({
     id: `photo-${date}`,

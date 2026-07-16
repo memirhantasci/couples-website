@@ -31,8 +31,7 @@ export default async function CalendarPage() {
       .order("date"),
     supabase
       .from("moods")
-      .select("date, mood_type")
-      .eq("user_id", session.userId)
+      .select("date, mood_type, user:users(username, display_name)")
       .gte("date", threeMonthsAgo)
       .lte("date", twoMonthsLater)
       .order("date"),
