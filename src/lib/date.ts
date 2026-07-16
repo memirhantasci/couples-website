@@ -21,8 +21,8 @@ dayjs.tz.setDefault("Europe/Istanbul");
 export { dayjs };
 
 // Fixed dates
-export const MEETING_DATE = dayjs("2026-01-19"); // Tanışma
-export const TOGETHER_DATE = dayjs("2026-01-26"); // Sevgili olma
+export const MEETING_DATE = dayjs.tz("2026-01-19", "Europe/Istanbul"); // Tanışma
+export const TOGETHER_DATE = dayjs.tz("2026-01-26", "Europe/Istanbul"); // Sevgili olma
 
 /**
  * Returns the number of days since a given date (0 if in the future)
@@ -78,7 +78,7 @@ export function seededRandom(seed: number, min: number, max: number): number {
  */
 export function getLoveMeter(): number {
   const today = dayjs().tz("Europe/Istanbul").startOf("day");
-  const seed = today.diff(dayjs("2020-01-01").tz("Europe/Istanbul"), "day");
+  const seed = today.diff(dayjs.tz("2020-01-01", "Europe/Istanbul"), "day");
   return seededRandom(seed, 80, 100);
 }
 
@@ -110,7 +110,7 @@ export function getTodayHitap(): string {
  * Returns a countdown object from now to a future datetime
  */
 export function getCountdown(targetDate: string | Date) {
-  const target = dayjs(targetDate).tz("Europe/Istanbul");
+  const target = dayjs.tz(targetDate, "Europe/Istanbul");
   const now = dayjs().tz("Europe/Istanbul");
   const diff = target.diff(now, "second");
 
