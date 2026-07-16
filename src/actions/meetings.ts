@@ -89,27 +89,27 @@ export async function upsertCalendarNoteAction(
 
   const supabase = createServerClient();
 
-  // Check if note exists for this date
+  // Check if note exists for this date AND this user
   const { data: existing } = await supabase
     .from("calendar_notes")
     .select("id, user_id")
     .eq("date", parsed.data.date)
-    .single();
+    .eq("user_id", session.userId)
+    .maybeSingle();
 
   if (existing) {
-    if (existing.user_id !== session.userId) {
-      return { error: "Bu not başkasına ait, değiştiremezsiniz." };
-    }
-    await supabase
+    const { error } = await supabase
       .from("calendar_notes")
-      .update({ note: parsed.data.note, user_id: session.userId })
+      .update({ note: parsed.data.note })
       .eq("id", existing.id);
+    if (error) return { error: "Not güncellenirken hata oluştu: " + error.message };
   } else {
-    await supabase.from("calendar_notes").insert({
+    const { error } = await supabase.from("calendar_notes").insert({
       date: parsed.data.date,
       note: parsed.data.note,
       user_id: session.userId,
     });
+    if (error) return { error: "Not eklenirken hata oluştu: " + error.message };
   }
 
   revalidatePath("/calendar");
