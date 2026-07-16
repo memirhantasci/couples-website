@@ -33,13 +33,20 @@ export default async function PeriodTrackerPage() {
     <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Activity size={22} style={{ color: "var(--gs-red)" }} />
-          Regl Takvimi
-        </h1>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
+        <div className="flex items-center gap-2.5 mb-1">
+          <div
+            className="w-9 h-9 rounded-[12px] flex items-center justify-center"
+            style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
+          >
+            <Activity size={18} />
+          </div>
+          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+            Regl Takvimi
+          </h1>
+        </div>
+        <p className="text-xs ml-[52px]" style={{ color: "var(--text-tertiary)" }}>
           {isOyku 
-            ? "Tarihin üzerine tıklayarak yeni kayıt ekleyebilir veya silebilirsin."
+            ? "Tarihin üzerine tıklayarak kayıt ekleyebilir veya silebilirsin."
             : "Bu tabloyu sadece Öykü güncelleyebilir."}
         </p>
       </div>

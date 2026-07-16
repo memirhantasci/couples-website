@@ -70,7 +70,7 @@ export function MoodChart({ moods, users }: MoodChartProps) {
   const COLORS = ["#E8002D", "#FFD700"];
 
   return (
-    <div className="glass-card p-5">
+    <div className="card p-5">
       <h3 className="font-bold text-white mb-4 text-sm">
         Ruh Hali İstatistikleri (Son 30 Gün)
       </h3>

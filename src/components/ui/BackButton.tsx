@@ -9,16 +9,18 @@ export function BackButton() {
   return (
     <button
       onClick={() => router.back()}
-      className="flex items-center justify-center rounded-xl transition-all hover:bg-white/10 shrink-0"
-      style={{ 
-        width: 48, 
-        height: 48, 
-        background: "rgba(255,255,255,0.06)", 
-        color: "rgba(255,255,255,0.8)" 
+      className="flex items-center justify-center rounded-[12px] transition-all active:scale-95"
+      style={{
+        width: 40,
+        height: 40,
+        background: "var(--surface-3)",
+        border: "1px solid var(--border-subtle)",
+        color: "var(--text-secondary)",
+        flexShrink: 0,
       }}
       aria-label="Geri Dön"
     >
-      <ArrowLeft size={24} />
+      <ArrowLeft size={20} strokeWidth={2} />
     </button>
   );
 }

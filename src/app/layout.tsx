@@ -36,12 +36,12 @@ export default function RootLayout({
           position="top-center"
           toastOptions={{
             style: {
-              background: "rgba(19, 19, 39, 0.95)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              background: "var(--surface-3)",
+              border: "1px solid rgba(255,255,255,0.10)",
               color: "#ffffff",
               borderRadius: "14px",
               fontFamily: "Inter, sans-serif",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
             },
           }}
           richColors

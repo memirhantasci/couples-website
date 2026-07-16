@@ -100,7 +100,7 @@ export function MobileMenu({ role }: MobileMenuProps) {
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
               className="fixed inset-0 z-[100]"
-              style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+              style={{ background: "rgba(0,0,0,0.75)" }}
             />
 
             {/* Drawer */}
@@ -111,8 +111,7 @@ export function MobileMenu({ role }: MobileMenuProps) {
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed top-0 right-0 bottom-0 w-[280px] z-[101] flex flex-col"
               style={{
-                background: "rgba(13, 13, 26, 0.95)",
-                backdropFilter: "blur(20px)",
+                background: "#18181b",
                 borderLeft: "1px solid rgba(255,255,255,0.08)",
                 boxShadow: "-10px 0 40px rgba(0,0,0,0.5)",
               }}

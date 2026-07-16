@@ -108,7 +108,7 @@ export function Lightbox({ photos, initialIndex, onClose }: LightboxProps) {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
         className="fixed inset-0 z-[200] flex flex-col"
-        style={{ background: "rgba(4, 4, 12, 0.96)", backdropFilter: "blur(20px)" }}
+        style={{ background: "rgba(4, 4, 12, 0.97)" }}
         onClick={onClose}
       >
         {/* Top bar */}
@@ -171,9 +171,8 @@ export function Lightbox({ photos, initialIndex, onClose }: LightboxProps) {
               onClick={(e) => { e.stopPropagation(); goPrev(); }}
               className="absolute left-3 z-10 p-3 rounded-2xl transition-all"
               style={{
-                background: "rgba(255,255,255,0.1)",
-                backdropFilter: "blur(8px)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.15)",
                 color: "white",
               }}
             >
@@ -219,9 +218,8 @@ export function Lightbox({ photos, initialIndex, onClose }: LightboxProps) {
               onClick={(e) => { e.stopPropagation(); goNext(); }}
               className="absolute right-3 z-10 p-3 rounded-2xl transition-all"
               style={{
-                background: "rgba(255,255,255,0.1)",
-                backdropFilter: "blur(8px)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                background: "rgba(255,255,255,0.12)",
+                border: "1px solid rgba(255,255,255,0.15)",
                 color: "white",
               }}
             >

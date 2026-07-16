@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getCountdown, dayjs } from "@/lib/date";
+import { MapPin } from "lucide-react";
 
 interface CountdownProps {
   targetDate: string;
@@ -21,10 +22,10 @@ export function MeetingCountdown({ targetDate, title }: CountdownProps) {
 
   if (countdown.isPast) {
     return (
-      <div className="glass-card p-5 text-center">
+      <div className="card p-5 text-center">
         <div className="text-3xl mb-2">🎉</div>
         <p className="text-gradient font-bold text-lg">{title}</p>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, marginTop: 4 }}>
+        <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
           Buluşma gerçekleşti!
         </p>
       </div>
@@ -32,8 +33,8 @@ export function MeetingCountdown({ targetDate, title }: CountdownProps) {
   }
 
   const units = [
-    { label: "Gün", value: countdown.days },
-    { label: "Saat", value: countdown.hours },
+    { label: "Gün",    value: countdown.days },
+    { label: "Saat",   value: countdown.hours },
     { label: "Dakika", value: countdown.minutes },
     { label: "Saniye", value: countdown.seconds },
   ];
@@ -41,42 +42,49 @@ export function MeetingCountdown({ targetDate, title }: CountdownProps) {
   const formattedDate = dayjs(targetDate).locale("tr").format("D MMMM dddd, HH:mm");
 
   return (
-    <div className="glass-card p-5">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-xl">📍</span>
+    <div className="card p-5">
+      {/* Title row */}
+      <div className="flex items-center gap-2.5 mb-4">
+        <div
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0"
+          style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
+        >
+          <MapPin size={16} />
+        </div>
         <div>
-          <p className="font-bold text-white text-sm">{title}</p>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
-            {formattedDate}
-          </p>
+          <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{title}</p>
+          <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>{formattedDate}</p>
         </div>
       </div>
 
+      {/* Countdown grid */}
       <div className="grid grid-cols-4 gap-2">
         {units.map((unit) => (
-          <motion.div
+          <div
             key={unit.label}
-            className="flex flex-col items-center gap-1 p-3 rounded-2xl"
+            className="flex flex-col items-center gap-1.5 py-3 rounded-[14px]"
             style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--surface-3)",
+              border: "1px solid var(--border-subtle)",
             }}
           >
             <motion.span
               key={unit.value}
-              initial={{ y: -10, opacity: 0 }}
+              initial={{ y: -8, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="text-2xl font-bold text-gradient"
+              transition={{ duration: 0.25 }}
+              className="text-2xl font-bold"
+              style={{ color: "var(--gs-red)", fontVariantNumeric: "tabular-nums" }}
             >
               {String(unit.value).padStart(2, "0")}
             </motion.span>
             <span
-              className="text-xs font-semibold uppercase tracking-wider"
-              style={{ color: "rgba(255,255,255,0.4)" }}
+              className="text-[10px] font-semibold uppercase tracking-wider"
+              style={{ color: "var(--text-tertiary)" }}
             >
               {unit.label}
             </span>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>

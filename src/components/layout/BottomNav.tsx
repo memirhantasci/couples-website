@@ -2,38 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Pill, Camera, Calendar, LayoutDashboard, Mail, BookText, Images, Upload } from "lucide-react";
+import { Home, Pill, Calendar, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
   href: string;
   label: string;
-  icon: React.ReactNode;
-  adminOnly?: boolean;
+  icon: React.ElementType;
 }
 
 const navItems: NavItem[] = [
-  {
-    href: "/home",
-    label: "Ana Sayfa",
-    icon: <Home size={20} strokeWidth={2} />,
-  },
-  {
-    href: "/medicine",
-    label: "İlaçlar",
-    icon: <Pill size={20} strokeWidth={2} />,
-  },
-  {
-    href: "/calendar",
-    label: "Takvim",
-    icon: <Calendar size={20} strokeWidth={2} />,
-  },
-  {
-    href: "/letters",
-    label: "Mektuplar",
-    icon: <Mail size={20} strokeWidth={2} />,
-  }
+  { href: "/home",     label: "Ana Sayfa", icon: Home },
+  { href: "/medicine", label: "İlaçlar",   icon: Pill },
+  { href: "/calendar", label: "Takvim",    icon: Calendar },
+  { href: "/letters",  label: "Mektuplar", icon: Mail },
 ];
 
 interface BottomNavProps {
@@ -43,20 +26,15 @@ interface BottomNavProps {
 export function BottomNav({ role }: BottomNavProps) {
   const pathname = usePathname();
 
-  const visibleItems = navItems.filter(
-    (item) => !item.adminOnly || role === "ADMIN"
-  );
-
-  // Admin rotalarında alt menüyü tamamen gizle
-  // Ayrıca admin kullanıcısı için hiçbir zaman alt menü gösterme
   if (role === "ADMIN" || pathname.startsWith("/admin")) {
     return null;
   }
 
   return (
     <nav className="bottom-nav">
-      {visibleItems.map((item) => {
+      {navItems.map((item) => {
         const isActive = pathname.startsWith(item.href);
+        const Icon = item.icon;
 
         return (
           <Link
@@ -64,20 +42,24 @@ export function BottomNav({ role }: BottomNavProps) {
             href={item.href}
             className={cn("bottom-nav-item", isActive && "active")}
           >
+            {/* Pill indicator behind icon */}
             <div className="nav-icon relative">
-              {item.icon}
+              <Icon size={21} strokeWidth={isActive ? 2.2 : 1.8} />
               {isActive && (
                 <motion.div
-                  layoutId="nav-indicator"
-                  className="absolute inset-0 rounded-[10px]"
-                  style={{
-                    background: "rgba(232, 0, 45, 0.15)",
-                  }}
+                  layoutId="nav-pill"
+                  className="absolute inset-0 rounded-[12px]"
+                  style={{ background: "rgba(232, 0, 45, 0.15)" }}
                   transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                 />
               )}
             </div>
-            <span className="nav-label">{item.label}</span>
+            <span
+              className="nav-label"
+              style={{ color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)" }}
+            >
+              {item.label}
+            </span>
           </Link>
         );
       })}

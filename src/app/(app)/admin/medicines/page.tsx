@@ -53,7 +53,7 @@ export default async function AdminMedicinesPage() {
 
       <AddMedicineForm users={usersResult.data || []} />
 
-      <div className="glass-card p-5">
+      <div className="card p-5">
         <h2 className="font-bold text-white text-base mb-4">Tüm İlaçlar ve Kayıtlar</h2>
         <AdminMedicineList 
           medicines={medicinesResult.data || []} 

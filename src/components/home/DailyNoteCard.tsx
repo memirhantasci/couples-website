@@ -17,7 +17,7 @@ export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (saved) return; // already saved today — locked
+    if (saved) return;
     setSubmitting(true);
     const formData = new FormData(e.currentTarget);
     const result = await upsertDailyNoteAction({}, formData);
@@ -32,16 +32,31 @@ export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
   }
 
   return (
-    <div className="glass-card" style={{ padding: "22px 20px" }}>
+    <div className="card p-5">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <BookOpen size={18} style={{ color: "var(--gs-gold)" }} />
-          <span className="font-semibold text-sm text-white">Günlük Notum</span>
+        <div className="flex items-center gap-2.5">
+          <div
+            className="w-8 h-8 rounded-[10px] flex items-center justify-center"
+            style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
+          >
+            <BookOpen size={16} />
+          </div>
+          <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
+            Günlük Notum
+          </span>
         </div>
+
         {saved && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <Lock size={11} style={{ color: "rgba(255,255,255,0.35)" }} />
-            <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 600 }}>
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg"
+            style={{
+              background: "var(--surface-3)",
+              border: "1px solid var(--border-subtle)",
+            }}
+          >
+            <Lock size={10} style={{ color: "var(--text-tertiary)" }} />
+            <span className="text-[10px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
               Bugün için kaydedildi
             </span>
           </div>
@@ -51,22 +66,19 @@ export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
       {saved ? (
         /* Read-only display */
         <div
-          className="p-4 rounded-2xl"
+          className="p-4 rounded-[14px]"
           style={{
-            background: "rgba(255,215,0,0.06)",
-            border: "1px solid rgba(255,215,0,0.12)",
+            background: "rgba(245,200,66,0.05)",
+            border: "1px solid rgba(245,200,66,0.12)",
           }}
         >
           <p
             className="text-sm leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.80)", whiteSpace: "pre-wrap" }}
+            style={{ color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}
           >
             {content}
           </p>
-          <p
-            className="text-xs mt-3"
-            style={{ color: "rgba(255,255,255,0.3)" }}
-          >
+          <p className="text-xs mt-3" style={{ color: "var(--text-tertiary)" }}>
             Yarın yeni bir not yazabilirsin 🌙
           </p>
         </div>
@@ -79,24 +91,28 @@ export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
             placeholder="Bugün nasıldı? Ne hissediyorsun?..."
             rows={4}
             className="input-glass resize-none"
+            style={{ borderRadius: 14, lineHeight: 1.6 }}
             maxLength={2000}
             required
           />
           <div className="flex items-center justify-between">
-            <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 11 }}>
+            <span className="text-[11px]" style={{ color: "var(--text-tertiary)" }}>
               {content.length}/2000
             </span>
             <button
               type="submit"
               disabled={submitting}
               className="btn-primary"
-              style={{ padding: "10px 20px", fontSize: 13 }}
+              style={{ padding: "10px 18px", fontSize: 13, borderRadius: 12 }}
             >
               {submitting ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div
+                  className="w-4 h-4 border-2 border-t-white rounded-full animate-spin"
+                  style={{ borderColor: "rgba(255,255,255,0.25)", borderTopColor: "white" }}
+                />
               ) : (
                 <>
-                  <Send size={14} />
+                  <Send size={13} />
                   Kaydet
                 </>
               )}

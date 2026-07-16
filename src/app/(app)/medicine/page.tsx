@@ -84,33 +84,48 @@ export default async function MedicinePage() {
   const streakValue = await calculateStreak(supabase, session.userId, medIds);
 
   return (
-    <div className="px-4 py-6 flex flex-col gap-5 max-w-lg mx-auto">
-      {/* Header */}
-      <div className="glass-card p-5">
+    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
+
+      {/* Header Card */}
+      <div className="card p-5">
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Pill size={20} style={{ color: "var(--gs-red)" }} />
-              <h1 className="text-xl font-bold text-white">İlaç Takibi</h1>
+            <div className="flex items-center gap-2.5 mb-1">
+              <div
+                className="w-8 h-8 rounded-[10px] flex items-center justify-center"
+                style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
+              >
+                <Pill size={16} />
+              </div>
+              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                İlaç Takibi
+              </h1>
             </div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>
+            <p className="text-xs ml-[44px]" style={{ color: "var(--text-tertiary)" }}>
               {dayjs().locale("tr").format("D MMMM YYYY, dddd")}
             </p>
           </div>
 
           {streakValue > 0 && (
             <div
-              className="flex flex-col items-center gap-1 px-4 py-3 rounded-2xl"
+              className="flex flex-col items-center gap-0.5 px-4 py-2.5 rounded-[14px]"
               style={{
-                background: "rgba(255,140,0,0.1)",
-                border: "1px solid rgba(255,140,0,0.2)",
+                background: "rgba(255,140,0,0.10)",
+                border: "1px solid rgba(255,140,0,0.18)",
               }}
             >
               <div className="flex items-center gap-1">
-                <Flame size={18} style={{ color: "#ff8c00" }} />
-                <span className="font-bold text-2xl" style={{ color: "#ff8c00" }}>{streakValue}</span>
+                <Flame size={16} style={{ color: "#ff8c00" }} />
+                <span className="font-bold text-xl" style={{ color: "#ff8c00" }}>
+                  {streakValue}
+                </span>
               </div>
-              <span style={{ color: "rgba(255,140,0,0.7)", fontSize: 11, fontWeight: 600 }}>günlük seri</span>
+              <span
+                className="text-[10px] font-semibold"
+                style={{ color: "rgba(255,140,0,0.65)" }}
+              >
+                günlük seri
+              </span>
             </div>
           )}
         </div>
@@ -119,10 +134,20 @@ export default async function MedicinePage() {
         {streakValue >= 7 && (
           <div className="mt-3">
             <span
-              className={`streak-badge ${streakValue >= 100 ? "streak-badge-100" : streakValue >= 30 ? "streak-badge-30" : "streak-badge-7"}`}
+              className={`streak-badge ${
+                streakValue >= 100
+                  ? "streak-badge-100"
+                  : streakValue >= 30
+                    ? "streak-badge-30"
+                    : "streak-badge-7"
+              }`}
             >
-              <Trophy size={13} />
-              {streakValue >= 100 ? "💎 100 Gün Şampiyonu!" : streakValue >= 30 ? "🌟 30 Gün Ustası!" : "🔥 7 Günlük Seri!"}
+              <Trophy size={12} />
+              {streakValue >= 100
+                ? "💎 100 Gün Şampiyonu!"
+                : streakValue >= 30
+                  ? "🌟 30 Gün Ustası!"
+                  : "🔥 7 Günlük Seri!"}
             </span>
           </div>
         )}
@@ -134,9 +159,9 @@ export default async function MedicinePage() {
       )}
 
       {/* Today's Medicines */}
-      <div className="glass-card p-5">
-        <h2 className="font-bold text-white mb-4 flex items-center gap-2">
-          <span style={{ fontSize: 18 }}>💊</span>
+      <div className="card p-5">
+        <h2 className="section-title mb-4 flex items-center gap-2">
+          <span style={{ fontSize: 17 }}>💊</span>
           Bugünün İlaçları
         </h2>
         <MedicineTracker

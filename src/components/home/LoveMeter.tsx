@@ -9,7 +9,7 @@ interface LoveMeterProps {
 
 export function LoveMeter({ value }: LoveMeterProps) {
   return (
-    <div className="glass-card p-5">
+    <div className="card p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Heart size={18} fill="#E8002D" color="#E8002D" />

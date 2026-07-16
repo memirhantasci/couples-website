@@ -20,13 +20,16 @@ interface Letter {
 
 export function LetterList({ letters, type = "received" }: { letters: Letter[], type?: "received" | "sent" }) {
   const [openLetterId, setOpenLetterId] = useState<number | null>(null);
-  
+
   const today = dayjs().startOf("day");
 
   if (!letters.length) {
     return (
-      <div className="p-4 rounded-xl text-center" style={{ background: "#ffffff", border: "1px dashed #cccccc" }}>
-        <p style={{ color: "#666666", fontSize: 14 }}>
+      <div
+        className="p-6 rounded-2xl text-center"
+        style={{ background: "var(--surface-2)", border: "1px dashed rgba(255,255,255,0.1)" }}
+      >
+        <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
           {type === "received" ? "Henüz sana yazılmış bir mektup yok." : "Henüz kimseye mektup göndermedin."}
         </p>
       </div>
@@ -34,95 +37,125 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {letters.map(letter => {
         const unlockDate = dayjs(letter.unlock_date);
         const isLockedDate = unlockDate.isAfter(today);
-        
-        // Eğer gelen mektupsa ve tarihi gelmediyse kilitlidir
-        // Gönderilen mektuplar her zaman açılabilir
         const canOpen = type === "sent" || !isLockedDate;
-        
+        const isOpen = openLetterId === letter.id;
+
         const actualSenderName = letter.sender?.display_name || letter.sender?.username || "Gizli Biri";
         const senderName = (type === "received" && !canOpen) ? "Gizli Biri" : actualSenderName;
         const receiverName = letter.receiver?.display_name || letter.receiver?.username || "Gizli Biri";
-        
+
         return (
-          <div 
-            key={letter.id} 
-            className="rounded-xl overflow-hidden transition-all"
+          <div
+            key={letter.id}
+            className="rounded-2xl overflow-hidden transition-all"
             style={{
-              background: "#ffffff",
-              border: "1px solid #e0e0e0",
-              color: "#000000"
+              background: "var(--surface-2)",
+              border: `1px solid ${isOpen ? "rgba(245,200,66,0.25)" : "var(--border-subtle)"}`,
+              boxShadow: isOpen ? "0 4px 24px rgba(0,0,0,0.25)" : "none",
             }}
           >
             {/* Header (Clickable if unlocked) */}
             <button
-              onClick={() => canOpen && setOpenLetterId(openLetterId === letter.id ? null : letter.id)}
+              onClick={() => canOpen && setOpenLetterId(isOpen ? null : letter.id)}
               disabled={!canOpen}
               className="w-full p-4 flex items-center justify-between text-left transition-colors"
               style={{
                 cursor: !canOpen ? "not-allowed" : "pointer",
+                background: isOpen ? "rgba(245,200,66,0.04)" : "transparent",
               }}
             >
-              <div className="flex items-center gap-3">
-                <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ 
-                    background: !canOpen ? "#f0f0f0" : "rgba(255,215,0,0.15)",
-                    color: !canOpen ? "#888888" : "var(--gs-gold)"
+              <div className="flex items-center gap-3 min-w-0">
+                {/* Icon */}
+                <div
+                  className="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: !canOpen
+                      ? "rgba(255,255,255,0.06)"
+                      : isOpen
+                        ? "rgba(245,200,66,0.14)"
+                        : "rgba(245,200,66,0.10)",
+                    color: !canOpen ? "var(--text-tertiary)" : "var(--gs-gold)",
                   }}
                 >
-                  {!canOpen ? <Lock size={18} /> : <MailOpen size={18} />}
+                  {!canOpen ? <Lock size={17} /> : <MailOpen size={17} />}
                 </div>
-                <div>
-                  <h4 className="font-bold text-black text-base">
+
+                {/* Title & sender */}
+                <div className="min-w-0">
+                  <h4
+                    className="font-semibold text-sm truncate"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     {letter.title}
                   </h4>
-                  <p style={{ color: "#666666", fontSize: 13, marginTop: 2 }}>
+                  <p className="text-xs mt-0.5 truncate" style={{ color: "var(--text-tertiary)" }}>
                     {type === "received" ? `Kimden: ${senderName}` : `Kime: ${receiverName}`}
                   </p>
                 </div>
               </div>
 
-              {!canOpen ? (
-                <div className="flex flex-col items-end">
-                  <span className="text-xs font-semibold mb-1" style={{ color: "var(--gs-red)" }}>Kilitli</span>
-                  <span className="flex items-center gap-1 text-xs" style={{ color: "#888888" }}>
-                    <CalendarClock size={12} />
-                    {unlockDate.format("DD MMM YYYY")}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  {type === "sent" && isLockedDate && (
-                    <div className="flex flex-col items-end mr-2 hidden sm:flex">
-                      <span className="text-xs font-semibold mb-1" style={{ color: "var(--gs-gold)" }}>Alıcıya Kilitli</span>
-                      <span className="flex items-center gap-1 text-xs" style={{ color: "#888888" }}>
-                        <CalendarClock size={12} />
-                        {unlockDate.format("DD MMM")}
-                      </span>
-                    </div>
-                  )}
-                  <div style={{ color: "#888888", transform: openLetterId === letter.id ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
-                    <ChevronDown size={20} />
+              {/* Right side */}
+              <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                {!canOpen ? (
+                  <div className="flex flex-col items-end gap-0.5">
+                    <span className="badge badge-red text-[10px] py-0.5 px-2">Kilitli</span>
+                    <span
+                      className="flex items-center gap-1 text-[10px]"
+                      style={{ color: "var(--text-tertiary)" }}
+                    >
+                      <CalendarClock size={10} />
+                      {unlockDate.format("DD MMM YYYY")}
+                    </span>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <>
+                    {type === "sent" && isLockedDate && (
+                      <span className="badge badge-gold text-[10px] py-0.5 px-2 hidden sm:inline-flex">
+                        Alıcıya Kilitli
+                      </span>
+                    )}
+                    <div
+                      style={{
+                        color: "var(--text-tertiary)",
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                        transition: "transform 0.3s ease",
+                      }}
+                    >
+                      <ChevronDown size={18} />
+                    </div>
+                  </>
+                )}
+              </div>
             </button>
 
             {/* Content Body */}
-            {canOpen && openLetterId === letter.id && (
-              <div className="p-4 pt-2 border-t" style={{ borderColor: "#f0f0f0" }}>
-                <div className="p-4 rounded-xl" style={{ background: "#f9f9f9" }}>
-                  <p className="whitespace-pre-wrap text-black leading-relaxed text-sm" style={{ opacity: 0.9 }}>
+            {canOpen && isOpen && (
+              <div
+                className="px-4 pb-4"
+                style={{ borderTop: "1px solid var(--border-subtle)" }}
+              >
+                <div
+                  className="p-4 rounded-xl mt-4"
+                  style={{
+                    background: "var(--surface-1)",
+                    border: "1px solid var(--border-subtle)",
+                  }}
+                >
+                  <p
+                    className="whitespace-pre-wrap leading-relaxed text-sm"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
                     {letter.content}
                   </p>
                 </div>
                 <div className="mt-3 text-right">
-                  <span className="text-xs italic" style={{ color: "#888888" }}>
-                    {type === "received" ? "Yazılma Tarihi:" : "Gönderilme Tarihi:"} {dayjs(letter.created_at).format("DD MMMM YYYY")}
+                  <span className="text-xs italic" style={{ color: "var(--text-tertiary)" }}>
+                    {type === "received" ? "Yazılma Tarihi:" : "Gönderilme Tarihi:"}{" "}
+                    {dayjs(letter.created_at).format("DD MMMM YYYY")}
                   </span>
                 </div>
               </div>

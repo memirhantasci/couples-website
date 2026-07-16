@@ -3,7 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { CalendarPageClient } from "@/components/calendar/CalendarPageClient";
-import { Calendar } from "lucide-react";
+import { Calendar, Upload } from "lucide-react";
 import Link from "next/link";
 import dayjs from "dayjs";
 
@@ -19,11 +19,6 @@ export default async function CalendarPage() {
 
   const supabase = createServerClient();
 
-  // Get current month range
-  const startOfMonth = dayjs().startOf("month").format("YYYY-MM-DD");
-  const endOfMonth = dayjs().endOf("month").format("YYYY-MM-DD");
-
-  // Fetch 3 months of data for calendar navigation
   const threeMonthsAgo = dayjs().subtract(1, "month").startOf("month").format("YYYY-MM-DD");
   const twoMonthsLater = dayjs().add(2, "month").endOf("month").format("YYYY-MM-DD");
 
@@ -54,7 +49,6 @@ export default async function CalendarPage() {
 
   const notes = (notesResult.data as any) ?? [];
   const moods = moodsResult.data ?? [];
-  // Unique set of dates that have photos
   const photoDates = [...new Set((photosResult.data ?? []).map((p: any) => p.taken_date))] as string[];
 
   return (
@@ -62,49 +56,52 @@ export default async function CalendarPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Calendar size={22} style={{ color: "var(--gs-red)" }} />
-            Takvim & Fotoğraflar
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
-            Notlar, ruh halleri ve fotoğraflar tek bir yerde
+          <div className="flex items-center gap-2.5 mb-1">
+            <div
+              className="w-9 h-9 rounded-[12px] flex items-center justify-center"
+              style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
+            >
+              <Calendar size={18} />
+            </div>
+            <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+              Takvim & Fotoğraflar
+            </h1>
+          </div>
+          <p className="text-xs ml-[52px]" style={{ color: "var(--text-tertiary)" }}>
+            Notlar, ruh halleri ve anılar tek yerde
           </p>
         </div>
         <Link
           href="/photos/upload"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-semibold text-sm transition-all active:scale-95"
           style={{
-            background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
+            background: "linear-gradient(135deg, var(--gs-red) 0%, #C4001F 100%)",
             color: "white",
+            boxShadow: "0 3px 12px rgba(232,0,45,0.30)",
           }}
         >
-          + Yükle
+          <Upload size={14} />
+          Yükle
         </Link>
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{ background: "rgba(232,0,45,0.3)" }}
-          />
-          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>Not</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{ background: "rgba(255,215,0,0.2)" }}
-          />
-          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>Ruh Hali</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{ background: "rgba(34,197,94,0.25)" }}
-          />
-          <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>📷 Fotoğraf</span>
-        </div>
+      <div className="flex items-center gap-4 flex-wrap px-1">
+        {[
+          { color: "rgba(232,0,45,0.35)", label: "Not" },
+          { color: "rgba(245,200,66,0.30)", label: "Ruh Hali" },
+          { color: "rgba(34,197,94,0.30)", label: "📷 Fotoğraf" },
+        ].map(item => (
+          <div key={item.label} className="flex items-center gap-1.5">
+            <div
+              className="w-3 h-3 rounded-[3px]"
+              style={{ background: item.color }}
+            />
+            <span className="text-[11px] font-medium" style={{ color: "var(--text-tertiary)" }}>
+              {item.label}
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Client Component for View Toggling */}
@@ -115,8 +112,6 @@ export default async function CalendarPage() {
         currentUserId={session.userId}
         currentUsername={session.username}
       />
-      
-
     </div>
   );
 }

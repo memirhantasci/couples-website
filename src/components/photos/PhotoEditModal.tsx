@@ -29,7 +29,7 @@ export function PhotoEditModal({ photo, onClose, onSuccess }: PhotoEditModalProp
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center p-4"
-        style={{ background: "rgba(4, 4, 12, 0.85)", backdropFilter: "blur(12px)" }}
+        style={{ background: "rgba(4, 4, 12, 0.88)" }}
         onClick={onClose}
       >
         <motion.div
@@ -39,8 +39,8 @@ export function PhotoEditModal({ photo, onClose, onSuccess }: PhotoEditModalProp
           transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
           className="w-full max-w-md rounded-3xl overflow-hidden"
           style={{
-            background: "rgba(19, 19, 39, 0.98)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "var(--surface-2)",
+            border: "1px solid var(--border-default)",
             boxShadow: "0 24px 80px rgba(0,0,0,0.6)",
           }}
           onClick={(e) => e.stopPropagation()}
@@ -108,7 +108,6 @@ export function PhotoEditModal({ photo, onClose, onSuccess }: PhotoEditModalProp
                 required
                 defaultValue={photo.taken_date}
                 className="input-glass text-sm"
-                style={{ colorScheme: "dark" }}
               />
             </div>
 
@@ -122,7 +121,6 @@ export function PhotoEditModal({ photo, onClose, onSuccess }: PhotoEditModalProp
                 type="time"
                 defaultValue={photo.taken_time || ""}
                 className="input-glass text-sm"
-                style={{ colorScheme: "dark" }}
               />
             </div>
 

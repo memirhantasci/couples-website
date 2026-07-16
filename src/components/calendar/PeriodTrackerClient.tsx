@@ -92,7 +92,7 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
 
   return (
     <>
-      <div className="glass-card p-4 relative">
+      <div className="card p-4 relative">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
@@ -134,15 +134,14 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
                 left: 0,
                 width: "100%",
                 height: "100%",
-                backgroundColor: "rgba(0,0,0,0.7)",
-                backdropFilter: "blur(2px)",
+                backgroundColor: "rgba(0,0,0,0.70)",
                 cursor: "pointer"
               }}
             />
             
             {/* Modal Box */}
             <div
-              className="glass-card"
+              className="card"
               style={{ 
                 position: "relative",
                 width: "100%",
@@ -153,8 +152,7 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
                 gap: "1.25rem",
                 textAlign: "center",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                borderRadius: "1rem"
+                borderRadius: "1.25rem"
               }}
             >
               <div 

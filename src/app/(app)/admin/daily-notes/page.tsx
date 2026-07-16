@@ -45,7 +45,7 @@ export default async function AdminDailyNotesPage() {
         </h1>
       </div>
 
-      <div className="glass-card p-5">
+      <div className="card p-5">
         <h2 className="font-bold text-white text-base mb-4">Kullanıcıların Notları</h2>
         
         {!notes?.length ? (

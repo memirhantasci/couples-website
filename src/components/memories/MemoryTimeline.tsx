@@ -46,14 +46,14 @@ export function MemoryTimeline({ memories, isAdmin }: MemoryTimelineProps) {
   if (memories.length === 0) {
     return (
       <div
-        className="flex flex-col items-center gap-3 py-16 rounded-3xl"
+        className="flex flex-col items-center gap-3 py-16 rounded-[20px]"
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px dashed rgba(255,255,255,0.1)",
+          background: "var(--surface-2)",
+          border: "1px dashed var(--border-default)",
         }}
       >
         <span className="text-5xl">📸</span>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+        <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
           Henüz anı eklenmedi
         </p>
       </div>
@@ -93,7 +93,7 @@ export function MemoryTimeline({ memories, isAdmin }: MemoryTimelineProps) {
 
           {/* Card */}
           <div
-            className="flex-1 glass-card p-4 relative"
+            className="flex-1 card p-4 relative"
             style={{ marginLeft: 4 }}
           >
             {/* Date badge */}
@@ -111,7 +111,7 @@ export function MemoryTimeline({ memories, isAdmin }: MemoryTimelineProps) {
             {memory.description && (
               <p
                 className="text-sm leading-relaxed mb-3"
-                style={{ color: "rgba(255,255,255,0.6)" }}
+                style={{ color: "var(--text-secondary)", fontSize: 14 }}
               >
                 {memory.description}
               </p>

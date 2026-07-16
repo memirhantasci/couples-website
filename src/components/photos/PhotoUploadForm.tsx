@@ -244,7 +244,6 @@ export function PhotoUploadForm() {
                 onChange={(e) => setTakenDate(e.target.value)}
                 required
                 className="input-glass text-sm"
-                style={{ colorScheme: "dark" }}
               />
             </div>
 
@@ -259,7 +258,6 @@ export function PhotoUploadForm() {
                 value={takenTime}
                 onChange={(e) => setTakenTime(e.target.value)}
                 className="input-glass text-sm"
-                style={{ colorScheme: "dark" }}
               />
             </div>
           </motion.div>
@@ -298,14 +296,14 @@ export function PhotoUploadForm() {
 
       {/* Info */}
       <div
-        className="flex items-start gap-3 px-4 py-3 rounded-xl"
+        className="flex items-start gap-3 px-4 py-3 rounded-[12px]"
         style={{
-          background: "rgba(255,255,255,0.03)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--surface-2)",
+          border: "1px solid var(--border-subtle)",
         }}
       >
-        <Info size={14} style={{ color: "rgba(255,255,255,0.3)", flexShrink: 0, marginTop: 2 }} />
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)", lineHeight: 1.6 }}>
+        <Info size={14} style={{ color: "var(--text-tertiary)", flexShrink: 0, marginTop: 2 }} />
+        <p className="text-xs" style={{ color: "var(--text-tertiary)", lineHeight: 1.6 }}>
           Yüklenen fotoğraflar kalıcı olarak saklanır ve silinemez. Her iki kullanıcı da tüm fotoğrafları görebilir.
         </p>
       </div>

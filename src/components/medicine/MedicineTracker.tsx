@@ -39,7 +39,6 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
 
   async function handleMarkDrank(medicineId: number) {
     const current = logs[medicineId];
-    // If already DRANK — locked, can't change
     if (current === "DRANK") {
       toast.info("Alındı olarak işaretlendi, değiştirilemez 🔒");
       return;
@@ -58,7 +57,6 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
 
   async function handleMarkMissed(medicineId: number) {
     const current = logs[medicineId];
-    // If DRANK — locked
     if (current === "DRANK") {
       toast.info("Alındı olarak işaretlendi, değiştirilemez 🔒");
       return;
@@ -91,22 +89,24 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
   const getMedName = (id: number) => medicines.find(m => m.id === id)?.name ?? "İlaç";
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {/* Summary Bar */}
       {total > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {[
-            { label: "Toplam", value: total, color: "rgba(255,255,255,0.6)", bg: "rgba(255,255,255,0.05)" },
-            { label: "Alındı ✓", value: drankCount, color: "#4ade80", bg: "rgba(34,197,94,0.08)" },
-            { label: "Bekliyor", value: pendingCount, color: "var(--gs-gold)", bg: "rgba(255,215,0,0.07)" },
+            { label: "Toplam",   value: total,        color: "var(--text-secondary)", bg: "var(--surface-3)" },
+            { label: "Alındı",   value: drankCount,   color: "#4ade80", bg: "rgba(34,197,94,0.09)" },
+            { label: "Bekliyor", value: pendingCount,  color: "var(--gs-gold)", bg: "rgba(245,200,66,0.08)" },
           ].map((stat) => (
             <div
               key={stat.label}
-              className="flex flex-col items-center gap-1 py-3 rounded-2xl"
-              style={{ background: stat.bg, border: "1px solid rgba(255,255,255,0.07)" }}
+              className="flex flex-col items-center gap-1 py-3 rounded-[14px]"
+              style={{ background: stat.bg, border: "1px solid var(--border-subtle)" }}
             >
               <span className="font-bold text-xl" style={{ color: stat.color }}>{stat.value}</span>
-              <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600 }}>{stat.label}</span>
+              <span className="text-[11px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
+                {stat.label}
+              </span>
             </div>
           ))}
         </div>
@@ -115,11 +115,13 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
       {/* Medicine Cards */}
       {medicines.length === 0 ? (
         <div
-          className="flex flex-col items-center gap-3 py-14 rounded-3xl"
-          style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)" }}
+          className="flex flex-col items-center gap-3 py-14 rounded-[20px]"
+          style={{ background: "var(--surface-2)", border: "1px dashed var(--border-default)" }}
         >
           <span className="text-4xl">💊</span>
-          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 14 }}>Bugün için aktif ilaç yok</p>
+          <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
+            Bugün için aktif ilaç yok
+          </p>
         </div>
       ) : (
         medicines.map((medicine) => {
@@ -133,83 +135,129 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
             <motion.div
               key={medicine.id}
               layout
-              className="rounded-2xl overflow-hidden"
+              className="rounded-[18px] overflow-hidden"
               style={{
                 background: isDrank
-                  ? "rgba(34,197,94,0.08)"
+                  ? "rgba(34,197,94,0.07)"
                   : isMissed
-                  ? "rgba(248,113,113,0.06)"
-                  : "rgba(255,255,255,0.04)",
-                border: `1.5px solid ${isDrank ? "rgba(34,197,94,0.22)" : isMissed ? "rgba(248,113,113,0.18)" : "rgba(255,255,255,0.09)"}`,
-                transition: "all 0.3s ease",
+                    ? "rgba(248,113,113,0.06)"
+                    : "var(--surface-2)",
+                border: `1.5px solid ${isDrank
+                  ? "rgba(34,197,94,0.20)"
+                  : isMissed
+                    ? "rgba(248,113,113,0.16)"
+                    : "var(--border-default)"}`,
+                transition: "background 0.3s ease, border-color 0.3s ease",
               }}
             >
               <div className="flex flex-col p-4">
-                <div className="flex items-center gap-3 mb-3 pb-3 border-b border-white/5">
-                  {/* Icon */}
+                {/* Top: icon + info */}
+                <div className="flex items-center gap-3 mb-3 pb-3" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
                   <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                    className="w-11 h-11 rounded-[14px] flex items-center justify-center text-xl flex-shrink-0"
                     style={{
-                      background: isDrank ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)",
+                      background: isDrank
+                        ? "rgba(34,197,94,0.14)"
+                        : isMissed
+                          ? "rgba(248,113,113,0.10)"
+                          : "var(--surface-3)",
                     }}
                   >
                     {isDrank ? "✅" : isMissed ? "❌" : "💊"}
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-white text-base">{medicine.name}</p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <Clock size={12} style={{ color: "rgba(255,255,255,0.4)" }} />
-                      <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 500 }}>{medicine.time}</span>
+                    <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
+                      {medicine.name}
+                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <Clock size={11} style={{ color: "var(--text-tertiary)" }} />
+                      <span className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+                        {medicine.time}
+                      </span>
                       {isLocked && (
                         <>
-                          <span style={{ color: "rgba(255,255,255,0.2)", margin: "0 4px" }}>•</span>
-                          <Lock size={12} style={{ color: "rgba(34,197,94,0.7)" }} />
-                          <span style={{ color: "rgba(34,197,94,0.7)", fontSize: 11, fontWeight: 700 }}>Kilitli</span>
+                          <span style={{ color: "var(--border-default)", margin: "0 2px" }}>•</span>
+                          <Lock size={11} style={{ color: "rgba(34,197,94,0.7)" }} />
+                          <span className="text-[11px] font-semibold" style={{ color: "rgba(34,197,94,0.7)" }}>
+                            Kilitli
+                          </span>
                         </>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Action buttons as big cards */}
-                <div className="grid grid-cols-2 gap-3 w-full">
+                {/* Action buttons */}
+                <div className="grid grid-cols-2 gap-2.5 w-full">
                   {isLoading ? (
-                    <div className="col-span-2 py-4 flex items-center justify-center bg-white/5 rounded-2xl border border-white/5">
-                      <div className="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ color: "var(--gs-gold)" }} />
+                    <div
+                      className="col-span-2 py-4 flex items-center justify-center rounded-[14px]"
+                      style={{ background: "var(--surface-3)", border: "1px solid var(--border-subtle)" }}
+                    >
+                      <div
+                        className="w-6 h-6 border-2 rounded-full animate-spin"
+                        style={{ borderColor: "var(--border-default)", borderTopColor: "var(--gs-gold)" }}
+                      />
                     </div>
                   ) : isDrank ? (
-                    <div className="col-span-2 flex items-center justify-center gap-2 py-4 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400">
-                      <Check size={20} strokeWidth={3} />
+                    <div
+                      className="col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-[14px]"
+                      style={{
+                        background: "rgba(34,197,94,0.10)",
+                        border: "1.5px solid rgba(34,197,94,0.22)",
+                        color: "#4ade80",
+                      }}
+                    >
+                      <Check size={18} strokeWidth={2.5} />
                       <span className="font-bold text-sm tracking-wide">İLAÇ ALINDI</span>
                     </div>
                   ) : isMissed ? (
-                    <div className="col-span-2 flex items-center justify-center gap-2 py-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400">
-                      <X size={20} strokeWidth={3} />
+                    <div
+                      className="col-span-2 flex items-center justify-center gap-2 py-3.5 rounded-[14px]"
+                      style={{
+                        background: "rgba(248,113,113,0.09)",
+                        border: "1.5px solid rgba(248,113,113,0.18)",
+                        color: "#f87171",
+                      }}
+                    >
+                      <X size={18} strokeWidth={2.5} />
                       <span className="font-bold text-sm tracking-wide">İLAÇ ATLANDI</span>
                     </div>
                   ) : (
                     <>
                       <button
                         onClick={() => handleMarkDrank(medicine.id)}
-                        className="flex flex-col items-center justify-center gap-2 py-3 rounded-2xl transition-all hover:bg-green-500/20 active:scale-95"
-                        style={{ background: "rgba(34,197,94,0.12)", border: "1.5px solid rgba(34,197,94,0.25)" }}
+                        className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px] transition-all active:scale-95"
+                        style={{
+                          background: "rgba(34,197,94,0.10)",
+                          border: "1.5px solid rgba(34,197,94,0.22)",
+                        }}
                       >
-                        <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 shadow-sm">
-                          <Check size={22} strokeWidth={3} />
+                        <div
+                          className="w-9 h-9 rounded-full flex items-center justify-center"
+                          style={{ background: "rgba(34,197,94,0.18)", color: "#4ade80" }}
+                        >
+                          <Check size={20} strokeWidth={2.5} />
                         </div>
-                        <span className="font-bold text-sm text-green-400">İçtim</span>
+                        <span className="font-bold text-sm" style={{ color: "#4ade80" }}>İçtim</span>
                       </button>
+
                       <button
                         onClick={() => handleMarkMissed(medicine.id)}
-                        className="flex flex-col items-center justify-center gap-2 py-3 rounded-2xl transition-all hover:bg-red-500/20 active:scale-95"
-                        style={{ background: "rgba(248,113,113,0.10)", border: "1.5px solid rgba(248,113,113,0.2)" }}
+                        className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px] transition-all active:scale-95"
+                        style={{
+                          background: "rgba(248,113,113,0.08)",
+                          border: "1.5px solid rgba(248,113,113,0.16)",
+                        }}
                       >
-                        <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 shadow-sm">
-                          <X size={22} strokeWidth={3} />
+                        <div
+                          className="w-9 h-9 rounded-full flex items-center justify-center"
+                          style={{ background: "rgba(248,113,113,0.16)", color: "#f87171" }}
+                        >
+                          <X size={20} strokeWidth={2.5} />
                         </div>
-                        <span className="font-bold text-sm text-red-400">Atladım</span>
+                        <span className="font-bold text-sm" style={{ color: "#f87171" }}>Atladım</span>
                       </button>
                     </>
                   )}
@@ -222,19 +270,22 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
 
       {/* Historical Logs */}
       {historyDates.length > 0 && (
-        <div className="mt-2">
+        <div className="mt-1">
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-2 w-full py-3 px-4 rounded-2xl font-semibold text-sm transition-all"
+            className="flex items-center gap-2 w-full py-3 px-4 rounded-[14px] font-semibold text-sm transition-all"
             style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              color: "rgba(255,255,255,0.6)",
+              background: "var(--surface-2)",
+              border: "1px solid var(--border-subtle)",
+              color: "var(--text-secondary)",
             }}
           >
-            <Calendar size={15} />
+            <Calendar size={14} />
             Geçmiş Kayıtlar
-            {showHistory ? <ChevronUp size={15} className="ml-auto" /> : <ChevronDown size={15} className="ml-auto" />}
+            {showHistory
+              ? <ChevronUp size={14} className="ml-auto" />
+              : <ChevronDown size={14} className="ml-auto" />
+            }
           </button>
 
           <AnimatePresence>
@@ -249,27 +300,49 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
                   const dayLogs = historyByDate[date];
                   const allDrank = dayLogs.every(l => l.status === "DRANK");
                   const anyMissed = dayLogs.some(l => l.status === "MISSED");
-                  const dateLabel = new Date(date + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "short" });
+                  const dateLabel = new Date(date + "T00:00:00").toLocaleDateString("tr-TR", {
+                    day: "numeric",
+                    month: "long",
+                    weekday: "short",
+                  });
 
                   return (
                     <div
                       key={date}
-                      className="p-3 rounded-xl flex items-center gap-3"
+                      className="p-3 rounded-[12px] flex items-center gap-3"
                       style={{
-                        background: allDrank ? "rgba(34,197,94,0.06)" : anyMissed ? "rgba(248,113,113,0.06)" : "rgba(255,255,255,0.03)",
-                        border: `1px solid ${allDrank ? "rgba(34,197,94,0.15)" : anyMissed ? "rgba(248,113,113,0.12)" : "rgba(255,255,255,0.06)"}`,
+                        background: allDrank
+                          ? "rgba(34,197,94,0.06)"
+                          : anyMissed
+                            ? "rgba(248,113,113,0.06)"
+                            : "var(--surface-2)",
+                        border: `1px solid ${allDrank
+                          ? "rgba(34,197,94,0.14)"
+                          : anyMissed
+                            ? "rgba(248,113,113,0.12)"
+                            : "var(--border-subtle)"}`,
                       }}
                     >
-                      <span style={{ fontSize: 20, flexShrink: 0 }}>{allDrank ? "✅" : anyMissed ? "❌" : "⏳"}</span>
+                      <span style={{ fontSize: 18, flexShrink: 0 }}>
+                        {allDrank ? "✅" : anyMissed ? "❌" : "⏳"}
+                      </span>
                       <div className="flex-1">
-                        <p className="font-semibold text-white text-xs">{dateLabel}</p>
-                        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
+                        <p className="font-semibold text-xs" style={{ color: "var(--text-primary)" }}>
+                          {dateLabel}
+                        </p>
+                        <p className="text-[11px] mt-0.5" style={{ color: "var(--text-tertiary)" }}>
                           {dayLogs.map(l => getMedName(l.medicine_id)).join(", ")}
                         </p>
                       </div>
                       <span
                         className="font-bold text-xs"
-                        style={{ color: allDrank ? "#4ade80" : anyMissed ? "#f87171" : "rgba(255,255,255,0.4)" }}
+                        style={{
+                          color: allDrank
+                            ? "#4ade80"
+                            : anyMissed
+                              ? "#f87171"
+                              : "var(--text-tertiary)",
+                        }}
                       >
                         {dayLogs.filter(l => l.status === "DRANK").length}/{dayLogs.length}
                       </span>

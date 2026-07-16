@@ -19,31 +19,37 @@ export default async function PhotoUploadPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/photos"
-          className="p-2 rounded-xl transition-all"
-          style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
+          className="flex items-center justify-center rounded-[12px] transition-all active:scale-95"
+          style={{
+            width: 40,
+            height: 40,
+            background: "var(--surface-3)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-secondary)",
+          }}
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={20} strokeWidth={2} />
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Camera size={22} style={{ color: "var(--gs-red)" }} />
-            Fotoğraf Yükle
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-8 h-8 rounded-[10px] flex items-center justify-center"
+              style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
+            >
+              <Camera size={16} />
+            </div>
+            <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+              Fotoğraf Yükle
+            </h1>
+          </div>
+          <p className="text-xs mt-1 ml-[44px]" style={{ color: "var(--text-tertiary)" }}>
             Bir anıyı arşive ekle 📸
           </p>
         </div>
       </div>
 
       {/* Form */}
-      <div
-        className="rounded-3xl p-6"
-        style={{
-          background: "rgba(19, 19, 39, 0.6)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
+      <div className="card p-5">
         <PhotoUploadForm />
       </div>
     </div>

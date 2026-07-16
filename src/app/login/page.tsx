@@ -82,7 +82,7 @@ function LoginForm() {
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="glass-card relative w-full mx-4 overflow-hidden"
+        className="card relative w-full mx-4 overflow-hidden"
         style={{ maxWidth: 420, padding: "40px 32px" }}
       >
         <AnimatePresence mode="wait">

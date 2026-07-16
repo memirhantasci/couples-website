@@ -9,7 +9,7 @@ import { LoveMeter } from "@/components/home/LoveMeter";
 import { MoodSelector } from "@/components/home/MoodSelector";
 import { DailyNoteCard } from "@/components/home/DailyNoteCard";
 import { PendingLettersCard } from "@/components/home/PendingLettersCard";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Heart } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Ana Sayfa — Emirhan & Öykü 💕",
@@ -72,92 +72,79 @@ export default async function HomePage() {
   });
 
   return (
-    <div className="px-4 py-6 flex flex-col gap-6 max-w-lg mx-auto">
+    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
 
       {/* ── HERO CARD ─────────────────────────────────── */}
       <div
-        className="glass-card overflow-hidden relative"
+        className="rounded-[24px] overflow-hidden relative"
         style={{
-          padding: "32px 24px 28px",
-          background: "linear-gradient(135deg, rgba(15,10,25,0.88) 0%, rgba(30,10,15,0.82) 100%)",
+          background: "linear-gradient(135deg, #1c1c20 0%, #201010 100%)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: "0 4px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.04) inset",
+          padding: "28px 22px 24px",
         }}
       >
-        {/* Decorative glow blobs */}
+        {/* Decorative red glow top-right */}
         <div
-          className="absolute pointer-events-none"
-          style={{
-            width: 200, height: 200,
-            top: -60, right: -60,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(232,0,45,0.35) 0%, transparent 70%)",
-            filter: "blur(30px)",
-          }}
           aria-hidden
-        />
-        <div
-          className="absolute pointer-events-none"
           style={{
-            width: 150, height: 150,
-            bottom: -40, left: -30,
+            position: "absolute",
+            width: 180,
+            height: 180,
+            top: -60,
+            right: -50,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,215,0,0.25) 0%, transparent 70%)",
-            filter: "blur(24px)",
+            background: "radial-gradient(circle, rgba(232,0,45,0.30) 0%, transparent 70%)",
+            filter: "blur(28px)",
+            pointerEvents: "none",
           }}
-          aria-hidden
         />
 
-        {/* Floating emojis */}
-        <span
-          className="absolute animate-float select-none"
-          style={{ top: 16, right: 24, fontSize: 28, opacity: 0.55, animationDelay: "-1s" }}
-          aria-hidden
-        >💕</span>
-        <span
-          className="absolute animate-float select-none"
-          style={{ top: 48, right: 64, fontSize: 18, opacity: 0.3, animationDelay: "-3s" }}
-          aria-hidden
-        >✨</span>
-
-        <p
-          className="font-semibold uppercase tracking-widest mb-3"
-          style={{ color: "var(--gs-gold)", fontSize: 11 }}
-        >
+        {/* Date label */}
+        <p className="page-header-label mb-3" style={{ color: "var(--gs-gold)" }}>
           {dateStr}
         </p>
 
-        <h1 className="font-display text-4xl font-bold mb-1 leading-tight" style={{ lineHeight: 1.2 }}>
+        {/* Greeting */}
+        <h1 className="font-display text-3xl font-bold leading-tight mb-0.5">
           <span className="text-gradient">Günaydın,</span>
         </h1>
         <h2
-          className="font-display text-2xl font-semibold mb-6"
-          style={{ color: "rgba(255,255,255,0.90)" }}
+          className="font-display text-xl font-semibold mb-5"
+          style={{ color: "rgba(255,255,255,0.88)" }}
         >
           {hitap} 💕
         </h2>
 
         {/* Date counters */}
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <div
-            className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl"
+            className="flex flex-col items-center gap-1.5 py-4 rounded-[16px]"
             style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.09)",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
             <span className="text-3xl font-bold text-gradient">{daysSinceMeeting}</span>
-            <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600, textAlign: "center" }}>
+            <span
+              className="text-[11px] font-semibold text-center"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
               gün tanışalı 💫
             </span>
           </div>
           <div
-            className="flex-1 flex flex-col items-center gap-1.5 py-4 rounded-2xl"
+            className="flex flex-col items-center gap-1.5 py-4 rounded-[16px]"
             style={{
-              background: "rgba(232,0,45,0.1)",
-              border: "1px solid rgba(232,0,45,0.2)",
+              background: "rgba(232,0,45,0.10)",
+              border: "1px solid rgba(232,0,45,0.18)",
             }}
           >
             <span className="text-3xl font-bold text-gradient">{daysSinceTogether}</span>
-            <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, fontWeight: 600, textAlign: "center" }}>
+            <span
+              className="text-[11px] font-semibold text-center"
+              style={{ color: "rgba(255,255,255,0.45)" }}
+            >
               gün sevgili ❤️
             </span>
           </div>
@@ -166,20 +153,26 @@ export default async function HomePage() {
 
       {/* ── GÜNÜN SÖZÜ ────────────────────────────────── */}
       <div
-        className="glass-card flex gap-4 items-start"
-        style={{ padding: "20px 22px", borderLeft: "3px solid var(--gs-gold)" }}
+        className="flex gap-4 items-start p-4 rounded-[18px]"
+        style={{
+          background: "var(--surface-2)",
+          border: "1px solid var(--border-subtle)",
+          borderLeft: "3px solid var(--gs-gold)",
+        }}
       >
-        <Sparkles size={22} style={{ color: "var(--gs-gold)", flexShrink: 0, marginTop: 2 }} />
+        <div
+          className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0 mt-0.5"
+          style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
+        >
+          <Sparkles size={15} />
+        </div>
         <div>
-          <p
-            className="font-semibold text-xs uppercase tracking-wider mb-2"
-            style={{ color: "var(--gs-gold)" }}
-          >
+          <p className="page-header-label mb-1.5" style={{ color: "var(--gs-gold)" }}>
             Günün Sözü
           </p>
           <p
-            className="font-display text-base italic leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.85)" }}
+            className="font-display text-sm italic leading-relaxed"
+            style={{ color: "var(--text-secondary)" }}
           >
             "{quote}"
           </p>
@@ -206,8 +199,7 @@ export default async function HomePage() {
       {/* ── BEKLEYEN MEKTUPLAR ─────────────────────────── */}
       <PendingLettersCard letters={pendingLetters} />
 
-      {/* Bottom spacer */}
-      <div style={{ height: 8 }} />
+      <div style={{ height: 4 }} />
     </div>
   );
 }

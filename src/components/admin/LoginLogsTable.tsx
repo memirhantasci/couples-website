@@ -48,7 +48,7 @@ export function LoginLogsTable({ logs }: LoginLogsTableProps) {
   });
 
   return (
-    <div className="glass-card p-5 flex flex-col gap-4">
+    <div className="card p-5 flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-white text-sm">Giriş Geçmişi</h3>
         <div className="flex gap-1">

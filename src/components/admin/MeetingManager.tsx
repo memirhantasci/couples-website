@@ -49,7 +49,7 @@ export function MeetingManager({ activeMeetings }: MeetingManagerProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="glass-card p-5">
+      <div className="card p-5">
         <div className="flex items-center gap-2 mb-4">
           <CalendarClock size={20} style={{ color: "var(--gs-gold)" }} />
           <h3 className="font-bold text-white text-base">Aktif Buluşmalar</h3>
@@ -104,7 +104,7 @@ export function MeetingManager({ activeMeetings }: MeetingManagerProps) {
         )}
       </div>
 
-      <div className="glass-card p-5">
+      <div className="card p-5">
         <h3 className="font-bold text-white text-base mb-4">Yeni Buluşma Planla</h3>
         <form ref={formRef} action={formAction} className="flex flex-col gap-4">
           <div>

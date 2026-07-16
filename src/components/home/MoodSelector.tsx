@@ -16,7 +16,7 @@ const MOODS = [
 
 interface MoodSelectorProps {
   currentMood?: string | null;
-  moodLocked?: boolean; // true if already set today
+  moodLocked?: boolean;
 }
 
 export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorProps) {
@@ -27,15 +27,13 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
   async function handleMoodSelect(emoji: string) {
     if (locked || loading) return;
     setLoading(true);
-
     const result = await upsertMoodAction(emoji);
     setLoading(false);
-
     if (result?.error) {
       toast.error(result.error);
     } else {
       setSelected(emoji);
-      setLocked(true); // lock after first selection
+      setLocked(true);
       toast.success("Ruh halin kaydedildi! " + emoji);
     }
   }
@@ -43,33 +41,43 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
   const selectedMoodLabel = MOODS.find(m => m.emoji === selected)?.label;
 
   return (
-    <div className="glass-card" style={{ padding: "22px 20px" }}>
+    <div className="card p-5">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <span style={{ fontSize: 18 }}>💭</span>
-          <span className="font-semibold text-sm text-white">Bugün nasılsın?</span>
+        <div className="flex items-center gap-2.5">
+          <span style={{ fontSize: 20 }}>💭</span>
+          <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
+            Bugün nasılsın?
+          </span>
         </div>
         {locked && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg" style={{ background: "rgba(255,255,255,0.06)" }}>
-            <Lock size={11} style={{ color: "rgba(255,255,255,0.35)" }} />
-            <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, fontWeight: 600 }}>Bugün için kaydedildi</span>
+          <div
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg"
+            style={{ background: "var(--surface-3)", border: "1px solid var(--border-subtle)" }}
+          >
+            <Lock size={10} style={{ color: "var(--text-tertiary)" }} />
+            <span className="text-[10px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
+              Bugün için kaydedildi
+            </span>
           </div>
         )}
       </div>
 
       {locked && selected ? (
-        /* Show locked state nicely */
+        /* Locked / show-only state */
         <div
-          className="flex items-center gap-4 p-4 rounded-2xl"
+          className="flex items-center gap-4 p-4 rounded-[14px]"
           style={{
-            background: "rgba(255,215,0,0.08)",
-            border: "1px solid rgba(255,215,0,0.15)",
+            background: "rgba(245,200,66,0.07)",
+            border: "1px solid rgba(245,200,66,0.14)",
           }}
         >
-          <span style={{ fontSize: 48 }}>{selected}</span>
+          <span style={{ fontSize: 44, lineHeight: 1 }}>{selected}</span>
           <div>
-            <p className="font-bold text-white text-base">{selectedMoodLabel}</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>
+            <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
+              {selectedMoodLabel}
+            </p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-tertiary)" }}>
               Yarın tekrar seçebilirsin 🌙
             </p>
           </div>
@@ -83,7 +91,7 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
               disabled={loading || locked}
               className="mood-btn"
               style={{
-                opacity: locked ? 0.5 : 1,
+                opacity: locked ? 0.45 : 1,
                 cursor: locked ? "not-allowed" : "pointer",
               }}
             >
@@ -91,7 +99,7 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
               <span
                 style={{
                   fontSize: 10,
-                  color: "rgba(255,255,255,0.4)",
+                  color: "var(--text-tertiary)",
                   fontWeight: 600,
                   textAlign: "center",
                   lineHeight: 1.3,

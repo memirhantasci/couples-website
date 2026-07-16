@@ -29,7 +29,7 @@ export function AddMemoryForm() {
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="glass-card p-5">
+    <div className="card p-5">
       <div className="flex items-center gap-2 mb-4">
         <Camera size={20} style={{ color: "var(--gs-gold)" }} />
         <h3 className="font-bold text-white text-base">Yeni Anı Ekle</h3>
@@ -37,7 +37,7 @@ export function AddMemoryForm() {
 
       <form ref={formRef} action={formAction} className="flex flex-col gap-4">
         <div>
-          <label className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
             Tarih
           </label>
           <input
@@ -50,7 +50,7 @@ export function AddMemoryForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
             Başlık
           </label>
           <input
@@ -64,7 +64,7 @@ export function AddMemoryForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
             Açıklama (isteğe bağlı)
           </label>
           <textarea
@@ -77,7 +77,7 @@ export function AddMemoryForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
             Fotoğraf URL (isteğe bağlı)
           </label>
           <div className="relative">

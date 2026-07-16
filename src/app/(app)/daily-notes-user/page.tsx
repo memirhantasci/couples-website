@@ -29,19 +29,17 @@ export default async function DailyNotesUserPage() {
   return (
     <div className="px-4 py-6 flex flex-col gap-6 max-w-lg mx-auto">
       {/* Header */}
-      <div className="glass-card p-5">
-        <div className="flex items-center gap-3 mb-2">
+      <div className="card p-5">
+        <div className="flex items-center gap-3 mb-1">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center glow-red"
-            style={{
-              background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
-            }}
+            className="w-8 h-8 rounded-[10px] flex items-center justify-center"
+            style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
           >
-            <BookText size={20} color="white" />
+            <BookText size={16} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">Günlüğüm</h1>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 13 }}>
+            <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Günlüğüm</h1>
+            <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
               Sadece senin görebildiğin notların
             </p>
           </div>
@@ -61,8 +59,8 @@ export default async function DailyNotesUserPage() {
             return (
               <div 
                 key={note.id} 
-                className="glass-card p-5 relative overflow-hidden" 
-                style={{ borderRadius: "12px" }}
+                className="card p-5 relative overflow-hidden" 
+                style={{ borderLeft: "3px solid var(--gs-gold)" }}
               >
                 {/* Sol taraftaki şerit */}
                 <div 
@@ -87,8 +85,8 @@ export default async function DailyNotesUserPage() {
                 </div>
 
                 <div 
-                  className="text-base leading-relaxed whitespace-pre-wrap break-words"
-                  style={{ color: "rgba(255,255,255,0.85)" }}
+                  className="text-sm leading-relaxed whitespace-pre-wrap break-words"
+                  style={{ color: "var(--text-secondary)" }}
                 >
                   {note.content}
                 </div>

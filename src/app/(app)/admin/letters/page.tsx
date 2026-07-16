@@ -43,7 +43,7 @@ export default async function AdminLettersPage() {
         </h1>
       </div>
 
-      <div className="glass-card p-5">
+      <div className="card p-5">
         <h2 className="font-bold text-white text-base mb-4">Sistemdeki Tüm Mektuplar</h2>
         <AdminLetterList letters={letters || []} />
       </div>

@@ -172,8 +172,7 @@ export function CalendarView({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.6)",
-        backdropFilter: "blur(4px)",
+        backgroundColor: "rgba(0,0,0,0.70)",
         zIndex: 9999,
         display: "flex",
         alignItems: "center",
@@ -186,11 +185,11 @@ export function CalendarView({
         style={{
           width: "100%",
           maxWidth: "400px",
-          backgroundColor: "var(--gs-bg)",
-          borderRadius: "24px",
+          backgroundColor: "var(--surface-2)",
+          borderRadius: "20px",
           padding: "24px",
-          border: "1px solid rgba(255,255,255,0.1)",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
+          border: "1px solid rgba(255,255,255,0.10)",
+          boxShadow: "0 20px 48px rgba(0,0,0,0.5)",
           position: "relative",
         }}
         onClick={(e) => e.stopPropagation()}
@@ -265,15 +264,16 @@ export function CalendarView({
             width: "100%",
             minHeight: "120px",
             padding: "14px",
-            borderRadius: "12px",
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            color: "white",
+            borderRadius: "14px",
+            background: "var(--surface-1)",
+            border: "1.5px solid var(--border-default)",
+            color: "var(--text-primary)",
             fontSize: "14px",
             resize: "none",
             outline: "none",
             fontFamily: "inherit",
             boxSizing: "border-box",
+            lineHeight: 1.6,
           }}
         />
 
@@ -330,7 +330,7 @@ export function CalendarView({
 
   return (
     <>
-      <div className="glass-card p-4">
+      <div className="card p-4">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"

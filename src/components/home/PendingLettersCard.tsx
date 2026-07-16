@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, CalendarClock } from "lucide-react";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
 dayjs.locale("tr");
@@ -16,7 +16,6 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
 
   const today = dayjs().startOf("day");
 
-  // Only show locked letters
   const pendingLetters = letters.filter(letter => {
     const unlockDate = dayjs(letter.unlock_date);
     return unlockDate.isAfter(today);
@@ -25,12 +24,12 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
   if (pendingLetters.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-3 mt-2">
-      <h2 className="font-bold text-white text-base flex items-center gap-2">
-        <Lock size={18} style={{ color: "var(--gs-gold)" }} />
+    <div className="flex flex-col gap-3">
+      <h2 className="section-title flex items-center gap-2">
+        <Lock size={16} style={{ color: "var(--gs-gold)" }} />
         Bekleyen Mektuplar
       </h2>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
         {pendingLetters.map(letter => {
           const unlockDate = dayjs(letter.unlock_date);
           const daysLeft = unlockDate.diff(today, "day");
@@ -39,32 +38,35 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
           return (
             <div
               key={letter.id}
-              className="glass-card p-4 rounded-xl flex items-center gap-4 transition-all hover:scale-[1.01]"
+              className="flex items-center gap-4 p-4 rounded-[16px] transition-all"
               style={{
-                background: "linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0.02) 100%)",
-                border: "1px solid rgba(255,215,0,0.15)",
-                borderLeft: "3px solid var(--gs-gold)"
+                background: "rgba(245,200,66,0.05)",
+                border: "1px solid rgba(245,200,66,0.14)",
+                borderLeft: "3px solid var(--gs-gold)",
               }}
             >
-              <div 
-                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(255,215,0,0.1)", color: "var(--gs-gold)" }}
+              <div
+                className="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0"
+                style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
               >
-                <Mail size={22} />
+                <Mail size={18} />
               </div>
+
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-white text-base truncate">
+                <p className="font-semibold text-sm truncate" style={{ color: "var(--text-primary)" }}>
                   Kimden: {senderName}
                 </p>
-                <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, marginTop: 2 }}>
-                  Açılacak Tarih: {unlockDate.format("DD MMMM YYYY")}
+                <p className="flex items-center gap-1 text-xs mt-0.5" style={{ color: "var(--text-tertiary)" }}>
+                  <CalendarClock size={10} />
+                  {unlockDate.format("DD MMMM YYYY")}
                 </p>
               </div>
+
               <div className="flex flex-col items-end flex-shrink-0">
-                <span className="text-xl font-bold" style={{ color: "var(--gs-gold)" }}>
+                <span className="text-lg font-bold" style={{ color: "var(--gs-gold)" }}>
                   {daysLeft}
                 </span>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600 }}>
+                <span className="text-[10px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
                   gün kaldı
                 </span>
               </div>

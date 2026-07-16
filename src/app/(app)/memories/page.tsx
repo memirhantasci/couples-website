@@ -27,11 +27,18 @@ export default async function MemoriesPage() {
     <div className="px-4 py-5 flex flex-col gap-5 max-w-lg mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <Camera size={22} style={{ color: "var(--gs-red)" }} />
-          Özel Günlerimiz
-        </h1>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 2 }}>
+        <div className="flex items-center gap-2.5 mb-1">
+          <div
+            className="w-9 h-9 rounded-[12px] flex items-center justify-center"
+            style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
+          >
+            <Camera size={18} />
+          </div>
+          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+            Özel Günlerimiz
+          </h1>
+        </div>
+        <p className="text-xs ml-[52px]" style={{ color: "var(--text-tertiary)" }}>
           {(memories ?? []).length} özel gün • birlikte yaşananlar ❤️
         </p>
       </div>
