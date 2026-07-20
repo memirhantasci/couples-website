@@ -226,39 +226,79 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
                     </div>
                   ) : (
                     <>
-                      <button
-                        onClick={() => handleMarkDrank(medicine.id)}
-                        className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px] transition-all active:scale-95"
-                        style={{
-                          background: "rgba(34,197,94,0.10)",
-                          border: "1.5px solid rgba(34,197,94,0.22)",
-                        }}
-                      >
-                        <div
-                          className="w-9 h-9 rounded-full flex items-center justify-center"
-                          style={{ background: "rgba(34,197,94,0.18)", color: "#4ade80" }}
-                        >
-                          <Check size={20} strokeWidth={2.5} />
-                        </div>
-                        <span className="font-bold text-sm" style={{ color: "#4ade80" }}>İçtim</span>
-                      </button>
+                      {(() => {
+                        const formatter = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Istanbul", hour: "2-digit", minute: "2-digit" });
+                        const currentTimeStr = formatter.format(new Date());
+                        const isTimePassed = currentTimeStr >= medicine.time;
 
-                      <button
-                        onClick={() => handleMarkMissed(medicine.id)}
-                        className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px] transition-all active:scale-95"
-                        style={{
-                          background: "rgba(248,113,113,0.08)",
-                          border: "1.5px solid rgba(248,113,113,0.16)",
-                        }}
-                      >
-                        <div
-                          className="w-9 h-9 rounded-full flex items-center justify-center"
-                          style={{ background: "rgba(248,113,113,0.16)", color: "#f87171" }}
-                        >
-                          <X size={20} strokeWidth={2.5} />
-                        </div>
-                        <span className="font-bold text-sm" style={{ color: "#f87171" }}>Atladım</span>
-                      </button>
+                        if (!isTimePassed) {
+                          return (
+                            <div className="col-span-2 flex flex-col gap-2.5">
+                              <div className="grid grid-cols-2 gap-2.5 w-full opacity-50 pointer-events-none">
+                                <button
+                                  className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px]"
+                                  style={{ background: "rgba(34,197,94,0.10)", border: "1.5px solid rgba(34,197,94,0.22)" }}
+                                >
+                                  <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(34,197,94,0.18)", color: "#4ade80" }}>
+                                    <Check size={20} strokeWidth={2.5} />
+                                  </div>
+                                  <span className="font-bold text-sm" style={{ color: "#4ade80" }}>İçtim</span>
+                                </button>
+                                <button
+                                  className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px]"
+                                  style={{ background: "rgba(248,113,113,0.08)", border: "1.5px solid rgba(248,113,113,0.16)" }}
+                                >
+                                  <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(248,113,113,0.16)", color: "#f87171" }}>
+                                    <X size={20} strokeWidth={2.5} />
+                                  </div>
+                                  <span className="font-bold text-sm" style={{ color: "#f87171" }}>Atladım</span>
+                                </button>
+                              </div>
+                              <p className="text-xs text-center font-semibold" style={{ color: "var(--gs-gold)" }}>
+                                Saat {medicine.time}'dan sonra açılacak 🔒
+                              </p>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <>
+                            <button
+                              onClick={() => handleMarkDrank(medicine.id)}
+                              className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px] transition-all active:scale-95 hover:bg-white/5"
+                              style={{
+                                background: "rgba(34,197,94,0.10)",
+                                border: "1.5px solid rgba(34,197,94,0.22)",
+                              }}
+                            >
+                              <div
+                                className="w-9 h-9 rounded-full flex items-center justify-center"
+                                style={{ background: "rgba(34,197,94,0.18)", color: "#4ade80" }}
+                              >
+                                <Check size={20} strokeWidth={2.5} />
+                              </div>
+                              <span className="font-bold text-sm" style={{ color: "#4ade80" }}>İçtim</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleMarkMissed(medicine.id)}
+                              className="flex flex-col items-center justify-center gap-2 py-3.5 rounded-[14px] transition-all active:scale-95 hover:bg-white/5"
+                              style={{
+                                background: "rgba(248,113,113,0.08)",
+                                border: "1.5px solid rgba(248,113,113,0.16)",
+                              }}
+                            >
+                              <div
+                                className="w-9 h-9 rounded-full flex items-center justify-center"
+                                style={{ background: "rgba(248,113,113,0.16)", color: "#f87171" }}
+                              >
+                                <X size={20} strokeWidth={2.5} />
+                              </div>
+                              <span className="font-bold text-sm" style={{ color: "#f87171" }}>Atladım</span>
+                            </button>
+                          </>
+                        );
+                      })()}
                     </>
                   )}
                 </div>

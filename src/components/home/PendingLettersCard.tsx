@@ -1,9 +1,7 @@
 "use client";
 
 import { Lock, Mail, CalendarClock } from "lucide-react";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
-dayjs.locale("tr");
+import { dayjs } from "@/lib/date";
 
 interface PendingLetter {
   id: number;
@@ -58,7 +56,7 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
                 </p>
                 <p className="flex items-center gap-1 text-xs mt-0.5" style={{ color: "var(--text-tertiary)" }}>
                   <CalendarClock size={10} />
-                  {unlockDate.format("DD MMMM YYYY")}
+                  {unlockDate.tz("Europe/Istanbul").format("DD MMMM YYYY")}
                 </p>
               </div>
 

@@ -5,8 +5,7 @@ import { redirect } from "next/navigation";
 import { MedicineTracker } from "@/components/medicine/MedicineTracker";
 import { AddMedicineForm } from "@/components/medicine/AddMedicineForm";
 import { Flame, Trophy, Pill } from "lucide-react";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
+import { dayjs, todayString } from "@/lib/date";
 
 export const metadata: Metadata = {
   title: "İlaç Takibi — Emirhan & Öykü 💕",
@@ -21,9 +20,9 @@ async function calculateStreak(
 ): Promise<number> {
   if (medIds.length === 0) return 0;
   let streak = 0;
-  let checkDate = dayjs().subtract(1, "day").startOf("day");
+  let checkDate = dayjs().tz("Europe/Istanbul").subtract(1, "day").startOf("day");
   for (let i = 0; i < 180; i++) {
-    const dateStr = checkDate.format("YYYY-MM-DD");
+    const dateStr = checkDate.tz("Europe/Istanbul").format("YYYY-MM-DD");
     const { data: logs } = await supabase
       .from("medicine_logs")
       .select("medicine_id, status")
@@ -46,8 +45,8 @@ export default async function MedicinePage() {
   if (!session) redirect("/login");
 
   const supabase = createServerClient();
-  const today = dayjs().format("YYYY-MM-DD");
-  const fourteenDaysAgo = dayjs().subtract(14, "day").format("YYYY-MM-DD");
+  const today = todayString();
+  const fourteenDaysAgo = dayjs().tz("Europe/Istanbul").subtract(14, "day").tz("Europe/Istanbul").format("YYYY-MM-DD");
 
   const [medicinesResult, todayLogsResult, historicalLogsResult, usersResult] = await Promise.all([
     supabase
@@ -102,7 +101,7 @@ export default async function MedicinePage() {
               </h1>
             </div>
             <p className="text-xs ml-[44px]" style={{ color: "var(--text-tertiary)" }}>
-              {dayjs().locale("tr").format("D MMMM YYYY, dddd")}
+              {dayjs().locale("tr").tz("Europe/Istanbul").format("D MMMM YYYY, dddd")}
             </p>
           </div>
 

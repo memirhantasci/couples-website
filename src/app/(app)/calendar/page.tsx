@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { CalendarPageClient } from "@/components/calendar/CalendarPageClient";
 import { Calendar, Upload } from "lucide-react";
 import Link from "next/link";
-import dayjs from "dayjs";
+import { dayjs } from "@/lib/date";
 
 export const metadata: Metadata = {
   title: "Takvim — Emirhan & Öykü 💕",
@@ -19,8 +19,8 @@ export default async function CalendarPage() {
 
   const supabase = createServerClient();
 
-  const threeMonthsAgo = dayjs().subtract(1, "month").startOf("month").format("YYYY-MM-DD");
-  const twoMonthsLater = dayjs().add(2, "month").endOf("month").format("YYYY-MM-DD");
+  const threeMonthsAgo = dayjs().subtract(1, "month").startOf("month").tz("Europe/Istanbul").format("YYYY-MM-DD");
+  const twoMonthsLater = dayjs().add(2, "month").endOf("month").tz("Europe/Istanbul").format("YYYY-MM-DD");
 
   const [notesResult, moodsResult, photosResult] = await Promise.all([
     supabase

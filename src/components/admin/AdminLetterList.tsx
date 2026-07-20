@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { MailOpen, ChevronDown } from "lucide-react";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
-dayjs.locale("tr");
+import { DeleteLetterButton } from "@/components/admin/AdminActionButtons";
+import { dayjs } from "@/lib/date";
 
 interface Letter {
   id: number;
@@ -72,7 +71,7 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
               <div className="flex items-center gap-3">
                 <div className="text-right mr-2 hidden sm:block">
                   <p className="text-xs text-[#888888] mb-1">Açılış Tarihi</p>
-                  <p className="text-xs text-[#555555] font-mono">{dayjs(letter.unlock_date).format("DD MMM YYYY")}</p>
+                  <p className="text-xs text-[#555555] font-mono">{dayjs(letter.unlock_date).tz("Europe/Istanbul").format("DD MMM YYYY")}</p>
                 </div>
                 <div style={{ color: "#888888", transform: openLetterId === letter.id ? "rotate(180deg)" : "rotate(0deg)", transition: "0.3s" }}>
                   <ChevronDown size={20} />
@@ -90,9 +89,10 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
                 </div>
                 <div className="mt-3 text-right">
                   <span className="text-xs italic" style={{ color: "#888888" }}>
-                    Yazılma Tarihi: {dayjs(letter.created_at).format("DD MMMM YYYY HH:mm")}
+                    Yazılma Tarihi: {dayjs(letter.created_at).tz("Europe/Istanbul").format("DD MMMM YYYY HH:mm")}
                   </span>
                 </div>
+                <DeleteLetterButton id={letter.id} />
               </div>
             )}
           </div>

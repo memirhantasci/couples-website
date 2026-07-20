@@ -7,7 +7,8 @@ import { logoutAction } from "@/actions/auth";
 import {
   Heart, LogOut, X, Home, Pill, Camera, Calendar,
   LayoutDashboard, Mail, BookText, Images, Upload, Activity,
-  Menu,
+  Menu, CalendarDays, LineChart, Users, BookOpen,
+  ChevronDown, ChevronUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -27,8 +28,23 @@ const navItems: NavItem[] = [
   { href: "/daily-notes-user", label: "Günlük",   icon: <BookText size={38} strokeWidth={2} /> },
   { href: "/letters",    label: "Mektuplar",      icon: <Mail size={38} strokeWidth={2} /> },
   { href: "/period-tracker", label: "Regl Takvimi", icon: <Activity size={38} strokeWidth={2} /> },
+  { href: "/photos", label: "Fotoğraflar", icon: <Images size={38} strokeWidth={2} /> },
   { href: "/photos/upload", label: "Fotoğraf Yükle", icon: <Upload size={38} strokeWidth={2} /> },
   { href: "/admin",      label: "Admin Paneli",   icon: <LayoutDashboard size={38} strokeWidth={2} />, adminOnly: true },
+];
+
+const adminNavItems: NavItem[] = [
+  { href: "/admin", label: "Admin Ana Sayfa", icon: <LayoutDashboard size={38} strokeWidth={2} /> },
+  { href: "/admin/meetings", label: "Buluşmalar", icon: <CalendarDays size={38} strokeWidth={2} /> },
+  { href: "/admin/moods", label: "Ruh Hali", icon: <LineChart size={38} strokeWidth={2} /> },
+  { href: "/admin/medicines", label: "İlaç Yönetimi", icon: <Pill size={38} strokeWidth={2} /> },
+  { href: "/admin/logs", label: "Giriş Geçmişi", icon: <Users size={38} strokeWidth={2} /> },
+  { href: "/admin/memories", label: "Özel Günler Y.", icon: <Camera size={38} strokeWidth={2} /> },
+  { href: "/admin/calendar-events", label: "Kullanıcı Takvimi", icon: <CalendarDays size={38} strokeWidth={2} /> },
+  { href: "/admin/daily-notes", label: "Günlük Notlar", icon: <BookOpen size={38} strokeWidth={2} /> },
+  { href: "/admin/letters", label: "Tüm Mektuplar", icon: <Mail size={38} strokeWidth={2} /> },
+  { href: "/admin/photos", label: "Tüm Fotoğraflar", icon: <Images size={38} strokeWidth={2} /> },
+  { href: "/home", label: "Uygulamaya Dön", icon: <Home size={38} strokeWidth={2} /> },
 ];
 
 interface TopHeaderProps {
@@ -39,8 +55,11 @@ interface TopHeaderProps {
 export function TopHeader({ role, displayName }: TopHeaderProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [isAppMenuExpanded, setIsAppMenuExpanded] = useState(false);
 
-  const visibleItems = navItems.filter(
+  const itemsToUse = role === "ADMIN" ? adminNavItems : navItems;
+
+  const visibleItems = itemsToUse.filter(
     (item) => !item.adminOnly || role === "ADMIN"
   );
 
@@ -152,21 +171,67 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               {/* Drawer Links */}
               <div className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto">
                 {visibleItems.map((item) => {
+                  const isAppReturn = item.href === "/home" && role === "ADMIN";
                   const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
+                  
                   return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="flex items-center gap-5 px-5 py-4 rounded-[16px] font-semibold transition-all text-[28px]"
-                      style={{
-                        background: isActive ? "rgba(232, 0, 45, 0.12)" : "transparent",
-                        color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.75)",
-                        border: isActive ? "1px solid rgba(232, 0, 45, 0.22)" : "1px solid transparent",
-                      }}
-                    >
-                      <span style={{ opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
-                      <span>{item.label}</span>
-                    </Link>
+                    <div key={item.href} className="flex flex-col">
+                      <div className="flex items-stretch gap-1">
+                        <Link
+                          href={item.href}
+                          className="flex-1 flex items-center gap-5 px-5 py-4 rounded-[16px] font-semibold transition-all text-[28px]"
+                          style={{
+                            background: isActive ? "rgba(232, 0, 45, 0.12)" : "transparent",
+                            color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.75)",
+                            border: isActive ? "1px solid rgba(232, 0, 45, 0.22)" : "1px solid transparent",
+                          }}
+                        >
+                          <span style={{ opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
+                          <span>{item.label}</span>
+                        </Link>
+                        {isAppReturn && (
+                          <button
+                            onClick={() => setIsAppMenuExpanded(!isAppMenuExpanded)}
+                            className="px-4 rounded-[16px] transition-all flex items-center justify-center active:scale-95"
+                            style={{ 
+                              background: isAppMenuExpanded ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+                              color: "rgba(255,255,255,0.85)" 
+                            }}
+                          >
+                            {isAppMenuExpanded ? <ChevronUp size={34} /> : <ChevronDown size={34} />}
+                          </button>
+                        )}
+                      </div>
+
+                      {isAppReturn && (
+                        <AnimatePresence>
+                          {isAppMenuExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden flex flex-col pl-4 pr-1 gap-1 mt-2"
+                            >
+                              <div className="pl-6 border-l-2 border-white/10 py-2 flex flex-col gap-2">
+                                {navItems.filter(i => !i.adminOnly && i.href !== "/home").map(subItem => (
+                                  <Link
+                                    key={subItem.href}
+                                    href={subItem.href}
+                                    className="flex items-center gap-4 px-4 py-3 rounded-[14px] font-semibold transition-all text-[24px] active:bg-white/5"
+                                    style={{
+                                      color: "rgba(255,255,255,0.65)",
+                                    }}
+                                  >
+                                    <span style={{ opacity: 0.7, transform: "scale(0.85)" }}>{subItem.icon}</span>
+                                    <span>{subItem.label}</span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
+                    </div>
                   );
                 })}
               </div>

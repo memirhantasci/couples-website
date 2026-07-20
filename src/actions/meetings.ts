@@ -65,6 +65,25 @@ export async function deactivateMeetingAction(id: number) {
   return { success: true };
 }
 
+export async function updateMeetingAction(id: number, meeting_datetime: string) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") {
+    return { error: "Bu işlem için yetkiniz yok." };
+  }
+
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from("meetings")
+    .update({ meeting_datetime })
+    .eq("id", id);
+
+  if (error) return { error: "Güncelleme başarısız." };
+
+  revalidatePath("/home");
+  revalidatePath("/admin");
+  return { success: true };
+}
+
 // Calendar notes
 const calendarNoteSchema = z.object({
   date: z.string().min(1, "Tarih gerekli"),
@@ -136,5 +155,18 @@ export async function deleteCalendarNoteAction(id: number) {
   if (error) return { error: "Silme başarısız." };
 
   revalidatePath("/calendar");
+  return { success: true };
+}
+
+export async function deleteCalendarNoteAdminAction(id: number) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
+
+  const supabase = createServerClient();
+  const { error } = await supabase.from("calendar_notes").delete().eq("id", id);
+
+  if (error) return { error: "Silme başarısız." };
+
+  revalidatePath("/admin/calendar-events");
   return { success: true };
 }

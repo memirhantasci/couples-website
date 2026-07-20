@@ -35,6 +35,21 @@ export async function createLetterAction(
     return { error: "Mektup gönderilemedi, lütfen tekrar dene." };
   }
 
+  revalidatePath("/admin/letters");
+  return { success: true };
+}
+
+export async function deleteLetterAction(id: number) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
+
+  const supabase = createServerClient();
+  const { error } = await supabase.from("letters").delete().eq("id", id);
+
+  if (error) {
+    return { error: "Mektup silinirken hata oluştu." };
+  }
+
   revalidatePath("/letters");
   revalidatePath("/admin/letters");
   return { success: true };

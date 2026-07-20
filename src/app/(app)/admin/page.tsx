@@ -4,7 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { LayoutDashboard, Pill, Users, LineChart, CalendarDays, ChevronRight, Camera, Mail, BookOpen, Images } from "lucide-react";
 import Link from "next/link";
-import dayjs from "dayjs";
+import { dayjs } from "@/lib/date";
 
 export const metadata: Metadata = {
   title: "Admin Paneli — Emirhan & Öykü 💕",
@@ -17,7 +17,7 @@ export default async function AdminDashboardPage() {
   if (!session || session.role !== "ADMIN") redirect("/home");
 
   const supabase = createServerClient();
-  const today = dayjs().format("YYYY-MM-DD");
+  const today = dayjs().tz("Europe/Istanbul").format("YYYY-MM-DD");
 
   const [activeMeetingResult, activeMedsResult, todayLoginsResult] = await Promise.all([
     supabase

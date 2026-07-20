@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Home, Pill, Camera, Calendar, LayoutDashboard, Mail, BookText, Images, Upload, LogOut } from "lucide-react";
+import { Menu, X, Home, Pill, Camera, Calendar, LayoutDashboard, Mail, BookText, Images, Upload, CalendarDays, LineChart, Users, BookOpen, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ interface NavItem {
   adminOnly?: boolean;
 }
 
-const navItems: NavItem[] = [
+const userNavItems: NavItem[] = [
   {
     href: "/home",
     label: "Ana Sayfa",
@@ -46,6 +46,11 @@ const navItems: NavItem[] = [
     icon: <Mail size={34} strokeWidth={2} />,
   },
   {
+    href: "/period-tracker",
+    label: "Regl Takvimi",
+    icon: <Activity size={34} strokeWidth={2} />,
+  },
+  {
     href: "/photos",
     label: "Fotoğraflar",
     icon: <Images size={34} strokeWidth={2} />,
@@ -63,6 +68,64 @@ const navItems: NavItem[] = [
   },
 ];
 
+const adminNavItems: NavItem[] = [
+  {
+    href: "/admin",
+    label: "Admin Ana Sayfa",
+    icon: <LayoutDashboard size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/meetings",
+    label: "Buluşmalar",
+    icon: <CalendarDays size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/moods",
+    label: "Ruh Hali",
+    icon: <LineChart size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/medicines",
+    label: "İlaç Yönetimi",
+    icon: <Pill size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/logs",
+    label: "Giriş Geçmişi",
+    icon: <Users size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/memories",
+    label: "Özel Günler Y.",
+    icon: <Camera size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/calendar-events",
+    label: "Kullanıcı Takvimi",
+    icon: <CalendarDays size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/daily-notes",
+    label: "Günlük Notlar",
+    icon: <BookOpen size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/letters",
+    label: "Tüm Mektuplar",
+    icon: <Mail size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/photos",
+    label: "Tüm Fotoğraflar",
+    icon: <Images size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/home",
+    label: "Uygulamaya Dön",
+    icon: <Home size={34} strokeWidth={2} />,
+  },
+];
+
 interface MobileMenuProps {
   role: "ADMIN" | "USER";
 }
@@ -71,7 +134,9 @@ export function MobileMenu({ role }: MobileMenuProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  const visibleItems = navItems.filter(
+  const itemsToUse = role === "ADMIN" ? adminNavItems : userNavItems;
+
+  const visibleItems = itemsToUse.filter(
     (item) => !item.adminOnly || role === "ADMIN"
   );
 

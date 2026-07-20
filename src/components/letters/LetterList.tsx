@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { Lock, MailOpen, CalendarClock, ChevronDown } from "lucide-react";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
-dayjs.locale("tr");
+import { dayjs } from "@/lib/date";
 
 interface Letter {
   id: number;
@@ -107,7 +105,7 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
                       style={{ color: "var(--text-tertiary)" }}
                     >
                       <CalendarClock size={10} />
-                      {unlockDate.format("DD MMM YYYY")}
+                      {unlockDate.tz("Europe/Istanbul").format("DD MMM YYYY")}
                     </span>
                   </div>
                 ) : (
@@ -154,7 +152,7 @@ export function LetterList({ letters, type = "received" }: { letters: Letter[], 
                 <div className="mt-3 text-right">
                   <span className="text-xs italic" style={{ color: "var(--text-tertiary)" }}>
                     {type === "received" ? "Yazılma Tarihi:" : "Gönderilme Tarihi:"}{" "}
-                    {dayjs(letter.created_at).format("DD MMMM YYYY")}
+                    {dayjs(letter.created_at).tz("Europe/Istanbul").format("DD MMMM YYYY")}
                   </span>
                 </div>
               </div>

@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { Monitor, Smartphone, Tablet, Globe, Clock, User } from "lucide-react";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
+import { dayjs } from "@/lib/date";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
-dayjs.locale("tr");
 
 interface LoginLog {
   id: number;
@@ -110,7 +108,7 @@ export function LoginLogsTable({ logs }: LoginLogsTableProps) {
                     className="text-sm font-medium"
                     style={{ color: "rgba(255,255,255,0.5)" }}
                   >
-                    {dayjs(log.login_at).format("DD MMMM YYYY HH:mm")}
+                    {dayjs(log.login_at).tz("Europe/Istanbul").format("DD MMMM YYYY HH:mm")}
                   </span>
                 </div>
 

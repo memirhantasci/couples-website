@@ -39,7 +39,7 @@ export function MeetingCountdown({ targetDate, title }: CountdownProps) {
     { label: "Saniye", value: countdown.seconds },
   ];
 
-  const formattedDate = dayjs(targetDate).locale("tr").format("D MMMM dddd, HH:mm");
+  const formattedDate = dayjs(targetDate).locale("tr").tz("Europe/Istanbul").format("D MMMM dddd, HH:mm");
 
   return (
     <div className="card p-5">

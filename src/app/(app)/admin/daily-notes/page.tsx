@@ -4,10 +4,8 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ArrowLeft, BookOpen, User } from "lucide-react";
 import Link from "next/link";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
-
-dayjs.locale("tr");
+import { DeleteDailyNoteButton } from "@/components/admin/AdminActionButtons";
+import { dayjs } from "@/lib/date";
 
 export const metadata: Metadata = {
   title: "Günlük Notlar — Admin",
@@ -83,9 +81,11 @@ export default async function AdminDailyNotesPage() {
                 
                 <div className="text-right mt-1">
                   <span className="text-[10px] text-white/40">
-                    Oluşturulma: {dayjs(note.created_at).format("DD MMM HH:mm")}
+                    Oluşturulma: {dayjs(note.created_at).tz("Europe/Istanbul").format("DD MMM HH:mm")}
                   </span>
                 </div>
+                
+                <DeleteDailyNoteButton id={note.id} />
               </div>
             ))}
           </div>

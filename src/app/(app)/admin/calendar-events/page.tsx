@@ -4,10 +4,9 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ArrowLeft, CalendarDays, User } from "lucide-react";
 import Link from "next/link";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
+import { DeleteCalendarEventButton } from "@/components/admin/AdminActionButtons";
+import { dayjs } from "@/lib/date";
 
-dayjs.locale("tr");
 
 export const metadata: Metadata = {
   title: "Kullanıcı Takvim Etkinlikleri — Admin",
@@ -66,7 +65,7 @@ export default async function AdminCalendarEventsPage() {
                   <div className="flex items-center gap-2">
                     <CalendarDays size={16} style={{ color: "#ffffff" }} />
                     <span className="text-sm font-bold text-white">
-                      {dayjs(event.date).format("DD MMMM YYYY")}
+                      {dayjs(event.date).tz("Europe/Istanbul").format("DD MMMM YYYY")}
                     </span>
                   </div>
                   {username && (
@@ -82,6 +81,7 @@ export default async function AdminCalendarEventsPage() {
                 <p className="text-sm text-white/80 whitespace-pre-wrap leading-relaxed">
                   {event.note || "Açıklama yok."}
                 </p>
+                <DeleteCalendarEventButton id={event.id} />
               </div>
             )})}
           </div>

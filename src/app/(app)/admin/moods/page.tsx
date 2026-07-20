@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { MoodChart } from "@/components/admin/MoodChart";
 import { ArrowLeft, LineChart } from "lucide-react";
 import Link from "next/link";
-import dayjs from "dayjs";
+import { dayjs } from "@/lib/date";
 
 export const metadata: Metadata = {
   title: "Ruh Hali İstatistikleri — Admin",
@@ -18,8 +18,8 @@ export default async function AdminMoodsPage() {
   if (!session || session.role !== "ADMIN") redirect("/home");
 
   const supabase = createServerClient();
-  const today = dayjs().format("YYYY-MM-DD");
-  const thirtyDaysAgo = dayjs().subtract(29, "day").format("YYYY-MM-DD");
+  const today = dayjs().tz("Europe/Istanbul").format("YYYY-MM-DD");
+  const thirtyDaysAgo = dayjs().subtract(29, "day").tz("Europe/Istanbul").format("YYYY-MM-DD");
 
   const [moodsResult, usersResult] = await Promise.all([
     supabase

@@ -8,10 +8,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { togglePeriodLogAction } from "@/actions/period";
 import { toast } from "sonner";
 import { X, Check } from "lucide-react";
-import dayjs from "dayjs";
-import "dayjs/locale/tr";
+import { dayjs } from "@/lib/date";
 
-dayjs.locale("tr");
 interface PeriodLog {
   id: string;
   date: string;
@@ -173,7 +171,7 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
               
               <div>
                 <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "0.25rem", color: "white" }}>
-                  {dayjs(selectedDate).format("DD MMMM YYYY")}
+                  {dayjs(selectedDate).tz("Europe/Istanbul").format("DD MMMM YYYY")}
                 </h3>
                 <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.7)" }}>
                   {isAdding ? "Sıkıntılı günler başladı mı?" : "Bu günkü kaydı silmek istediğine emin misin?"}

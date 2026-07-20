@@ -45,6 +45,21 @@ export async function upsertDailyNoteAction(
   return { success: true };
 }
 
+export async function deleteDailyNoteAction(id: number) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
+
+  const supabase = createServerClient();
+  const { error } = await supabase.from("daily_notes").delete().eq("id", id);
+
+  if (error) {
+    return { error: "Not silinirken hata oluştu." };
+  }
+
+  revalidatePath("/admin/daily-notes");
+  return { success: true };
+}
+
 const moodSchema = z.object({
   mood_type: z.enum(["😍", "😊", "😐", "😔", "😢", "😴"]),
 });
