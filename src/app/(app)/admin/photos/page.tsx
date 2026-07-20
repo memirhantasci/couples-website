@@ -69,10 +69,10 @@ export default async function AdminPhotosPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin"
-          className="p-2 rounded-xl transition-all"
+          className="w-20 h-20 shrink-0 flex items-center justify-center rounded-2xl transition-all"
           style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={40} />
         </Link>
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">

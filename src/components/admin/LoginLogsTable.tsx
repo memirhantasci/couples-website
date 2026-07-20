@@ -42,6 +42,15 @@ export function LoginLogsTable({ logs }: LoginLogsTableProps) {
   const filtered = logs.filter((log) => {
     if (filter === "all") return true;
     const u = Array.isArray(log.users) ? log.users[0] : log.users;
+    
+    if (filter === "oyku") {
+      return u?.display_name?.toLowerCase() === "öykü" || u?.username?.toLowerCase() === "oyku";
+    }
+    
+    if (filter === "emirhan") {
+      return u?.display_name?.toLowerCase() === "emirhan" || u?.username?.toLowerCase() === "emirhan";
+    }
+
     return u?.username?.toLowerCase() === filter;
   });
 

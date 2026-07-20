@@ -29,10 +29,10 @@ export default async function AdminLogsPage() {
       <div className="flex items-center gap-3">
         <Link
           href="/admin"
-          className="w-12 h-12 shrink-0 flex items-center justify-center rounded-xl transition-all"
+          className="w-20 h-20 shrink-0 flex items-center justify-center rounded-2xl transition-all"
           style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)" }}
         >
-          <ArrowLeft size={24} />
+          <ArrowLeft size={40} />
         </Link>
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
           <Users size={20} style={{ color: "var(--gs-gold)" }} />

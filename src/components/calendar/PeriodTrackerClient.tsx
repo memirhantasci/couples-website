@@ -35,8 +35,10 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
       id: log.id,
       date: log.date,
       display: "background",
-      backgroundColor: "rgba(232, 0, 45, 0.4)",
+      backgroundColor: "rgba(160, 0, 20, 0.85)", // Darker red
     }));
+
+  const sortedLogs = [...logs].sort((a, b) => dayjs(b.date).unix() - dayjs(a.date).unix());
 
   function handleDateClick(info: { dateStr: string }) {
     console.log("👉 handleDateClick tetiklendi! Gelen tarih:", info.dateStr);
@@ -105,6 +107,63 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
             right: "today",
           }}
         />
+      </div>
+
+      <div className="card p-5 mt-6 mb-8">
+        <h3 className="font-bold text-white text-lg mb-4 flex items-center gap-2">
+          <Check size={20} style={{ color: "var(--gs-red)" }} />
+          Geçmiş Kayıtlar
+        </h3>
+        
+        {sortedLogs.length === 0 ? (
+          <div className="py-8 text-center text-sm text-white/40">
+            Henüz hiç regl kaydı bulunmuyor.
+          </div>
+        ) : (
+          <div 
+            className="flex flex-col gap-3 max-h-[350px] overflow-y-auto pr-2" 
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
+            {sortedLogs.map((log, index) => {
+              const logDate = dayjs(log.date).tz("Europe/Istanbul");
+              return (
+                <div 
+                  key={log.id} 
+                  className="flex items-center justify-between p-4 rounded-xl transition-all"
+                  style={{ 
+                    background: "rgba(255,255,255,0.03)", 
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" 
+                      style={{ 
+                        background: "linear-gradient(135deg, rgba(160, 0, 20, 0.2) 0%, rgba(160, 0, 20, 0.05) 100%)",
+                        border: "1px solid rgba(160, 0, 20, 0.2)"
+                      }}
+                    >
+                      <span className="text-2xl drop-shadow-lg">🩸</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-bold text-white/90 text-[17px] tracking-wide">
+                        {logDate.format("DD MMMM YYYY")}
+                      </span>
+                      <span className="text-sm font-medium" style={{ color: "var(--gs-red)" }}>
+                        {logDate.format("dddd")}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="px-3 py-1.5 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <span className="text-white/70 text-xs font-bold tracking-wide uppercase">
+                      {logDate.format("MMMM")}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {mounted && typeof document !== 'undefined' && createPortal(

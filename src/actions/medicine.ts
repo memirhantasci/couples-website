@@ -122,3 +122,37 @@ export async function deleteMedicineAction(id: number) {
   revalidatePath("/admin");
   return { success: true };
 }
+
+// ─── Edit Medicine (Admin only) ─────────────────────────────────────────────
+export async function editMedicineAction(
+  id: number,
+  data: { name: string; start_date: string; end_date: string; time: string; user_id: number }
+) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
+
+  const parsed = medicineSchema.safeParse(data);
+  if (!parsed.success) {
+    return { error: parsed.error.errors[0].message };
+  }
+
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from("medicines")
+    .update({
+      name: parsed.data.name,
+      start_date: parsed.data.start_date,
+      end_date: parsed.data.end_date,
+      time: parsed.data.time,
+      user_id: parsed.data.user_id,
+    })
+    .eq("id", id);
+
+  if (error) {
+    return { error: "İlaç güncellenirken hata oluştu." };
+  }
+
+  revalidatePath("/medicine");
+  revalidatePath("/admin");
+  return { success: true };
+}

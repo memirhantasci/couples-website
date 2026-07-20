@@ -237,24 +237,24 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
                     </div>
                   );
                 })}
-              </div>
 
-              {/* Logout Button in Drawer Footer */}
-              <div className="p-4 border-t shrink-0 mt-auto" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                <form action={logoutAction}>
-                  <button
-                    type="submit"
-                    className="w-full flex items-center justify-center gap-4 py-4 rounded-[16px] font-bold text-[28px] transition-all"
-                    style={{
-                      background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
-                      color: "#ffffff",
-                      boxShadow: "0 4px 16px rgba(232, 0, 45, 0.3)",
-                    }}
-                  >
-                    <LogOut size={32} />
-                    <span>Çıkış Yap</span>
-                  </button>
-                </form>
+                {/* Logout Button in Scrollable Area */}
+                <div className="mt-8 pt-4 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                  <form action={logoutAction}>
+                    <button
+                      type="submit"
+                      className="w-full flex items-center justify-center gap-4 py-4 rounded-[16px] font-bold text-[24px] transition-all"
+                      style={{
+                        background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
+                        color: "#ffffff",
+                        boxShadow: "0 4px 16px rgba(232, 0, 45, 0.3)",
+                      }}
+                    >
+                      <LogOut size={28} />
+                      <span>Çıkış Yap</span>
+                    </button>
+                  </form>
+                </div>
               </div>
             </motion.div>
           </>
