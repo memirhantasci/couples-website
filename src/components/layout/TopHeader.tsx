@@ -146,14 +146,14 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 220 }}
-              className="fixed top-0 right-0 bottom-0 w-[90vw] sm:w-[460px] z-[101] flex flex-col"
+              className="fixed top-0 right-0 h-[100dvh] w-[90vw] sm:w-[460px] z-[101] flex flex-col"
               style={{
                 background: "#1a1a1e",
                 borderLeft: "1px solid rgba(255,255,255,0.08)",
                 boxShadow: "-16px 0 48px rgba(0,0,0,0.55)",
               }}
             >
-              <div className="flex items-center justify-between px-6 py-6 border-b" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+              <div className="flex items-center justify-between px-6 py-6 border-b shrink-0" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
                 <span className="font-bold text-white text-[32px]">Menü</span>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -169,7 +169,10 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               </div>
 
               {/* Drawer Links */}
-              <div className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto">
+              <div 
+                className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto min-h-0 pb-16"
+                style={{ WebkitOverflowScrolling: "touch" }}
+              >
                 {visibleItems.map((item) => {
                   const isAppReturn = item.href === "/home" && role === "ADMIN";
                   const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
@@ -237,7 +240,7 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               </div>
 
               {/* Logout Button in Drawer Footer */}
-              <div className="p-4 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+              <div className="p-4 border-t shrink-0 mt-auto" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
                 <form action={logoutAction}>
                   <button
                     type="submit"

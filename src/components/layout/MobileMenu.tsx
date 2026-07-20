@@ -174,7 +174,7 @@ export function MobileMenu({ role }: MobileMenuProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[340px] z-[101] flex flex-col"
+              className="fixed top-0 right-0 h-[100dvh] w-[340px] z-[101] flex flex-col"
               style={{
                 background: "#18181b",
                 borderLeft: "1px solid rgba(255,255,255,0.08)",
@@ -182,7 +182,7 @@ export function MobileMenu({ role }: MobileMenuProps) {
               }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-5 border-b border-white/10">
+              <div className="flex items-center justify-between p-5 border-b shrink-0" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
                 <span className="font-bold text-white text-[32px]">Menü</span>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -193,7 +193,10 @@ export function MobileMenu({ role }: MobileMenuProps) {
               </div>
 
               {/* Links */}
-              <div className="flex flex-col p-4 gap-2 flex-1 overflow-y-auto">
+              <div 
+                className="flex flex-col p-4 gap-2 flex-1 overflow-y-auto min-h-0 pb-16"
+                style={{ WebkitOverflowScrolling: "touch" }}
+              >
                 {visibleItems.map((item) => {
                   const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
                   return (
