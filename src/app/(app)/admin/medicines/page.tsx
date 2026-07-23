@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { AddMedicineForm } from "@/components/medicine/AddMedicineForm";
 import { ArrowLeft, Pill, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { deleteMedicineAction, toggleMedicineActiveAction } from "@/actions/medicine";
 import { AdminMedicineList } from "./AdminMedicineList";
 
 export const metadata: Metadata = {

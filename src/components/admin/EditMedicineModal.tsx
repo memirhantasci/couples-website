@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Pill, Save } from "lucide-react";
+import { X, Pill, Save, Plus, Trash2, Clock } from "lucide-react";
 import { editMedicineAction } from "@/actions/medicine";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
@@ -18,31 +18,52 @@ export function EditMedicineModal({
   const [submitting, setSubmitting] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  const initialTimes: string[] = Array.isArray(med.times) && med.times.length > 0
+    ? med.times.map((t: string) => t.substring(0, 5))
+    : [med.time ? med.time.substring(0, 5) : "08:00"];
+
+  const [times, setTimes] = useState<string[]>(initialTimes);
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  function handleSetFrequency(freq: number) {
+    if (freq === 1) setTimes(["08:00"]);
+    else if (freq === 2) setTimes(["08:00", "20:00"]);
+    else if (freq === 3) setTimes(["08:00", "14:00", "20:00"]);
+  }
+
+  function handleTimeChange(index: number, val: string) {
+    const updated = [...times];
+    updated[index] = val;
+    setTimes(updated);
+  }
+
+  function handleAddTimeSlot() {
+    setTimes([...times, "12:00"]);
+  }
+
+  function handleRemoveTimeSlot(index: number) {
+    if (times.length <= 1) return;
+    setTimes(times.filter((_, i) => i !== index));
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSubmitting(true);
     const formData = new FormData(e.currentTarget);
+    
     const data = {
       name: formData.get("name") as string,
       start_date: formData.get("start_date") as string,
       end_date: formData.get("end_date") as string,
-      time: formData.get("time") as string,
+      times: times.map((t) => t.substring(0, 5)).filter(Boolean),
       user_id: Number(formData.get("user_id")),
     };
 
-    // Değişiklik kontrolü
-    const isNameSame = data.name.trim() === med.name;
-    const isStartSame = data.start_date === (med.start_date ? med.start_date.substring(0, 10) : "");
-    const isEndSame = data.end_date === (med.end_date ? med.end_date.substring(0, 10) : "");
-    const isTimeSame = data.time === (med.time ? med.time.substring(0, 5) : "");
-    const isUserSame = data.user_id === med.user_id;
-
-    if (isNameSame && isStartSame && isEndSame && isTimeSame && isUserSame) {
-      toast.info("Herhangi bir değişiklik yapmadınız.");
+    if (data.times.length === 0) {
+      toast.error("En az 1 alım saati eklenmelidir.");
       setSubmitting(false);
       return;
     }
@@ -102,7 +123,9 @@ export function EditMedicineModal({
       <div
         style={{
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "420px",
+          maxHeight: "90vh",
+          overflowY: "auto",
           backgroundColor: "var(--surface-2)",
           borderRadius: "20px",
           padding: "24px",
@@ -156,38 +179,131 @@ export function EditMedicineModal({
             />
           </div>
 
-            <div style={{ display: "flex", gap: "16px" }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Başlangıç</label>
-                <input
-                  name="start_date"
-                  type="date"
-                  defaultValue={med.start_date?.substring(0, 10)}
-                  required
-                  style={inputStyle}
-                />
-              </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Bitiş</label>
-                <input
-                  name="end_date"
-                  type="date"
-                  defaultValue={med.end_date?.substring(0, 10)}
-                  required
-                  style={inputStyle}
-                />
-              </div>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Başlangıç</label>
+              <input
+                name="start_date"
+                type="date"
+                defaultValue={med.start_date?.substring(0, 10)}
+                required
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Bitiş</label>
+              <input
+                name="end_date"
+                type="date"
+                defaultValue={med.end_date?.substring(0, 10)}
+                required
+                style={inputStyle}
+              />
+            </div>
+          </div>
+
+          {/* Times / Frequency Selection */}
+          <div>
+            <label style={labelStyle}>Günde Kaç Kez Alınacak?</label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", marginBottom: "12px" }}>
+              {[1, 2, 3].map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => handleSetFrequency(f)}
+                  style={{
+                    padding: "8px",
+                    borderRadius: "10px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    background: times.length === f ? "rgba(232,0,45,0.18)" : "var(--surface-1)",
+                    border: `1px solid ${times.length === f ? "var(--gs-red)" : "var(--border-default)"}`,
+                    color: times.length === f ? "white" : "var(--text-secondary)",
+                  }}
+                >
+                  Günde {f} Kez
+                </button>
+              ))}
             </div>
 
-          <div>
-            <label style={labelStyle}>Saat</label>
-            <input
-              name="time"
-              type="time"
-              defaultValue={med.time?.substring(0, 5)}
-              required
-              style={inputStyle}
-            />
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {times.map((t, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "10px 14px",
+                      borderRadius: "12px",
+                      background: "var(--surface-1)",
+                      border: "1px solid var(--border-default)",
+                    }}
+                  >
+                    <Clock size={14} style={{ color: "rgba(255,255,255,0.5)" }} />
+                    <span style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>
+                      Doz {idx + 1}:
+                    </span>
+                    <input
+                      type="time"
+                      value={t}
+                      onChange={(e) => handleTimeChange(idx, e.target.value)}
+                      required
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: "white",
+                        fontWeight: 700,
+                        fontSize: "14px",
+                        outline: "none",
+                        marginLeft: "auto",
+                      }}
+                    />
+                  </div>
+                  {times.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTimeSlot(idx)}
+                      style={{
+                        padding: "10px",
+                        borderRadius: "12px",
+                        background: "rgba(248,113,113,0.12)",
+                        color: "#f87171",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={handleAddTimeSlot}
+                style={{
+                  padding: "8px",
+                  borderRadius: "10px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  border: "1px dashed rgba(255,255,255,0.2)",
+                  background: "transparent",
+                  color: "rgba(255,255,255,0.7)",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  marginTop: "4px",
+                }}
+              >
+                <Plus size={14} />
+                Saat Ekle
+              </button>
+            </div>
           </div>
 
           <div>

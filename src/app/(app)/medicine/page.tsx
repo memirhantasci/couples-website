@@ -16,24 +16,44 @@ export const dynamic = "force-dynamic";
 async function calculateStreak(
   supabase: ReturnType<typeof createServerClient>,
   userId: number,
-  medIds: number[]
+  activeMeds: { id: number; time: string; times?: string[] }[]
 ): Promise<number> {
-  if (medIds.length === 0) return 0;
+  if (activeMeds.length === 0) return 0;
   let streak = 0;
   let checkDate = dayjs().tz("Europe/Istanbul").subtract(1, "day").startOf("day");
+  const medIds = activeMeds.map((m) => m.id);
+
   for (let i = 0; i < 180; i++) {
     const dateStr = checkDate.tz("Europe/Istanbul").format("YYYY-MM-DD");
     const { data: logs } = await supabase
       .from("medicine_logs")
-      .select("medicine_id, status")
+      .select("medicine_id, status, time")
       .eq("user_id", userId)
       .eq("date", dateStr)
       .in("medicine_id", medIds);
+
     if (!logs || logs.length === 0) break;
-    const allDrank = medIds.every((id) =>
-      logs.some((l) => l.medicine_id === id && l.status === "DRANK")
-    );
-    if (!allDrank) break;
+
+    // Check if every scheduled dose slot for every active medicine was marked DRANK
+    let allDosesDrank = true;
+    for (const med of activeMeds) {
+      const medTimes = Array.isArray(med.times) && med.times.length > 0
+        ? med.times.map((t) => t.substring(0, 5))
+        : [med.time ? med.time.substring(0, 5) : "08:00"];
+
+      for (const t of medTimes) {
+        const slotLog = logs.find(
+          (l) => l.medicine_id === med.id && (l.time ? l.time.substring(0, 5) : medTimes[0]) === t
+        );
+        if (!slotLog || slotLog.status !== "DRANK") {
+          allDosesDrank = false;
+          break;
+        }
+      }
+      if (!allDosesDrank) break;
+    }
+
+    if (!allDosesDrank) break;
     streak++;
     checkDate = checkDate.subtract(1, "day");
   }
@@ -51,7 +71,7 @@ export default async function MedicinePage() {
   const [medicinesResult, todayLogsResult, historicalLogsResult, usersResult] = await Promise.all([
     supabase
       .from("medicines")
-      .select("id, name, time, start_date, end_date, is_active, user_id")
+      .select("id, name, time, times, start_date, end_date, is_active, user_id")
       .eq("is_active", true)
       .eq("user_id", session.userId)
       .lte("start_date", today)
@@ -59,12 +79,12 @@ export default async function MedicinePage() {
       .order("time"),
     supabase
       .from("medicine_logs")
-      .select("medicine_id, status, date")
+      .select("medicine_id, status, date, time")
       .eq("user_id", session.userId)
       .eq("date", today),
     supabase
       .from("medicine_logs")
-      .select("medicine_id, status, date")
+      .select("medicine_id, status, date, time")
       .eq("user_id", session.userId)
       .gte("date", fourteenDaysAgo)
       .lt("date", today)
@@ -79,8 +99,8 @@ export default async function MedicinePage() {
   const todayLogs = todayLogsResult.data ?? [];
   const historicalLogs = historicalLogsResult.data ?? [];
   const users = usersResult?.data ?? [];
-  const medIds = medicines.map((m) => m.id);
-  const streakValue = await calculateStreak(supabase, session.userId, medIds);
+
+  const streakValue = await calculateStreak(supabase, session.userId, medicines);
 
   return (
     <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
