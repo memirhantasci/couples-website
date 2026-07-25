@@ -34,23 +34,20 @@ async function calculateStreak(
 
     if (!logs || logs.length === 0) break;
 
-    // Check if every scheduled dose slot for every active medicine was marked DRANK
+    // For historical dates, check if there is at least one DRANK log and no MISSED logs.
+    // This makes the streak robust against changes in medicine schedule (times/doses).
     let allDosesDrank = true;
     for (const med of activeMeds) {
-      const medTimes = Array.isArray(med.times) && med.times.length > 0
-        ? med.times.map((t) => t.substring(0, 5))
-        : [med.time ? med.time.substring(0, 5) : "08:00"];
+      const medLogs = logs.filter((l) => l.medicine_id === med.id);
+      
+      const hasDrank = medLogs.some((l) => l.status === "DRANK");
+      const hasMissed = medLogs.some((l) => l.status === "MISSED");
 
-      for (const t of medTimes) {
-        const slotLog = logs.find(
-          (l) => l.medicine_id === med.id && (l.time ? l.time.substring(0, 5) : medTimes[0]) === t
-        );
-        if (!slotLog || slotLog.status !== "DRANK") {
-          allDosesDrank = false;
-          break;
-        }
+      // We consider the day successful if they took at least one dose and missed none.
+      if (!hasDrank || hasMissed) {
+        allDosesDrank = false;
+        break;
       }
-      if (!allDosesDrank) break;
     }
 
     if (!allDosesDrank) break;

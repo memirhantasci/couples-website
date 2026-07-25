@@ -187,6 +187,26 @@ export async function editMedicineAction(
     return { error: "İlaç güncellenirken hata oluştu." };
   }
 
+  // Update today's logs if the number of doses hasn't changed to prevent losing today's progress
+  const today = todayString();
+  const { data: todayLogs } = await supabase
+    .from("medicine_logs")
+    .select("id, time")
+    .eq("medicine_id", id)
+    .eq("date", today)
+    .order("time");
+
+  if (todayLogs && todayLogs.length > 0 && todayLogs.length === sortedTimes.length) {
+    for (let i = 0; i < todayLogs.length; i++) {
+      if (todayLogs[i].time !== sortedTimes[i]) {
+        await supabase
+          .from("medicine_logs")
+          .update({ time: sortedTimes[i] })
+          .eq("id", todayLogs[i].id);
+      }
+    }
+  }
+
   revalidatePath("/medicine");
   revalidatePath("/admin");
   return { success: true };

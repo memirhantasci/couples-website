@@ -3,7 +3,8 @@
 import { useActionState, useRef, useState } from "react";
 import { createMeetingAction, deactivateMeetingAction, updateMeetingAction } from "@/actions/meetings";
 import { toast } from "sonner";
-import { Plus, CalendarClock, Trash2, Edit2, Save, X } from "lucide-react";
+import { Plus, CalendarClock, Trash2, Edit2 } from "lucide-react";
+import { EditMeetingModal } from "./EditMeetingModal";
 
 interface Meeting {
   id: number;
@@ -20,8 +21,7 @@ export function MeetingManager({ activeMeetings }: MeetingManagerProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const initialState: { error?: string; success?: boolean } = {};
   
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editDatetime, setEditDatetime] = useState<string>("");
+  const [editingMeeting, setEditingMeeting] = useState<Meeting | null>(null);
 
   const [state, formAction, isPending] = useActionState(
     async (prev: { error?: string; success?: boolean }, formData: FormData) => {
@@ -45,15 +45,7 @@ export function MeetingManager({ activeMeetings }: MeetingManagerProps) {
     else toast.success("Buluşma iptal edildi.");
   }
 
-  async function handleUpdate(id: number) {
-    if (!editDatetime) return;
-    const result = await updateMeetingAction(id, editDatetime);
-    if (result?.error) toast.error(result.error);
-    else {
-      toast.success("Buluşma tarihi güncellendi.");
-      setEditingId(null);
-    }
-  }
+  // Empty block, handleUpdate logic moved to EditMeetingModal
 
   // Min datetime: now
   const now = new Date();
@@ -83,89 +75,35 @@ export function MeetingManager({ activeMeetings }: MeetingManagerProps) {
                   <p className="font-bold text-white text-lg">
                     {meeting.title || "Buluşma"}
                   </p>
-                  {editingId === meeting.id ? (
-                    <div className="flex items-center gap-2 mt-2">
-                      <input 
-                        type="datetime-local" 
-                        value={editDatetime}
-                        onChange={(e) => setEditDatetime(e.target.value)}
-                        className="input-glass text-sm py-1.5 px-2"
-                      />
-                    </div>
-                  ) : (
-                    <p style={{ color: "rgba(255,215,0,0.9)", fontSize: 14, marginTop: 4 }}>
-                      {new Date(meeting.meeting_datetime).toLocaleString("tr-TR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  )}
+                  <p style={{ color: "rgba(255,215,0,0.9)", fontSize: 14, marginTop: 4 }}>
+                    {new Date(meeting.meeting_datetime).toLocaleString("tr-TR", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  {editingId === meeting.id ? (
-                    <>
-                      <button
-                        onClick={() => handleUpdate(meeting.id)}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-80"
-                        style={{
-                          background: "rgba(34,197,94,0.15)",
-                          color: "#4ade80",
-                          border: "1px solid rgba(34,197,94,0.2)",
-                        }}
-                      >
-                        <Save size={16} />
-                        Kaydet
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-80"
-                        style={{
-                          background: "rgba(255,255,255,0.1)",
-                          color: "#fff",
-                          border: "1px solid rgba(255,255,255,0.2)",
-                        }}
-                      >
-                        <X size={16} />
-                        Vazgeç
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => {
-                          setEditingId(meeting.id);
-                          // format for datetime-local: YYYY-MM-DDThh:mm
-                          const d = new Date(meeting.meeting_datetime);
-                          d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-                          setEditDatetime(d.toISOString().slice(0, 16));
-                        }}
-                        className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-80"
-                        style={{
-                          background: "rgba(255,215,0,0.15)",
-                          color: "#ffd700",
-                          border: "1px solid rgba(255,215,0,0.2)",
-                        }}
-                      >
-                        <Edit2 size={16} />
-                        Düzenle
-                      </button>
-                      <button
-                        onClick={() => handleDeactivate(meeting.id)}
-                        className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-80"
-                        style={{
-                          background: "rgba(232,0,45,0.15)",
-                          color: "#ff4d4d",
-                          border: "1px solid rgba(232,0,45,0.2)",
-                        }}
-                      >
-                        <Trash2 size={16} />
-                        İptal
-                      </button>
-                    </>
-                  )}
+                
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 w-full mt-3 sm:mt-0 sm:w-auto">
+                  <button
+                    onClick={() => setEditingMeeting(meeting)}
+                    className="flex-1 py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2"
+                    style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa" }}
+                  >
+                    <Edit2 size={18} />
+                    Düzenle
+                  </button>
+                  <button
+                    onClick={() => handleDeactivate(meeting.id)}
+                    className="flex-1 py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2"
+                    style={{ background: "rgba(248,113,113,0.15)", color: "#f87171" }}
+                  >
+                    <Trash2 size={18} />
+                    İptal
+                  </button>
                 </div>
               </div>
             ))}
@@ -176,6 +114,13 @@ export function MeetingManager({ activeMeetings }: MeetingManagerProps) {
               Henüz aktif bir buluşma planlanmadı.
             </p>
           </div>
+        )}
+
+        {editingMeeting && (
+          <EditMeetingModal
+            meeting={editingMeeting}
+            onClose={() => setEditingMeeting(null)}
+          />
         )}
       </div>
 

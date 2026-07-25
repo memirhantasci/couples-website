@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/session";
+import { dayjs } from "@/lib/date";
 
 const meetingSchema = z.object({
   meeting_datetime: z.string().min(1, "Tarih/saat gerekli"),
@@ -30,9 +31,11 @@ export async function createMeetingAction(
 
   const supabase = createServerClient();
 
+  const utcDateTime = dayjs.tz(parsed.data.meeting_datetime, "Europe/Istanbul").toISOString();
+
   // Create new meeting
   const { error } = await supabase.from("meetings").insert({
-    meeting_datetime: parsed.data.meeting_datetime,
+    meeting_datetime: utcDateTime,
     title: parsed.data.title || "Buluşma",
     is_active: true,
   });
@@ -72,9 +75,11 @@ export async function updateMeetingAction(id: number, meeting_datetime: string) 
   }
 
   const supabase = createServerClient();
+  const utcDateTime = dayjs.tz(meeting_datetime, "Europe/Istanbul").toISOString();
+
   const { error } = await supabase
     .from("meetings")
-    .update({ meeting_datetime })
+    .update({ meeting_datetime: utcDateTime })
     .eq("id", id);
 
   if (error) return { error: "Güncelleme başarısız." };
