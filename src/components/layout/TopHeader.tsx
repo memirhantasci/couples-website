@@ -272,7 +272,7 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
                       🤎Emirhan &amp; Öykü🤎
                     </h2>
 
-                    <div className="flex flex-col gap-2 flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+                    <div className="flex flex-col gap-2 flex-1 overflow-y-auto pb-4" style={{ WebkitOverflowScrolling: "touch" }}>
                       {visibleItems.map((item) => {
                         const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
                         
@@ -294,22 +294,22 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
                           </Link>
                         );
                       })}
-                    </div>
 
-                    <div className="mt-6 pt-4">
-                      <form action={logoutAction}>
-                        <button
-                          type="submit"
-                          className="w-full flex items-center justify-center gap-3 py-3.5 rounded-full font-bold text-[17px] transition-all active:scale-95"
-                          style={{
-                            background: "#E8002D",
-                            color: "#ffffff",
-                          }}
-                        >
-                          <LogOut size={20} style={{ transform: "rotate(180deg)" }} />
-                          <span>Çıkış Yap</span>
-                        </button>
-                      </form>
+                      <div className="mt-6 pt-4 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                        <form action={logoutAction}>
+                          <button
+                            type="submit"
+                            className="w-full flex items-center justify-center gap-3 py-3.5 rounded-full font-bold text-[17px] transition-all active:scale-95"
+                            style={{
+                              background: "#E8002D",
+                              color: "#ffffff",
+                            }}
+                          >
+                            <LogOut size={20} style={{ transform: "rotate(180deg)" }} />
+                            <span>Çıkış Yap</span>
+                          </button>
+                        </form>
+                      </div>
                     </div>
                   </div>
                 </>

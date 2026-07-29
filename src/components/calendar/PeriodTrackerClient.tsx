@@ -28,22 +28,18 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
 
   useEffect(() => setMounted(true), []);
 
-  // Filter out invalid dates before passing to FullCalendar
   const events = logs
     .filter(log => dayjs(log.date).isValid())
     .map((log) => ({
       id: log.id,
       date: log.date,
       display: "background",
-      backgroundColor: "rgba(160, 0, 20, 0.85)", // Darker red
+      backgroundColor: "rgba(200, 0, 30, 0.75)",
     }));
 
   const sortedLogs = [...logs].sort((a, b) => dayjs(b.date).unix() - dayjs(a.date).unix());
 
   function handleDateClick(info: { dateStr: string }) {
-    console.log("👉 handleDateClick tetiklendi! Gelen tarih:", info.dateStr);
-    console.log("👉 isOyku yetkisi açık mı? (Şu an iptal edildiği için her türlü geçmeli):", isOyku);
-    
     if (!isOyku) {
       toast.error("Bu tabloyu sadece Öykü güncelleyebilir.");
       return;
@@ -51,37 +47,29 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
 
     const date = info.dateStr;
     const exists = logs.some((l) => l.date === date);
-    console.log("👉 Bu tarihte kayıt var mı?", exists);
-    
+
     if (!exists) {
-      const monthLogsCount = logs.filter(l => dayjs(l.date).isSame(dayjs(date), 'month')).length;
-      console.log("👉 Bu ayki kayıt sayısı:", monthLogsCount);
-      
+      const monthLogsCount = logs.filter(l => dayjs(l.date).isSame(dayjs(date), "month")).length;
       if (monthLogsCount >= 2) {
-        console.log("🚫 Ayda 2'den fazla kayıt eklenemez, işlem iptal ediliyor.");
         toast.error("Bir ay içerisinde en fazla 2 gün seçebilirsiniz.");
         return;
       }
     }
 
-    console.log("✅ Her şey tamam, setSelectedDate çalıştırılıyor:", date);
     setSelectedDate(date);
     setIsAdding(!exists);
   }
 
   function handleEventClick(info: any) {
-    const dateStr = info.event.startStr.split('T')[0] || info.event.startStr;
-    console.log("👉 handleEventClick tetiklendi! Gelen tarih:", dateStr);
+    const dateStr = info.event.startStr.split("T")[0] || info.event.startStr;
     handleDateClick({ dateStr });
   }
 
   async function handleToggle() {
     if (!selectedDate) return;
-    
     setLoading(true);
     const result = await togglePeriodLogAction(selectedDate);
     setLoading(false);
-    
     if (result.error) {
       toast.error(result.error);
     } else {
@@ -92,7 +80,133 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
 
   return (
     <>
-      <div className="card p-4 relative">
+      {/* ─── Calendar Card ─── */}
+      <style>{`
+        .period-calendar .fc {
+          background: transparent;
+          font-family: inherit;
+        }
+        .period-calendar .fc-toolbar {
+          padding: 4px 8px 0;
+        }
+        .period-calendar .fc-toolbar-title {
+          font-size: 17px !important;
+          font-weight: 700 !important;
+          color: #ffffff !important;
+        }
+        .period-calendar .fc-button {
+          background: transparent !important;
+          border: none !important;
+          color: rgba(255,255,255,0.7) !important;
+          font-size: 18px !important;
+          padding: 2px 8px !important;
+          box-shadow: none !important;
+        }
+        .period-calendar .fc-button:hover { color: #fff !important; }
+        .period-calendar .fc-today-button {
+          background: #E8002D !important;
+          color: #fff !important;
+          border-radius: 20px !important;
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          padding: 4px 14px !important;
+          text-transform: none !important;
+          opacity: 1 !important;
+        }
+        .period-calendar .fc-today-button:disabled {
+          opacity: 1 !important;
+        }
+        .period-calendar .fc-col-header-cell-cushion {
+          font-size: 12px !important;
+          color: rgba(255,255,255,0.45) !important;
+          font-weight: 500 !important;
+          text-transform: uppercase !important;
+        }
+        .period-calendar .fc-daygrid-day-number {
+          font-size: 14px !important;
+          color: rgba(255,255,255,0.85) !important;
+          font-weight: 500 !important;
+          padding: 4px 6px !important;
+          position: relative;
+          z-index: 2;
+        }
+        .period-calendar .fc-day-other .fc-daygrid-day-number {
+          color: rgba(255,255,255,0.2) !important;
+        }
+        .period-calendar .fc-day-today {
+          background: transparent !important;
+        }
+        .period-calendar .fc-day-today .fc-daygrid-day-number {
+          color: #ffffff !important;
+          font-weight: 800 !important;
+          z-index: 3;
+        }
+        .period-calendar .fc-bg-event {
+          opacity: 1 !important;
+          background: radial-gradient(circle, rgba(232, 0, 45, 0.5) 0%, rgba(139, 0, 0, 0.6) 40%, transparent 70%) !important;
+        }
+        .period-calendar .fc-daygrid-day-bg .fc-bg-event {
+          border-radius: 50% !important;
+          margin: 0 !important;
+          width: 44px !important;
+          height: 44px !important;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+        .period-calendar .fc-daygrid-body-balanced .fc-daygrid-day-events {
+          min-height: 0 !important;
+        }
+        .period-calendar .fc-theme-standard td,
+        .period-calendar .fc-theme-standard th,
+        .period-calendar .fc-theme-standard .fc-scrollgrid {
+          border-color: rgba(255,255,255,0.05) !important;
+        }
+        .period-calendar .fc-scrollgrid {
+          border: none !important;
+        }
+        .period-calendar .fc-scrollgrid-sync-inner {
+          border: none !important;
+        }
+        .period-calendar .fc-daygrid-day-frame {
+          min-height: 44px !important;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        /* Blood drop indicator for period days */
+        .period-calendar .fc-bg-event::after {
+          content: "🩸";
+          position: absolute;
+          bottom: 4px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 10px;
+          line-height: 1;
+        }
+        /* Today highlight circle */
+        .period-calendar .fc-day-today .fc-daygrid-day-number {
+          background: #E8002D;
+          border-radius: 50%;
+          width: 28px;
+          height: 28px;
+          display: flex !important;
+          align-items: center;
+          justify-content: center;
+        }
+      `}</style>
+
+      <div
+        className="period-calendar"
+        style={{
+          background: "#1c1c1e",
+          borderRadius: 20,
+          overflow: "hidden",
+          marginBottom: 0,
+        }}
+      >
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
@@ -101,6 +215,8 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
           dateClick={handleDateClick}
           eventClick={handleEventClick}
           height="auto"
+          showNonCurrentDates={false}
+          fixedWeekCount={false}
           headerToolbar={{
             left: "prev,next",
             center: "title",
@@ -109,56 +225,83 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
         />
       </div>
 
-      <div className="card p-5 mt-6 mb-8">
-        <h3 className="font-bold text-white text-lg mb-4 flex items-center gap-2">
-          <Check size={20} style={{ color: "var(--gs-red)" }} />
+      {/* ─── Past Records ─── */}
+      <div style={{ marginTop: 28 }}>
+        <h3
+          className="font-bold"
+          style={{ fontSize: 20, color: "#ffffff", marginBottom: 14 }}
+        >
           Geçmiş Kayıtlar
         </h3>
-        
+
         {sortedLogs.length === 0 ? (
-          <div className="py-8 text-center text-sm text-white/40">
+          <div
+            style={{
+              padding: "32px 0",
+              textAlign: "center",
+              fontSize: 14,
+              color: "rgba(255,255,255,0.35)",
+            }}
+          >
             Henüz hiç regl kaydı bulunmuyor.
           </div>
         ) : (
-          <div 
-            className="flex flex-col gap-3 max-h-[350px] overflow-y-auto pr-2" 
-            style={{ WebkitOverflowScrolling: "touch" }}
-          >
-            {sortedLogs.map((log, index) => {
+          <div className="flex flex-col" style={{ gap: 10 }}>
+            {sortedLogs.map((log) => {
               const logDate = dayjs(log.date).tz("Europe/Istanbul");
               return (
-                <div 
-                  key={log.id} 
-                  className="flex items-center justify-between p-4 rounded-xl transition-all"
-                  style={{ 
-                    background: "rgba(255,255,255,0.03)", 
-                    border: "1px solid rgba(255,255,255,0.06)",
+                <div
+                  key={log.id}
+                  className="flex items-center justify-between"
+                  style={{
+                    background: "#1c1c1e",
+                    borderRadius: 14,
+                    padding: "14px 16px",
                   }}
                 >
-                  <div className="flex items-center gap-4">
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" 
-                      style={{ 
-                        background: "linear-gradient(135deg, rgba(160, 0, 20, 0.2) 0%, rgba(160, 0, 20, 0.05) 100%)",
-                        border: "1px solid rgba(160, 0, 20, 0.2)"
+                  <div className="flex items-center gap-3">
+                    {/* Blood drop icon */}
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, rgba(200,0,30,0.25) 0%, rgba(200,0,30,0.08) 100%)",
+                        border: "1px solid rgba(200,0,30,0.3)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
                       }}
                     >
-                      <span className="text-2xl drop-shadow-lg">🩸</span>
+                      <span style={{ fontSize: 20 }}>🩸</span>
                     </div>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-bold text-white/90 text-[17px] tracking-wide">
+                    <div className="flex flex-col">
+                      <span
+                        className="font-bold"
+                        style={{ fontSize: 16, color: "rgba(255,255,255,0.9)" }}
+                      >
                         {logDate.format("DD MMMM YYYY")}
                       </span>
-                      <span className="text-sm font-medium" style={{ color: "var(--gs-red)" }}>
+                      <span
+                        style={{ fontSize: 13, color: "#E8002D", fontWeight: 500 }}
+                      >
                         {logDate.format("dddd")}
                       </span>
                     </div>
                   </div>
-                  <div className="px-3 py-1.5 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                    <span className="text-white/70 text-xs font-bold tracking-wide uppercase">
-                      {logDate.format("MMMM")}
-                    </span>
-                  </div>
+
+                  {/* Month label */}
+                  <span
+                    className="font-bold uppercase"
+                    style={{
+                      fontSize: 13,
+                      color: "#c8922a",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    {logDate.format("MMMM")}
+                  </span>
                 </div>
               );
             })}
@@ -166,20 +309,21 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
         )}
       </div>
 
-      {mounted && typeof document !== 'undefined' && createPortal(
+      {/* ─── Modal Popup ─── */}
+      {mounted && typeof document !== "undefined" && createPortal(
         selectedDate ? (
-          <div 
-            style={{ 
-              position: "fixed", 
-              top: 0, 
-              left: 0, 
-              width: "100vw", 
-              height: "100vh", 
-              zIndex: 999999, 
-              display: "flex", 
-              alignItems: "center", 
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              zIndex: 999999,
+              display: "flex",
+              alignItems: "center",
               justifyContent: "center",
-              padding: "1rem"
+              padding: "1rem",
             }}
           >
             {/* Backdrop */}
@@ -191,96 +335,109 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
                 left: 0,
                 width: "100%",
                 height: "100%",
-                backgroundColor: "rgba(0,0,0,0.70)",
-                cursor: "pointer"
+                backgroundColor: "rgba(0,0,0,0.75)",
+                cursor: "pointer",
               }}
             />
-            
+
             {/* Modal Box */}
             <div
-              className="card"
-              style={{ 
+              style={{
                 position: "relative",
                 width: "100%",
-                maxWidth: "24rem",
-                padding: "1.5rem",
+                maxWidth: "22rem",
+                background: "#1c1c1e",
+                borderRadius: 20,
+                padding: "28px 24px 24px",
                 display: "flex",
                 flexDirection: "column",
-                gap: "1.25rem",
+                alignItems: "center",
+                gap: 16,
                 textAlign: "center",
-                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-                borderRadius: "1.25rem"
+                boxShadow: "0 30px 60px rgba(0,0,0,0.6)",
               }}
             >
-              <div 
-                style={{ 
-                  width: "4rem", 
-                  height: "4rem", 
-                  borderRadius: "9999px", 
-                  margin: "0 auto", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center", 
-                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
-                  background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)" 
+              {/* Icon */}
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #E8002D 0%, #B5001F 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 8px 24px rgba(232,0,45,0.4)",
                 }}
               >
-                <span style={{ fontSize: "1.5rem" }}>🩸</span>
+                <span style={{ fontSize: 28 }}>🩸</span>
               </div>
-              
+
               <div>
-                <h3 style={{ fontSize: "1.25rem", fontWeight: "bold", marginBottom: "0.25rem", color: "white" }}>
+                <h3
+                  className="font-bold"
+                  style={{ fontSize: 18, color: "#ffffff", marginBottom: 6 }}
+                >
                   {dayjs(selectedDate).tz("Europe/Istanbul").format("DD MMMM YYYY")}
                 </h3>
-                <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.7)" }}>
-                  {isAdding ? "Sıkıntılı günler başladı mı?" : "Bu günkü kaydı silmek istediğine emin misin?"}
+                <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)" }}>
+                  {isAdding
+                    ? "Sıkıntılı günler başladı mı?"
+                    : "Bu günkü kaydı silmek istediğine emin misin?"}
                 </p>
               </div>
 
-              <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+              {/* Buttons */}
+              <div style={{ display: "flex", gap: 10, width: "100%", marginTop: 4 }}>
                 <button
                   disabled={loading}
                   onClick={() => setSelectedDate(null)}
                   style={{
-                    flex: "1",
-                    padding: "0.75rem",
-                    borderRadius: "0.75rem",
-                    fontWeight: "600",
-                    backgroundColor: "rgba(255,255,255,0.05)",
+                    flex: 1,
+                    padding: "12px",
+                    borderRadius: 12,
+                    fontWeight: 600,
+                    fontSize: 15,
+                    background: "rgba(255,255,255,0.07)",
                     border: "1px solid rgba(255,255,255,0.1)",
                     color: "rgba(255,255,255,0.7)",
                     cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center"
                   }}
                 >
-                  <X size={18} />
+                  İptal
                 </button>
                 <button
                   disabled={loading}
                   onClick={handleToggle}
                   style={{
-                    flex: "2",
+                    flex: 2,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "0.5rem",
-                    padding: "0.75rem",
-                    borderRadius: "0.75rem",
-                    fontWeight: "bold",
-                    color: "white",
-                    backgroundColor: "var(--gs-red)",
-                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
-                    cursor: "pointer"
+                    gap: 8,
+                    padding: "12px",
+                    borderRadius: 12,
+                    fontWeight: 700,
+                    fontSize: 15,
+                    color: "#ffffff",
+                    background: "#E8002D",
+                    border: "none",
+                    cursor: loading ? "not-allowed" : "pointer",
+                    opacity: loading ? 0.7 : 1,
+                    boxShadow: "0 4px 16px rgba(232,0,45,0.35)",
                   }}
                 >
                   {loading ? (
-                    <span style={{ opacity: 0.5 }}>İşleniyor...</span>
+                    <span>İşleniyor...</span>
+                  ) : isAdding ? (
+                    <>
+                      <Check size={16} />
+                      Evet
+                    </>
                   ) : (
                     <>
-                      <Check size={18} />
-                      {isAdding ? "Evet" : "Kaydı Sil"}
+                      <X size={16} />
+                      Kaydı Sil
                     </>
                   )}
                 </button>
@@ -293,3 +450,4 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
     </>
   );
 }
+
