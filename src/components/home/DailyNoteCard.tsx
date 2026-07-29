@@ -29,75 +29,73 @@ export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
   }
 
   return (
-    <div
-      style={{
-        background: "#181a20",
-        border: "1px solid rgba(255,255,255,0.05)",
-        borderRadius: "16px",
-        padding: "20px",
-      }}
-    >
-      {/* Header */}
-      <h2 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>
+    <div style={{
+      background: "#181a20",
+      border: "1px solid rgba(255,255,255,0.08)",
+      borderRadius: "20px",
+      padding: "20px",
+    }}>
+      <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", margin: "0 0 14px 0" }}>
         Günlük Notum
       </h2>
 
       {saved ? (
-        <div
-          style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.05)",
-            borderRadius: "12px",
-            padding: "16px",
-          }}
-        >
-          <p
-            className="text-[15px] leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.8)", whiteSpace: "pre-wrap" }}
-          >
+        <div style={{
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: "12px",
+          padding: "14px",
+        }}>
+          <p style={{ fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.8)", whiteSpace: "pre-wrap", margin: 0 }}>
             {content}
           </p>
-          <p className="text-[12px] mt-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "12px" }}>
             Yarın yeni bir not yazabilirsin 🌙
           </p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <textarea
             name="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Bugün nasıldı? Ne hissediyorsun?..."
             rows={4}
-            className="w-full resize-none"
             style={{
+              width: "100%",
+              resize: "none",
               background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.06)",
               borderRadius: "12px",
-              color: "#ffffff",
-              fontSize: "15px",
+              color: "rgba(255,255,255,0.85)",
+              fontSize: "14px",
               lineHeight: 1.6,
-              padding: "16px",
+              padding: "14px",
               outline: "none",
               fontFamily: "inherit",
-              transition: "border-color 0.15s ease",
+              boxSizing: "border-box",
             }}
             maxLength={2000}
             required
           />
-          
           <button
             type="submit"
             disabled={submitting}
-            className="w-full flex items-center justify-center font-bold text-[15px] transition-all"
             style={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 700,
+              fontSize: "14px",
               background: "#D84257",
-              color: "#ffffff",
+              color: "#fff",
               border: "none",
               borderRadius: "12px",
-              padding: "14px",
+              padding: "13px",
               cursor: submitting ? "not-allowed" : "pointer",
               opacity: submitting ? 0.7 : 1,
+              transition: "opacity 0.15s ease",
             }}
           >
             {submitting ? "Kaydediliyor..." : "Kaydet"}

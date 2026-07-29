@@ -38,21 +38,17 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
   }
 
   return (
-    <div
-      style={{
-        background: "#181a20",
-        border: "1px solid rgba(255,255,255,0.05)",
-        borderRadius: "16px",
-        padding: "20px",
-      }}
-    >
-      {/* Header */}
-      <h2 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>
+    <div style={{
+      background: "#181a20",
+      border: "1px solid rgba(255,255,255,0.08)",
+      borderRadius: "20px",
+      padding: "20px",
+    }}>
+      <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", margin: "0 0 14px 0" }}>
         Bugün nasılsın?
       </h2>
 
-      {/* Emoji Row - Fotodaki gibi tek satır ve ekran genişliğine sığacak şekilde */}
-      <div className="flex flex-row gap-1.5 w-full">
+      <div style={{ display: "flex", gap: "6px", width: "100%" }}>
         {MOODS.map((mood) => {
           const isSelected = selected === mood.emoji;
           return (
@@ -60,30 +56,24 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
               key={mood.emoji}
               onClick={() => handleMoodSelect(mood.emoji)}
               disabled={loading || locked}
-              className="flex-1 flex flex-col items-center justify-center transition-all py-3 px-1"
               style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px 4px",
                 borderRadius: "12px",
-                border: isSelected
-                  ? "1px solid #D84257"
-                  : "1px solid rgba(255,255,255,0.05)",
-                background: isSelected
-                  ? "rgba(216, 66, 87, 0.05)"
-                  : "rgba(255,255,255,0.03)",
+                border: isSelected ? "2px solid #D84257" : "1px solid rgba(255,255,255,0.06)",
+                background: isSelected ? "rgba(216,66,87,0.1)" : "rgba(255,255,255,0.03)",
                 cursor: locked ? "default" : "pointer",
-                opacity: locked && !isSelected ? 0.4 : 1,
+                opacity: locked && !isSelected ? 0.35 : 1,
                 WebkitTapHighlightColor: "transparent",
+                transition: "all 0.15s ease",
               }}
             >
               <span style={{ fontSize: "28px", lineHeight: 1, marginBottom: "4px" }}>{mood.emoji}</span>
-              <span
-                style={{
-                  fontSize: "9px",
-                  color: "rgba(255,255,255,0.7)",
-                  fontWeight: 500,
-                  textAlign: "center",
-                  wordBreak: "break-word"
-                }}
-              >
+              <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.6)", fontWeight: 500, textAlign: "center" }}>
                 {mood.label}
               </span>
             </button>
@@ -92,7 +82,7 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
       </div>
 
       {locked && selected && (
-        <p className="text-[12px] mt-2 text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", textAlign: "center", marginTop: "10px" }}>
           Bugün için kaydedildi 💛
         </p>
       )}

@@ -22,19 +22,17 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
   if (pendingLetters.length === 0) return null;
 
   return (
-    <div
-      className="flex flex-col gap-4"
-      style={{
-        background: "#181a20",
-        border: "1px solid rgba(255,255,255,0.05)",
-        borderRadius: "16px",
-        padding: "20px",
-      }}
-    >
-      <h2 className="text-xl font-bold" style={{ color: "#ffffff" }}>
+    <div style={{
+      background: "#181a20",
+      border: "1px solid rgba(255,255,255,0.08)",
+      borderRadius: "20px",
+      padding: "20px",
+    }}>
+      <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", margin: "0 0 12px 0" }}>
         Bekleyen Mektuplar
       </h2>
-      <div className="flex flex-col gap-2">
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {pendingLetters.map(letter => {
           const unlockDate = dayjs(letter.unlock_date);
           const daysLeft = unlockDate.diff(today, "day");
@@ -43,37 +41,43 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
           return (
             <div
               key={letter.id}
-              className="flex items-center gap-4 p-4 rounded-[16px] transition-all"
               style={{
-                background: "rgba(245,200,66,0.05)",
-                border: "1px solid rgba(245,200,66,0.14)",
-                borderLeft: "3px solid var(--gs-gold)",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "14px",
+                borderRadius: "14px",
+                background: "rgba(196,161,90,0.06)",
+                border: "1px solid rgba(196,161,90,0.18)",
               }}
             >
-              <div
-                className="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
-              >
-                <Mail size={18} />
+              <div style={{
+                width: 36,
+                height: 36,
+                borderRadius: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(196,161,90,0.12)",
+                color: "#C4A15A",
+                flexShrink: 0,
+              }}>
+                <Mail size={16} />
               </div>
 
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate" style={{ color: "var(--text-primary)" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: "13px", fontWeight: 600, color: "#fff", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   Kimden: {senderName}
                 </p>
-                <p className="flex items-center gap-1 text-xs mt-0.5" style={{ color: "var(--text-tertiary)" }}>
+                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", margin: "2px 0 0 0", display: "flex", alignItems: "center", gap: "4px" }}>
                   <CalendarClock size={10} />
                   {unlockDate.tz("Europe/Istanbul").format("DD MMMM YYYY")}
                 </p>
               </div>
 
-              <div className="flex flex-col items-end flex-shrink-0">
-                <span className="text-lg font-bold" style={{ color: "var(--gs-gold)" }}>
-                  {daysLeft}
-                </span>
-                <span className="text-[10px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
-                  gün kaldı
-                </span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 }}>
+                <span style={{ fontSize: "17px", fontWeight: 700, color: "#C4A15A" }}>{daysLeft}</span>
+                <span style={{ fontSize: "9px", fontWeight: 600, color: "rgba(255,255,255,0.4)" }}>gün kaldı</span>
               </div>
             </div>
           );

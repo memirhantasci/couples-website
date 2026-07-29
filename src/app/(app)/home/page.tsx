@@ -53,98 +53,83 @@ export default async function HomePage() {
   ]);
 
   const hitap = getTodayHitap();
-  const meetingDate = dayjs("2026-01-19");
-  const togetherDate = dayjs("2026-01-26");
-  const daysSinceMeeting = daysSince(meetingDate);
-  const daysSinceTogether = daysSince(togetherDate);
+  const daysSinceMeeting = daysSince(dayjs("2026-01-19"));
+  const daysSinceTogether = daysSince(dayjs("2026-01-26"));
   const loveMeter = getLoveMeter();
   const quote = getQuoteForDay(doy);
   const currentMood = moodResult.data?.mood_type ?? null;
   const currentNote = noteResult.data?.content ?? null;
   const activeMeeting = meetingResult.data;
   const pendingLetters = (pendingLettersResult.data as any[]) ?? [];
-
   const dateStr = dayjs().locale("tr").format("DD MMMM dddd").toUpperCase();
 
-  // Genel kart stili (fotoğraftaki gibi)
-  const cardStyle = {
-    background: "#181a20",
-    border: "1px solid rgba(255,255,255,0.05)",
-    borderRadius: "16px",
-    padding: "20px",
-  };
-
   return (
-    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto" style={{ paddingBottom: 100 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "16px 16px 100px 16px", maxWidth: "512px", margin: "0 auto" }}>
 
       {/* ── HERO CARD ─────────────────────────────────── */}
-      <div style={cardStyle} className="flex flex-row items-stretch justify-between gap-2">
-        {/* Left: date + greeting */}
-        <div className="flex-1 flex flex-col justify-center">
-          <p
-            className="text-[10px] font-medium tracking-wide mb-2"
-            style={{ color: "rgba(255,255,255,0.5)" }}
-          >
+      <div style={{
+        background: "#181a20",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "20px",
+        padding: "20px",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "stretch",
+        justifyContent: "space-between",
+        gap: "12px",
+      }}>
+        {/* Sol: tarih + selamlama */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <p style={{ fontSize: "10px", fontWeight: 500, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: "6px" }}>
             {dateStr}
           </p>
-          <h1 className="text-3xl font-bold leading-tight" style={{ color: "#ffffff" }}>
-            Günaydın,<br/>{hitap} <span style={{ fontSize: "28px" }}>❤️</span>
+          <h1 style={{ fontSize: "24px", fontWeight: 700, lineHeight: 1.2, color: "#fff", margin: 0 }}>
+            Günaydın,<br />{hitap} <span style={{ fontSize: "20px" }}>❤️</span>
           </h1>
         </div>
 
-        {/* Right: counters (Yan Yana) */}
-        <div className="flex gap-2">
-          {/* Tanışalı counter */}
-          <div
-            className="flex flex-col items-center justify-center rounded-xl"
-            style={{
-              border: "2px solid #C4A15A",
-              background: "rgba(196, 161, 90, 0.05)",
-              width: 90,
-              height: "100%",
-              padding: "16px 8px",
-            }}
-          >
-            <span
-              className="text-[26px] font-bold leading-none mb-1"
-              style={{ color: "#ffffff" }}
-            >
-              {daysSinceMeeting}
-            </span>
-            <span className="text-[10px] font-medium text-center leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>
-              gün tanışalı 🤝
-            </span>
+        {/* Sağ: sayaçlar */}
+        <div style={{ display: "flex", gap: "8px", alignItems: "stretch" }}>
+          <div style={{
+            border: "2px solid #C4A15A",
+            background: "rgba(196,161,90,0.06)",
+            borderRadius: "14px",
+            minWidth: "78px",
+            padding: "12px 8px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            <span style={{ fontSize: "24px", fontWeight: 700, color: "#fff", lineHeight: 1 }}>{daysSinceMeeting}</span>
+            <span style={{ fontSize: "9px", fontWeight: 500, color: "rgba(255,255,255,0.6)", textAlign: "center", marginTop: "4px" }}>gün tanışalı 🤝</span>
           </div>
-          {/* Sevgili counter */}
-          <div
-            className="flex flex-col items-center justify-center rounded-xl"
-            style={{
-              border: "2px solid #D84257",
-              background: "rgba(216, 66, 87, 0.05)",
-              width: 90,
-              height: "100%",
-              padding: "16px 8px",
-            }}
-          >
-            <span className="text-[26px] font-bold leading-none mb-1" style={{ color: "#ffffff" }}>
-              {daysSinceTogether}
-            </span>
-            <span className="text-[10px] font-medium text-center leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>
-              gün sevgili ❤️
-            </span>
+          <div style={{
+            border: "2px solid #D84257",
+            background: "rgba(216,66,87,0.06)",
+            borderRadius: "14px",
+            minWidth: "78px",
+            padding: "12px 8px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            <span style={{ fontSize: "24px", fontWeight: 700, color: "#fff", lineHeight: 1 }}>{daysSinceTogether}</span>
+            <span style={{ fontSize: "9px", fontWeight: 500, color: "rgba(255,255,255,0.6)", textAlign: "center", marginTop: "4px" }}>gün sevgili ❤️</span>
           </div>
         </div>
       </div>
 
       {/* ── GÜNÜN SÖZÜ ────────────────────────────────── */}
-      <div style={cardStyle}>
-        <h2 className="text-xl font-bold mb-3" style={{ color: "#ffffff" }}>
-          Günün Sözü
-        </h2>
-        <p
-          className="text-[15px] leading-relaxed"
-          style={{ color: "rgba(255,255,255,0.8)" }}
-        >
+      <div style={{
+        background: "#181a20",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "20px",
+        padding: "20px",
+      }}>
+        <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#fff", margin: "0 0 8px 0" }}>Günün Sözü</h2>
+        <p style={{ fontSize: "13px", lineHeight: 1.5, color: "rgba(255,255,255,0.65)", fontStyle: "italic", margin: 0 }}>
           &quot;{quote}&quot;
         </p>
       </div>

@@ -316,13 +316,13 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
                         <form action={logoutAction}>
                           <button
                             type="submit"
-                            className="w-full flex items-center justify-center gap-3 py-3.5 rounded-full font-bold text-[17px] transition-all active:scale-95"
+                            className="w-full flex items-center justify-center gap-4 py-4 rounded-full font-bold text-[20px] transition-all active:scale-95"
                             style={{
                               background: "#E8002D",
                               color: "#ffffff",
                             }}
                           >
-                            <LogOut size={20} style={{ transform: "rotate(180deg)" }} />
+                            <LogOut size={24} style={{ transform: "rotate(180deg)" }} />
                             <span>Çıkış Yap</span>
                           </button>
                         </form>
