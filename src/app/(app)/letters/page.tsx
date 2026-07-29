@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Mail, Send, Inbox } from "lucide-react";
 import { LetterList } from "@/components/letters/LetterList";
 import { WriteLetterForm } from "@/components/letters/WriteLetterForm";
 
@@ -46,44 +45,49 @@ export default async function LettersPage() {
   const availableUsers = (users || []).filter(u => u.username !== "admin" && u.username !== "adminadmin");
 
   return (
-    <div className="px-4 py-5 flex flex-col gap-5 max-w-lg mx-auto">
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2.5 mb-1">
-          <div
-            className="w-9 h-9 rounded-[12px] flex items-center justify-center"
-            style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
-          >
-            <Mail size={18} />
-          </div>
-          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-            Zaman Kapsülü
-          </h1>
+    <div
+      className="px-4 pt-6 pb-8 flex flex-col max-w-lg mx-auto"
+      style={{ background: "#0a0a0f", minHeight: "100%", gap: 24 }}
+    >
+      {/* ─── Gelen Mektuplar ─── */}
+      <div
+        style={{
+          background: "#141418",
+          border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 16,
+          padding: "20px 18px",
+        }}
+      >
+        <div className="flex items-center gap-2" style={{ marginBottom: 16 }}>
+          <span style={{ fontSize: 16 }}>✉️</span>
+          <h2 className="font-bold" style={{ fontSize: 16, color: "#ffffff" }}>
+            Gelen Mektuplar
+          </h2>
         </div>
-        <p className="text-sm ml-[52px]" style={{ color: "var(--text-tertiary)" }}>
-          Gelecekteki o özel güne mesaj bırak... 💌
-        </p>
-      </div>
 
-      {/* Gelen Mektuplar */}
-      <div className="flex flex-col gap-3">
-        <h2 className="section-title flex items-center gap-2">
-          <Inbox size={15} style={{ color: "var(--text-tertiary)" }} />
-          Gelen Mektuplar
-        </h2>
         <LetterList letters={receivedLetters || []} type="received" />
       </div>
 
-      {/* Gönderilen Mektuplar */}
-      <div className="flex flex-col gap-3">
-        <h2 className="section-title flex items-center gap-2">
-          <Send size={15} style={{ color: "var(--text-tertiary)" }} />
-          Gönderdiğim Mektuplar
-        </h2>
+      {/* ─── Gönderdiğim Mektuplar ─── */}
+      <div
+        style={{
+          background: "#141418",
+          border: "1px solid rgba(255,255,255,0.07)",
+          borderRadius: 16,
+          padding: "20px 18px",
+        }}
+      >
+        <div className="flex items-center gap-2" style={{ marginBottom: 16 }}>
+          <span style={{ fontSize: 16 }}>➤</span>
+          <h2 className="font-bold" style={{ fontSize: 16, color: "#ffffff" }}>
+            Gönderdiğim Mektuplar
+          </h2>
+        </div>
+
         <LetterList letters={sentLetters || []} type="sent" />
       </div>
 
-      {/* Yeni Mektup Yaz Formu */}
+      {/* ─── Yeni Mektup Yaz ─── */}
       <WriteLetterForm users={availableUsers} />
     </div>
   );

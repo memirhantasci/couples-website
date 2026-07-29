@@ -3,7 +3,7 @@
 import { useActionState, useRef } from "react";
 import { createLetterAction } from "@/actions/letters";
 import { toast } from "sonner";
-import { Send, LockKeyhole, ChevronDown } from "lucide-react";
+import { LockKeyhole, FileEdit } from "lucide-react";
 
 interface UserOption {
   id: number;
@@ -32,102 +32,196 @@ export function WriteLetterForm({ users }: { users: UserOption[] }) {
   const todayStr = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="card p-5">
+    <div
+      style={{
+        background: "#141418",
+        border: "1px solid rgba(255,255,255,0.07)",
+        borderRadius: 16,
+        padding: "20px 18px",
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center gap-2.5 mb-5">
+      <div className="flex items-center gap-2.5" style={{ marginBottom: 20 }}>
         <div
-          className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0"
-          style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
+          className="flex items-center justify-center"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 10,
+            background: "rgba(200,146,42,0.12)",
+            color: "#c8922a",
+          }}
         >
-          <Send size={15} />
+          <FileEdit size={16} />
         </div>
-        <h3 className="font-bold text-base" style={{ color: "var(--text-primary)" }}>
-          Geleceğe Mektup Yaz
+        <h3
+          className="font-bold"
+          style={{ fontSize: 16, color: "#c8922a" }}
+        >
+          Yeni Mektup Yaz
         </h3>
       </div>
 
-      <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+      <form ref={formRef} action={formAction} className="flex flex-col" style={{ gap: 16 }}>
         {/* Kime */}
         <div>
-          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+          <label
+            className="block font-semibold uppercase"
+            style={{
+              fontSize: 10,
+              color: "rgba(255,255,255,0.35)",
+              letterSpacing: "0.8px",
+              marginBottom: 8,
+            }}
+          >
             Kime
           </label>
-          <div className="relative">
-            <select
-              name="receiver_id"
-              required
-              className="input-glass w-full"
-              defaultValue=""
-            >
-              <option value="" disabled style={{ background: "#1f1f23" }}>Alıcı seç...</option>
-              {users.map(u => (
-                <option key={u.id} value={u.id} style={{ background: "#1f1f23", color: "#f4f4f5" }}>
-                  {u.display_name || (u.username.charAt(0).toUpperCase() + u.username.slice(1))}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            name="receiver_id"
+            required
+            defaultValue=""
+            style={{
+              width: "100%",
+              padding: "13px 16px",
+              background: "#1a1a1e",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 12,
+              color: "#f4f4f5",
+              fontSize: 14,
+              outline: "none",
+              appearance: "none",
+              WebkitAppearance: "none",
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.35)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "right 14px center",
+              paddingRight: 42,
+              cursor: "pointer",
+            }}
+          >
+            <option value="" disabled style={{ background: "#1a1a1e" }}>Alıcı seç...</option>
+            {users.map(u => (
+              <option key={u.id} value={u.id} style={{ background: "#1a1a1e", color: "#f4f4f5" }}>
+                {u.display_name || (u.username.charAt(0).toUpperCase() + u.username.slice(1))}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Açılış Tarihi */}
         <div>
-          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
-            Açılış Tarihi (Kilit)
+          <label
+            className="block font-semibold uppercase flex items-center gap-1"
+            style={{
+              fontSize: 10,
+              color: "rgba(255,255,255,0.35)",
+              letterSpacing: "0.8px",
+              marginBottom: 8,
+            }}
+          >
+            Açılış Tarihi (Kilit) <LockKeyhole size={10} />
           </label>
-          <div className="relative">
-            <LockKeyhole
-              size={16}
-              className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ color: "var(--text-tertiary)" }}
-            />
-            <input
-              name="unlock_date"
-              type="date"
-              min={todayStr}
-              required
-              className="input-glass w-full pl-11"
-            />
-          </div>
-          <p className="text-xs mt-2" style={{ color: "var(--text-tertiary)" }}>
-            Bu tarihe kadar mektup kilitli kalacak ve okunamayacak.
-          </p>
+          <input
+            name="unlock_date"
+            type="date"
+            min={todayStr}
+            required
+            style={{
+              width: "100%",
+              padding: "13px 16px",
+              background: "#1a1a1e",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 12,
+              color: "#f4f4f5",
+              fontSize: 14,
+              outline: "none",
+              WebkitAppearance: "none",
+              appearance: "none",
+            }}
+          />
         </div>
 
         {/* Başlık */}
         <div>
-          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+          <label
+            className="block font-semibold uppercase"
+            style={{
+              fontSize: 10,
+              color: "rgba(255,255,255,0.35)",
+              letterSpacing: "0.8px",
+              marginBottom: 8,
+            }}
+          >
             Mektup Başlığı
           </label>
           <input
             name="title"
             type="text"
-            placeholder="ör: Birinci yılımız için..."
+            placeholder="Gelecekteki Bize..."
             required
-            className="input-glass"
             maxLength={255}
+            style={{
+              width: "100%",
+              padding: "13px 16px",
+              background: "#1a1a1e",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 12,
+              color: "#f4f4f5",
+              fontSize: 14,
+              outline: "none",
+            }}
           />
         </div>
 
         {/* İçerik */}
         <div>
-          <label className="block text-xs font-semibold mb-2 uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+          <label
+            className="block font-semibold uppercase"
+            style={{
+              fontSize: 10,
+              color: "rgba(255,255,255,0.35)",
+              letterSpacing: "0.8px",
+              marginBottom: 8,
+            }}
+          >
             Mektup İçeriği
           </label>
           <textarea
             name="content"
-            placeholder="İçinden geçenleri yaz..."
+            placeholder="Yüreğinden geçenleri dök..."
             required
             rows={5}
-            className="input-glass resize-none"
-            style={{ lineHeight: 1.6 }}
+            style={{
+              width: "100%",
+              padding: "13px 16px",
+              background: "#1a1a1e",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 12,
+              color: "#f4f4f5",
+              fontSize: 14,
+              outline: "none",
+              resize: "none",
+              lineHeight: 1.6,
+            }}
           />
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={isPending}
-          className="btn-gold w-full mt-1"
-          style={{ borderRadius: 14, padding: "14px" }}
+          className="w-full flex items-center justify-center gap-2 font-bold"
+          style={{
+            marginTop: 4,
+            padding: "14px",
+            borderRadius: 14,
+            background: "linear-gradient(135deg, #c8922a 0%, #a67820 100%)",
+            color: "#111114",
+            fontSize: 14,
+            border: "none",
+            cursor: isPending ? "not-allowed" : "pointer",
+            opacity: isPending ? 0.6 : 1,
+            letterSpacing: "0.3px",
+          }}
         >
           {isPending ? (
             <div
@@ -135,7 +229,9 @@ export function WriteLetterForm({ users }: { users: UserOption[] }) {
               style={{ borderColor: "rgba(0,0,0,0.2)", borderTopColor: "#111" }}
             />
           ) : (
-            "💌 Mektubu Mühürle"
+            <>
+              <span>📮</span> MEKTUBU MÜHÜRLE
+            </>
           )}
         </button>
       </form>
