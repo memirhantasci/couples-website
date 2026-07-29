@@ -40,7 +40,7 @@ export default function RootLayout({
               border: "1px solid rgba(255,255,255,0.10)",
               color: "#ffffff",
               borderRadius: "14px",
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "'Outfit', sans-serif",
               boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
             },
           }}

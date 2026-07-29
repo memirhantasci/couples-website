@@ -12,18 +12,12 @@ export default async function PhotoUploadPage() {
   if (!session) redirect("/login");
 
   return (
-    <div className="px-4 py-5 flex flex-col gap-5 max-w-lg mx-auto">
+    <div className="px-4 py-5 flex flex-col max-w-lg mx-auto" style={{ gap: "12px" }}>
       {/* Header */}
-      <div className="mb-1">
-        <div className="flex items-center gap-2 mb-1">
-          <span style={{ color: "var(--gs-red)", fontSize: 20 }}>❤️</span>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-            Fotoğraf Yükle
-          </h1>
-        </div>
-        <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
-          Bir anıyı arşive ekle 📸
-        </p>
+      <div className="mt-6">
+        <h1 className="text-[32px] font-bold text-white leading-tight">
+          Fotoğraf Yükle
+        </h1>
       </div>
 
       {/* Form */}

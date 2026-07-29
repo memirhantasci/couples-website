@@ -26,119 +26,161 @@ export default async function DailyNotesUserPage() {
   const notes = notesResult ?? [];
 
   return (
-    <div className="px-4 py-6 flex flex-col gap-0 max-w-lg mx-auto">
-
-      {/* Header */}
+    <div
+      className="px-4 pt-6 pb-8 flex flex-col max-w-lg mx-auto"
+      style={{ background: "#0a0a0f", minHeight: "100%" }}
+    >
+      {/* ─── Header ─── */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+        <h1
+          className="font-bold leading-tight"
+          style={{ fontSize: 30, color: "#ffffff", letterSpacing: "-0.3px" }}
+        >
           Günlüğüm
         </h1>
-        <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>
+        <p
+          className="mt-1 text-sm"
+          style={{ color: "rgba(255,255,255,0.35)" }}
+        >
           Sadece senin görebildiğin notların
         </p>
       </div>
 
-      {/* Timeline */}
-      {notes.length === 0 ? (
-        <div className="text-center py-16">
-          <span className="text-5xl block mb-4">📓</span>
-          <p style={{ color: "var(--text-tertiary)" }}>Henüz günlüğüne hiçbir şey yazmadın.</p>
-        </div>
-      ) : (
-        <div className="relative">
-          {/* Vertical line */}
-          <div
-            className="absolute left-[54px] top-0 bottom-0 w-px"
-            style={{ background: "rgba(255,255,255,0.08)" }}
-          />
-
-          <div className="flex flex-col gap-6">
-            {notes.map((note) => {
-              const dateObj = dayjs(note.date).locale("tr");
-              const day = dateObj.format("DD");
-              const month = dateObj.format("MMMM YYYY").toUpperCase();
-              const weekday = dateObj.format("dddd");
-
-              return (
-                <div key={note.id} className="flex gap-5 relative">
-                  {/* Date column */}
-                  <div
-                    className="flex flex-col items-center flex-shrink-0"
-                    style={{ width: 54 }}
-                  >
-                    <span
-                      className="font-bold leading-none"
-                      style={{ fontSize: 28, color: "var(--text-primary)" }}
-                    >
-                      {day}
-                    </span>
-                    <span
-                      className="text-[10px] font-bold uppercase text-center leading-tight mt-0.5"
-                      style={{ color: "var(--gs-gold)" }}
-                    >
-                      {dateObj.format("MMMM")}
-                    </span>
-                    <span
-                      className="text-[10px] font-semibold uppercase text-center mt-0.5"
-                      style={{ color: "rgba(255,255,255,0.3)" }}
-                    >
-                      {dateObj.format("dddd").slice(0, 3).toUpperCase()}
-                    </span>
-                  </div>
-
-                  {/* Dot on timeline */}
-                  <div
-                    className="absolute flex-shrink-0"
-                    style={{
-                      left: 54 - 4,
-                      top: 8,
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: "rgba(255,255,255,0.25)",
-                      border: "1.5px solid rgba(255,255,255,0.08)",
-                    }}
-                  />
-
-                  {/* Content card */}
-                  <div
-                    className="flex-1 rounded-[16px] p-4 relative min-w-0"
-                    style={{
-                      background: "var(--surface-2)",
-                      border: "1px solid var(--border-subtle)",
-                    }}
-                  >
-                    {/* Three dots */}
-                    <button
-                      className="absolute top-3 right-3"
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "rgba(255,255,255,0.25)",
-                        fontSize: 18,
-                        lineHeight: 1,
-                        padding: "2px 6px",
-                      }}
-                    >
-                      •••
-                    </button>
-
-                    <p
-                      className="text-sm leading-relaxed whitespace-pre-wrap break-words pr-8"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {note.content}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* ─── Empty state ─── */}
+      {notes.length === 0 && (
+        <div
+          className="flex flex-col items-center justify-center py-20 rounded-[20px]"
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px dashed rgba(255,255,255,0.1)",
+          }}
+        >
+          <span className="text-5xl mb-4">📓</span>
+          <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+            Henüz günlüğüne hiçbir şey yazmadın.
+          </p>
         </div>
       )}
 
-      <div style={{ height: 24 }} />
+      {/* ─── Timeline ─── */}
+      {notes.length > 0 && (
+        <div className="relative flex flex-col gap-0">
+          {/* Vertical line — runs the full height of the list */}
+          <div
+            className="absolute"
+            style={{
+              left: 52,          // center of the date column
+              top: 12,
+              bottom: 12,
+              width: 1,
+              background: "rgba(255,255,255,0.1)",
+              zIndex: 0,
+            }}
+          />
+
+          {notes.map((note, index) => {
+            const dateObj = dayjs(note.date).locale("tr");
+            const day     = dateObj.format("D");           // "24"
+            const month   = dateObj.format("MMMM YYYY").toUpperCase(); // "TEMMUZ 2026"
+            const weekday = dateObj.format("dddd");        // "Cuma"
+
+            return (
+              <div
+                key={note.id}
+                className="flex gap-4 relative"
+                style={{ paddingBottom: index < notes.length - 1 ? 28 : 0 }}
+              >
+                {/* ── Date column ── */}
+                <div
+                  className="flex flex-col items-center flex-shrink-0 pt-1"
+                  style={{ width: 64 }}
+                >
+                  {/* Day number */}
+                  <span
+                    className="font-bold leading-none"
+                    style={{ fontSize: 32, color: "#ffffff" }}
+                  >
+                    {day}
+                  </span>
+                  {/* Month + Year */}
+                  <span
+                    className="font-semibold text-center leading-tight mt-0.5"
+                    style={{
+                      fontSize: 9,
+                      color: "#c8922a",   // warm gold / amber — matches screenshot
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    {month}
+                  </span>
+                  {/* Weekday */}
+                  <span
+                    className="font-medium text-center mt-0.5"
+                    style={{ fontSize: 9, color: "rgba(255,255,255,0.3)" }}
+                  >
+                    {weekday}
+                  </span>
+                </div>
+
+                {/* ── Dot on the line ── */}
+                <div
+                  className="absolute z-10"
+                  style={{
+                    left: 52 - 4,   // center the dot on the line
+                    top: 12,
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.3)",
+                    border: "1.5px solid rgba(255,255,255,0.15)",
+                  }}
+                />
+
+                {/* ── Content card ── */}
+                <div
+                  className="flex-1 relative rounded-[14px] p-4 min-w-0"
+                  style={{
+                    background: "#1a1a1e",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                  }}
+                >
+                  {/* Three-dot menu button */}
+                  <button
+                    className="absolute"
+                    style={{
+                      top: 10,
+                      right: 12,
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "rgba(255,255,255,0.25)",
+                      fontSize: 16,
+                      letterSpacing: "2px",
+                      lineHeight: 1,
+                      padding: "2px 4px",
+                    }}
+                    aria-label="Seçenekler"
+                  >
+                    •••
+                  </button>
+
+                  {/* Note text */}
+                  <p
+                    className="whitespace-pre-wrap break-words leading-relaxed"
+                    style={{
+                      fontSize: 13.5,
+                      color: "rgba(255,255,255,0.75)",
+                      paddingRight: 28,  // keep text clear of the dots button
+                    }}
+                  >
+                    {note.content}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -35,7 +35,7 @@
   --dark-800: #1f1f23;
   --dark-700: #27272c;
 
-  --font-inter: 'Inter', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
   --font-playfair: 'Playfair Display', serif;
   --bottom-nav-height: 76px;
 }
@@ -55,7 +55,7 @@ html {
 }
 
 body {
-  font-family: var(--font-inter);
+  font-family: var(--font-outfit);
   background-color: var(--surface-0);
   color: var(--text-primary);
   min-height: 100dvh;
@@ -270,7 +270,7 @@ main,
   border-radius: 14px;
   color: var(--text-primary);
   font-size: 15px;
-  font-family: var(--font-inter);
+  font-family: var(--font-outfit);
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   /* Safari'de input görünümü için */
@@ -605,7 +605,7 @@ input[type="date"].input-glass::-webkit-calendar-picker-indicator {
 
 /* ─── Toast Overrides ────────────────────────────────────────────────────── */
 [data-sonner-toast] {
-  font-family: var(--font-inter) !important;
+  font-family: var(--font-outfit) !important;
   background: var(--surface-3) !important;
   border: 1px solid var(--border-default) !important;
   color: var(--text-primary) !important;
@@ -623,7 +623,7 @@ input[type="date"].input-glass::-webkit-calendar-picker-indicator {
   --fc-page-bg-color: transparent;
   --fc-neutral-bg-color: var(--surface-2);
   color: var(--text-secondary);
-  font-family: var(--font-inter);
+  font-family: var(--font-outfit);
 }
 
 .fc .fc-toolbar-title {
@@ -689,7 +689,7 @@ input[type="date"].input-glass::-webkit-calendar-picker-indicator {
 
 .recharts-text {
   fill: var(--text-tertiary) !important;
-  font-family: var(--font-inter) !important;
+  font-family: var(--font-outfit) !important;
   font-size: 12px !important;
 }
 
