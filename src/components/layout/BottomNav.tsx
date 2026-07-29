@@ -31,7 +31,14 @@ export function BottomNav({ role }: BottomNavProps) {
   }
 
   return (
-    <nav className="bottom-nav">
+    <nav
+      className="bottom-nav"
+      style={{
+        background: "#111114",
+        borderTop: "1px solid rgba(255,255,255,0.07)",
+        boxShadow: "0 -4px 24px rgba(0,0,0,0.35)",
+      }}
+    >
       {navItems.map((item) => {
         const isActive = pathname.startsWith(item.href);
         const Icon = item.icon;
@@ -42,21 +49,24 @@ export function BottomNav({ role }: BottomNavProps) {
             href={item.href}
             className={cn("bottom-nav-item", isActive && "active")}
           >
-            {/* Pill indicator behind icon */}
             <div className="nav-icon relative">
-              <Icon size={21} strokeWidth={isActive ? 2.2 : 1.8} />
+              <Icon
+                size={22}
+                strokeWidth={isActive ? 2.2 : 1.8}
+                style={{ color: isActive ? "#E8002D" : "rgba(255,255,255,0.35)" }}
+              />
               {isActive && (
                 <motion.div
                   layoutId="nav-pill"
                   className="absolute inset-0 rounded-[12px]"
-                  style={{ background: "rgba(232, 0, 45, 0.15)" }}
+                  style={{ background: "rgba(232, 0, 45, 0.12)" }}
                   transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
                 />
               )}
             </div>
             <span
               className="nav-label"
-              style={{ color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)" }}
+              style={{ color: isActive ? "#E8002D" : "rgba(255,255,255,0.35)" }}
             >
               {item.label}
             </span>

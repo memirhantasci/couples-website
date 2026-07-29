@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
 
 interface LoveMeterProps {
   value: number; // 80-100
@@ -9,36 +8,53 @@ interface LoveMeterProps {
 
 export function LoveMeter({ value }: LoveMeterProps) {
   return (
-    <div className="card p-5">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Heart size={18} fill="#E8002D" color="#E8002D" />
-          <span className="font-semibold text-sm text-white">Aşk Ölçer</span>
-        </div>
-        <motion.span
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.5, type: "spring" }}
-          className="text-gradient font-bold text-2xl"
-        >
-          {value}%
-        </motion.span>
-      </div>
+    <div
+      style={{
+        background: "#181a20",
+        border: "1px solid rgba(255,255,255,0.05)",
+        borderRadius: "16px",
+        padding: "20px",
+      }}
+    >
+      <h2 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>
+        Aşk Ölçer
+      </h2>
 
-      <div className="progress-bar">
+      {/* Progress bar — kalın, red to gold */}
+      <div
+        className="relative rounded-[24px] overflow-hidden"
+        style={{
+          height: 36,
+          background: "rgba(255,255,255,0.05)",
+        }}
+      >
         <motion.div
-          className="progress-fill"
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
           transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
-        />
+          className="h-full rounded-[24px] flex items-center justify-end pr-4"
+          style={{
+            background: "linear-gradient(90deg, #E8002D 0%, #D8A030 100%)",
+          }}
+        >
+          {/* Percentage label inside bar */}
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="text-[14px] font-medium"
+            style={{ color: "rgba(255,255,255,0.9)" }}
+          >
+            {value}%
+          </motion.span>
+        </motion.div>
       </div>
 
       <p
-        className="text-xs mt-2 text-right"
-        style={{ color: "rgba(255,255,255,0.35)" }}
+        className="text-[13px] mt-4"
+        style={{ color: "rgba(255,255,255,0.5)" }}
       >
-        Bugün için ölçüldü 💫
+        Bugün için ölçüldü 🤝
       </p>
     </div>
   );

@@ -9,7 +9,6 @@ import { LoveMeter } from "@/components/home/LoveMeter";
 import { MoodSelector } from "@/components/home/MoodSelector";
 import { DailyNoteCard } from "@/components/home/DailyNoteCard";
 import { PendingLettersCard } from "@/components/home/PendingLettersCard";
-import { Sparkles, Heart } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Ana Sayfa — Emirhan & Öykü 💕",
@@ -65,86 +64,72 @@ export default async function HomePage() {
   const activeMeeting = meetingResult.data;
   const pendingLetters = (pendingLettersResult.data as any[]) ?? [];
 
-  const dateStr = new Date().toLocaleDateString("tr-TR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  const dateStr = dayjs().locale("tr").format("DD MMMM dddd").toUpperCase();
+
+  // Genel kart stili (fotoğraftaki gibi)
+  const cardStyle = {
+    background: "#181a20",
+    border: "1px solid rgba(255,255,255,0.05)",
+    borderRadius: "16px",
+    padding: "20px",
+  };
 
   return (
-    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
+    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto" style={{ paddingBottom: 100 }}>
 
       {/* ── HERO CARD ─────────────────────────────────── */}
-      <div
-        className="rounded-[24px] overflow-hidden relative"
-        style={{
-          background: "linear-gradient(135deg, #1c1c20 0%, #201010 100%)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          boxShadow: "0 4px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.04) inset",
-          padding: "28px 22px 24px",
-        }}
-      >
-        {/* Decorative red glow top-right */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            width: 180,
-            height: 180,
-            top: -60,
-            right: -50,
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(232,0,45,0.30) 0%, transparent 70%)",
-            filter: "blur(28px)",
-            pointerEvents: "none",
-          }}
-        />
+      <div style={cardStyle} className="flex flex-row items-stretch justify-between gap-2">
+        {/* Left: date + greeting */}
+        <div className="flex-1 flex flex-col justify-center">
+          <p
+            className="text-[10px] font-medium tracking-wide mb-2"
+            style={{ color: "rgba(255,255,255,0.5)" }}
+          >
+            {dateStr}
+          </p>
+          <h1 className="text-3xl font-bold leading-tight" style={{ color: "#ffffff" }}>
+            Günaydın,<br/>{hitap} <span style={{ fontSize: "28px" }}>❤️</span>
+          </h1>
+        </div>
 
-        {/* Date label */}
-        <p className="page-header-label mb-3" style={{ color: "var(--gs-gold)" }}>
-          {dateStr}
-        </p>
-
-        {/* Greeting */}
-        <h1 className="font-display text-3xl font-bold leading-tight mb-0.5">
-          <span className="text-gradient">Günaydın,</span>
-        </h1>
-        <h2
-          className="font-display text-xl font-semibold mb-5"
-          style={{ color: "rgba(255,255,255,0.88)" }}
-        >
-          {hitap} 💕
-        </h2>
-
-        {/* Date counters */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Right: counters (Yan Yana) */}
+        <div className="flex gap-2">
+          {/* Tanışalı counter */}
           <div
-            className="flex flex-col items-center gap-1.5 py-4 rounded-[16px]"
+            className="flex flex-col items-center justify-center rounded-xl"
             style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "2px solid #C4A15A",
+              background: "rgba(196, 161, 90, 0.05)",
+              width: 90,
+              height: "100%",
+              padding: "16px 8px",
             }}
           >
-            <span className="text-3xl font-bold text-gradient">{daysSinceMeeting}</span>
             <span
-              className="text-[11px] font-semibold text-center"
-              style={{ color: "rgba(255,255,255,0.45)" }}
+              className="text-[26px] font-bold leading-none mb-1"
+              style={{ color: "#ffffff" }}
             >
-              gün tanışalı 💫
+              {daysSinceMeeting}
+            </span>
+            <span className="text-[10px] font-medium text-center leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>
+              gün tanışalı 🤝
             </span>
           </div>
+          {/* Sevgili counter */}
           <div
-            className="flex flex-col items-center gap-1.5 py-4 rounded-[16px]"
+            className="flex flex-col items-center justify-center rounded-xl"
             style={{
-              background: "rgba(232,0,45,0.10)",
-              border: "1px solid rgba(232,0,45,0.18)",
+              border: "2px solid #D84257",
+              background: "rgba(216, 66, 87, 0.05)",
+              width: 90,
+              height: "100%",
+              padding: "16px 8px",
             }}
           >
-            <span className="text-3xl font-bold text-gradient">{daysSinceTogether}</span>
-            <span
-              className="text-[11px] font-semibold text-center"
-              style={{ color: "rgba(255,255,255,0.45)" }}
-            >
+            <span className="text-[26px] font-bold leading-none mb-1" style={{ color: "#ffffff" }}>
+              {daysSinceTogether}
+            </span>
+            <span className="text-[10px] font-medium text-center leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>
               gün sevgili ❤️
             </span>
           </div>
@@ -152,31 +137,16 @@ export default async function HomePage() {
       </div>
 
       {/* ── GÜNÜN SÖZÜ ────────────────────────────────── */}
-      <div
-        className="flex gap-4 items-start p-4 rounded-[18px]"
-        style={{
-          background: "var(--surface-2)",
-          border: "1px solid var(--border-subtle)",
-          borderLeft: "3px solid var(--gs-gold)",
-        }}
-      >
-        <div
-          className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0 mt-0.5"
-          style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
+      <div style={cardStyle}>
+        <h2 className="text-xl font-bold mb-3" style={{ color: "#ffffff" }}>
+          Günün Sözü
+        </h2>
+        <p
+          className="text-[15px] leading-relaxed"
+          style={{ color: "rgba(255,255,255,0.8)" }}
         >
-          <Sparkles size={15} />
-        </div>
-        <div>
-          <p className="page-header-label mb-1.5" style={{ color: "var(--gs-gold)" }}>
-            Günün Sözü
-          </p>
-          <p
-            className="font-display text-sm italic leading-relaxed"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            "{quote}"
-          </p>
-        </div>
+          &quot;{quote}&quot;
+        </p>
       </div>
 
       {/* ── AŞK ÖLÇERİ ────────────────────────────────── */}
@@ -199,7 +169,6 @@ export default async function HomePage() {
       {/* ── BEKLEYEN MEKTUPLAR ─────────────────────────── */}
       <PendingLettersCard letters={pendingLetters} />
 
-      <div style={{ height: 4 }} />
     </div>
   );
 }

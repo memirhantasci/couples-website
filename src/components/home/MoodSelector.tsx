@@ -3,15 +3,14 @@
 import { useState } from "react";
 import { upsertMoodAction } from "@/actions/notes";
 import { toast } from "sonner";
-import { Lock } from "lucide-react";
 
 const MOODS = [
-  { emoji: "😍", label: "Çok mutluyum" },
-  { emoji: "😊", label: "İyiyim" },
-  { emoji: "😐", label: "Normalim" },
-  { emoji: "😔", label: "Biraz kötüyüm" },
-  { emoji: "😢", label: "Moralim bozuk" },
-  { emoji: "😴", label: "Yorgunum" },
+  { emoji: "😄", label: "Çok Mutlu" },
+  { emoji: "😃", label: "Mutlu" },
+  { emoji: "😐", label: "Normal" },
+  { emoji: "😢", label: "Üzgün" },
+  { emoji: "😣", label: "Kızgın" },
+  { emoji: "😔", label: "Yorgun" },
 ] as const;
 
 interface MoodSelectorProps {
@@ -38,78 +37,64 @@ export function MoodSelector({ currentMood, moodLocked = false }: MoodSelectorPr
     }
   }
 
-  const selectedMoodLabel = MOODS.find(m => m.emoji === selected)?.label;
-
   return (
-    <div className="card p-5">
+    <div
+      style={{
+        background: "#181a20",
+        border: "1px solid rgba(255,255,255,0.05)",
+        borderRadius: "16px",
+        padding: "20px",
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <span style={{ fontSize: 20 }}>💭</span>
-          <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
-            Bugün nasılsın?
-          </span>
-        </div>
-        {locked && (
-          <div
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg"
-            style={{ background: "var(--surface-3)", border: "1px solid var(--border-subtle)" }}
-          >
-            <Lock size={10} style={{ color: "var(--text-tertiary)" }} />
-            <span className="text-[10px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
-              Bugün için kaydedildi
-            </span>
-          </div>
-        )}
-      </div>
+      <h2 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>
+        Bugün nasılsın?
+      </h2>
 
-      {locked && selected ? (
-        /* Locked / show-only state */
-        <div
-          className="flex items-center gap-4 p-4 rounded-[14px]"
-          style={{
-            background: "rgba(245,200,66,0.07)",
-            border: "1px solid rgba(245,200,66,0.14)",
-          }}
-        >
-          <span style={{ fontSize: 44, lineHeight: 1 }}>{selected}</span>
-          <div>
-            <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
-              {selectedMoodLabel}
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--text-tertiary)" }}>
-              Yarın tekrar seçebilirsin 🌙
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-2">
-          {MOODS.map((mood) => (
+      {/* Emoji Row - Fotodaki gibi tek satır ve ekran genişliğine sığacak şekilde */}
+      <div className="flex flex-row gap-1.5 w-full">
+        {MOODS.map((mood) => {
+          const isSelected = selected === mood.emoji;
+          return (
             <button
               key={mood.emoji}
               onClick={() => handleMoodSelect(mood.emoji)}
               disabled={loading || locked}
-              className="mood-btn"
+              className="flex-1 flex flex-col items-center justify-center transition-all py-3 px-1"
               style={{
-                opacity: locked ? 0.45 : 1,
-                cursor: locked ? "not-allowed" : "pointer",
+                borderRadius: "12px",
+                border: isSelected
+                  ? "1px solid #D84257"
+                  : "1px solid rgba(255,255,255,0.05)",
+                background: isSelected
+                  ? "rgba(216, 66, 87, 0.05)"
+                  : "rgba(255,255,255,0.03)",
+                cursor: locked ? "default" : "pointer",
+                opacity: locked && !isSelected ? 0.4 : 1,
+                WebkitTapHighlightColor: "transparent",
               }}
             >
-              <span>{mood.emoji}</span>
+              <span style={{ fontSize: "28px", lineHeight: 1, marginBottom: "4px" }}>{mood.emoji}</span>
               <span
                 style={{
-                  fontSize: 10,
-                  color: "var(--text-tertiary)",
-                  fontWeight: 600,
+                  fontSize: "9px",
+                  color: "rgba(255,255,255,0.7)",
+                  fontWeight: 500,
                   textAlign: "center",
-                  lineHeight: 1.3,
+                  wordBreak: "break-word"
                 }}
               >
                 {mood.label}
               </span>
             </button>
-          ))}
-        </div>
+          );
+        })}
+      </div>
+
+      {locked && selected && (
+        <p className="text-[12px] mt-2 text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
+          Bugün için kaydedildi 💛
+        </p>
       )}
     </div>
   );

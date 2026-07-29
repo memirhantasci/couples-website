@@ -3,9 +3,9 @@ import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { MedicineTracker } from "@/components/medicine/MedicineTracker";
-import { AddMedicineForm } from "@/components/medicine/AddMedicineForm";
-import { Flame, Trophy, Pill } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { dayjs, todayString } from "@/lib/date";
+import "dayjs/locale/tr";
 
 export const metadata: Metadata = {
   title: "İlaç Takibi — Emirhan & Öykü 💕",
@@ -34,16 +34,11 @@ async function calculateStreak(
 
     if (!logs || logs.length === 0) break;
 
-    // For historical dates, check if there is at least one DRANK log and no MISSED logs.
-    // This makes the streak robust against changes in medicine schedule (times/doses).
     let allDosesDrank = true;
     for (const med of activeMeds) {
       const medLogs = logs.filter((l) => l.medicine_id === med.id);
-      
       const hasDrank = medLogs.some((l) => l.status === "DRANK");
       const hasMissed = medLogs.some((l) => l.status === "MISSED");
-
-      // We consider the day successful if they took at least one dose and missed none.
       if (!hasDrank || hasMissed) {
         allDosesDrank = false;
         break;
@@ -65,7 +60,7 @@ export default async function MedicinePage() {
   const today = todayString();
   const fourteenDaysAgo = dayjs().tz("Europe/Istanbul").subtract(14, "day").tz("Europe/Istanbul").format("YYYY-MM-DD");
 
-  const [medicinesResult, todayLogsResult, historicalLogsResult, usersResult] = await Promise.all([
+  const [medicinesResult, todayLogsResult, historicalLogsResult] = await Promise.all([
     supabase
       .from("medicines")
       .select("id, name, time, times, start_date, end_date, is_active, user_id")
@@ -86,107 +81,46 @@ export default async function MedicinePage() {
       .gte("date", fourteenDaysAgo)
       .lt("date", today)
       .order("date", { ascending: false }),
-    supabase
-      .from("users")
-      .select("id, username")
-      .order("username"),
   ]);
 
   const medicines = medicinesResult.data ?? [];
   const todayLogs = todayLogsResult.data ?? [];
   const historicalLogs = historicalLogsResult.data ?? [];
-  const users = usersResult?.data ?? [];
 
   const streakValue = await calculateStreak(supabase, session.userId, medicines);
 
+  const dateLabel = dayjs().locale("tr").tz("Europe/Istanbul").format("D MMMM YYYY, dddd");
+
   return (
-    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
-
-      {/* Header Card */}
-      <div className="card p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2.5 mb-1">
-              <div
-                className="w-8 h-8 rounded-[10px] flex items-center justify-center"
-                style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
-              >
-                <Pill size={16} />
-              </div>
-              <h1 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
-                İlaç Takibi
-              </h1>
-            </div>
-            <p className="text-xs ml-[44px]" style={{ color: "var(--text-tertiary)" }}>
-              {dayjs().locale("tr").tz("Europe/Istanbul").format("D MMMM YYYY, dddd")}
-            </p>
-          </div>
-
-          {streakValue > 0 && (
-            <div
-              className="flex flex-col items-center gap-0.5 px-4 py-2.5 rounded-[14px]"
-              style={{
-                background: "rgba(255,140,0,0.10)",
-                border: "1px solid rgba(255,140,0,0.18)",
-              }}
-            >
-              <div className="flex items-center gap-1">
-                <Flame size={16} style={{ color: "#ff8c00" }} />
-                <span className="font-bold text-xl" style={{ color: "#ff8c00" }}>
-                  {streakValue}
-                </span>
-              </div>
-              <span
-                className="text-[10px] font-semibold"
-                style={{ color: "rgba(255,140,0,0.65)" }}
-              >
-                günlük seri
-              </span>
-            </div>
-          )}
+    <div className="flex flex-col max-w-lg mx-auto" style={{ paddingBottom: 64, backgroundColor: "#0c0c0c", minHeight: "100vh" }}>
+      {/* ── PAGE HEADER ─────────────────────────────────── */}
+      <div className="px-4 pt-4 pb-4 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold" style={{ color: "#d4a373" }}>
+            İlaç Takibi
+          </h1>
+          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+            {dateLabel}
+          </p>
         </div>
 
-        {/* Streak Badge */}
-        {streakValue >= 7 && (
-          <div className="mt-3">
-            <span
-              className={`streak-badge ${
-                streakValue >= 100
-                  ? "streak-badge-100"
-                  : streakValue >= 30
-                    ? "streak-badge-30"
-                    : "streak-badge-7"
-              }`}
-            >
-              <Trophy size={12} />
-              {streakValue >= 100
-                ? "💎 100 Gün Şampiyonu!"
-                : streakValue >= 30
-                  ? "🌟 30 Gün Ustası!"
-                  : "🔥 7 Günlük Seri!"}
+        {streakValue >= 0 && (
+          <div className="flex items-center gap-1.5 mt-2">
+            <Trophy size={14} style={{ color: "#d4a373" }} />
+            <span className="font-medium text-sm" style={{ color: "#d4a373" }}>
+              {streakValue} günlük seri
             </span>
           </div>
         )}
       </div>
 
-      {/* Admin: Add Medicine */}
-      {session.role === "ADMIN" && (
-        <AddMedicineForm users={users} />
-      )}
-
-      {/* Today's Medicines */}
-      <div className="card p-5">
-        <h2 className="section-title mb-4 flex items-center gap-2">
-          <span style={{ fontSize: 17 }}>💊</span>
-          Bugünün İlaçları
-        </h2>
-        <MedicineTracker
-          medicines={medicines}
-          todayLogs={todayLogs}
-          historicalLogs={historicalLogs}
-          userId={session.userId}
-        />
-      </div>
+      {/* ── STAT CIRCLES & CONTENT ─────────────────────────────────── */}
+      <MedicineTracker
+        medicines={medicines}
+        todayLogs={todayLogs}
+        historicalLogs={historicalLogs}
+        userId={session.userId}
+      />
     </div>
   );
 }

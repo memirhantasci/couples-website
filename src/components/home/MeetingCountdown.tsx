@@ -42,7 +42,14 @@ export function MeetingCountdown({ targetDate, title }: CountdownProps) {
   const formattedDate = dayjs(targetDate).locale("tr").tz("Europe/Istanbul").format("D MMMM dddd, HH:mm");
 
   return (
-    <div className="card p-5">
+    <div
+      style={{
+        background: "#181a20",
+        border: "1px solid rgba(255,255,255,0.05)",
+        borderRadius: "16px",
+        padding: "20px",
+      }}
+    >
       {/* Title row */}
       <div className="flex items-center gap-2.5 mb-4">
         <div

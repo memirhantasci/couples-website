@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { updateMedicineLogAction } from "@/actions/medicine";
 import { toast } from "sonner";
-import { Check, X, Clock, Lock, ChevronDown, ChevronUp, Calendar } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 interface Medicine {
   id: number;
@@ -28,12 +28,10 @@ interface MedicineTrackerProps {
 }
 
 export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }: MedicineTrackerProps) {
-  // Key format: `${medicine_id}_${time}`
   const [logs, setLogs] = useState<Record<string, "DRANK" | "MISSED" | "PENDING">>(
     () => {
       const map: Record<string, "DRANK" | "MISSED" | "PENDING"> = {};
       
-      // Populate from server logs
       todayLogs.forEach((log) => {
         const timeKey = log.time ? log.time.substring(0, 5) : "";
         if (timeKey) {
@@ -41,7 +39,6 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
         }
       });
 
-      // Default pending for all scheduled dose slots
       medicines.forEach((m) => {
         const medTimes = Array.isArray(m.times) && m.times.length > 0
           ? m.times.map((t) => t.substring(0, 5))
@@ -50,7 +47,6 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
         medTimes.forEach((t) => {
           const key = `${m.id}_${t}`;
           if (!map[key]) {
-            // Check if legacy log without time exists
             const legacyLog = todayLogs.find((l) => l.medicine_id === m.id && (!l.time || l.time === ""));
             map[key] = legacyLog ? legacyLog.status : "PENDING";
           }
@@ -62,7 +58,6 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
   );
 
   const [loadingSlot, setLoadingSlot] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
 
   async function handleMarkDrank(medicineId: number, slotTime: string) {
     const key = `${medicineId}_${slotTime}`;
@@ -102,7 +97,6 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
     }
   }
 
-  // Calculate summary counts across all active scheduled dose slots
   const scheduledSlots: { medId: number; time: string }[] = [];
   medicines.forEach((m) => {
     const medTimes = Array.isArray(m.times) && m.times.length > 0
@@ -118,16 +112,6 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
   const missedCount = scheduledSlots.filter((s) => logs[`${s.medId}_${s.time}`] === "MISSED").length;
   const pendingCount = scheduledSlots.filter((s) => (logs[`${s.medId}_${s.time}`] || "PENDING") === "PENDING").length;
 
-  // Group historical logs by date
-  const historyByDate: Record<string, MedicineLog[]> = {};
-  historicalLogs.forEach((log) => {
-    if (!historyByDate[log.date]) historyByDate[log.date] = [];
-    historyByDate[log.date].push(log);
-  });
-  const historyDates = Object.keys(historyByDate).sort((a, b) => b.localeCompare(a)).slice(0, 14);
-
-  const getMedName = (id: number) => medicines.find((m) => m.id === id)?.name ?? "İlaç";
-
   const formatter = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/Istanbul",
     hour: "2-digit",
@@ -136,304 +120,311 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
   const currentTimeStr = formatter.format(new Date());
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Summary Bar */}
-      {totalDoses > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { label: "Toplam Doz", value: totalDoses, color: "var(--text-secondary)", bg: "var(--surface-3)" },
-            { label: "Alındı", value: drankCount, color: "#4ade80", bg: "rgba(34,197,94,0.09)" },
-            { label: "Bekliyor", value: pendingCount, color: "var(--gs-gold)", bg: "rgba(245,200,66,0.08)" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="flex flex-col items-center gap-1 py-3 rounded-[14px]"
-              style={{ background: stat.bg, border: "1px solid var(--border-subtle)" }}
-            >
-              <span className="font-bold text-xl" style={{ color: stat.color }}>{stat.value}</span>
-              <span className="text-[11px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
-                {stat.label}
-              </span>
-            </div>
-          ))}
+    <div className="flex flex-col gap-0">
+
+      {/* ── CIRCULAR STAT BADGES ──────────────────────── */}
+      <div
+        className="mx-4 mb-5 py-6 px-4 flex justify-between"
+        style={{
+          background: "linear-gradient(135deg, #181a20 0%, #151012 100%)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          borderRadius: "20px",
+        }}
+      >
+        {/* Toplam Doz */}
+        <div className="flex justify-center flex-1">
+          <div
+            className="flex flex-col items-center justify-center relative"
+            style={{
+              width: 96,
+              height: 96,
+              borderRadius: "50%",
+              border: "8px solid #E8002D",
+              background: "transparent",
+            }}
+          >
+            <span className="font-medium text-[28px]" style={{ color: "#E8002D", lineHeight: 1.1, marginTop: "4px" }}>
+              {totalDoses}
+            </span>
+            <span className="text-[10px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
+              Toplam Doz
+            </span>
+          </div>
         </div>
-      )}
 
-      {/* Medicine Cards */}
-      {medicines.length === 0 ? (
-        <div
-          className="flex flex-col items-center gap-3 py-14 rounded-[20px]"
-          style={{ background: "var(--surface-2)", border: "1px dashed var(--border-default)" }}
-        >
-          <span className="text-4xl">💊</span>
-          <p className="text-sm" style={{ color: "var(--text-tertiary)" }}>
-            Bugün için aktif ilaç yok
-          </p>
+        {/* Alındı */}
+        <div className="flex justify-center flex-1">
+          <div
+            className="flex flex-col items-center justify-center relative"
+            style={{
+              width: 96,
+              height: 96,
+              borderRadius: "50%",
+              border: "8px solid #22C55E",
+              background: "transparent",
+            }}
+          >
+            <span className="font-medium text-[28px]" style={{ color: "#22C55E", lineHeight: 1.1, marginTop: "4px" }}>
+              {drankCount}
+            </span>
+            <span className="text-[10px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
+              Alındı
+            </span>
+          </div>
         </div>
-      ) : (
-        medicines.map((medicine) => {
-          const medTimes = Array.isArray(medicine.times) && medicine.times.length > 0
-            ? medicine.times.map((t) => t.substring(0, 5))
-            : [medicine.time ? medicine.time.substring(0, 5) : "08:00"];
 
-          const allDosesDrank = medTimes.every((t) => logs[`${medicine.id}_${t}`] === "DRANK");
-          const anyDoseMissed = medTimes.some((t) => logs[`${medicine.id}_${t}`] === "MISSED");
+        {/* Bekliyor */}
+        <div className="flex justify-center flex-1">
+          <div
+            className="flex flex-col items-center justify-center relative"
+            style={{
+              width: 96,
+              height: 96,
+              borderRadius: "50%",
+              border: "8px solid #D8A030",
+              background: "transparent",
+            }}
+          >
+            <span className="font-medium text-[28px]" style={{ color: "rgba(255,255,255,0.9)", lineHeight: 1.1, marginTop: "4px" }}>
+              {pendingCount}
+            </span>
+            <span className="text-[10px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
+              Bekliyor
+            </span>
+          </div>
+        </div>
+      </div>
 
-          return (
-            <motion.div
-              key={medicine.id}
-              layout
-              className="rounded-[18px] overflow-hidden"
-              style={{
-                background: allDosesDrank
-                  ? "rgba(34,197,94,0.07)"
-                  : anyDoseMissed
-                    ? "rgba(248,113,113,0.06)"
-                    : "var(--surface-2)",
-                border: `1.5px solid ${
-                  allDosesDrank
-                    ? "rgba(34,197,94,0.20)"
-                    : anyDoseMissed
-                      ? "rgba(248,113,113,0.16)"
-                      : "var(--border-default)"
-                }`,
-                transition: "background 0.3s ease, border-color 0.3s ease",
-              }}
-            >
-              <div className="flex flex-col p-4 gap-4">
-                {/* Header: Icon & Name */}
-                <div className="flex items-center gap-3 pb-3" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-                  <div
-                    className="w-11 h-11 rounded-[14px] flex items-center justify-center text-xl flex-shrink-0"
-                    style={{
-                      background: allDosesDrank
-                        ? "rgba(34,197,94,0.14)"
-                        : anyDoseMissed
-                          ? "rgba(248,113,113,0.10)"
-                          : "var(--surface-3)",
-                    }}
-                  >
-                    {allDosesDrank ? "✅" : anyDoseMissed ? "❌" : "💊"}
-                  </div>
+      {/* ── BUGÜNÜN İLAÇLARI HEADER ──────────────────── */}
+      <div className="mb-3 px-4">
+        <h2 className="font-normal text-[15px] flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.8)" }}>
+          <span style={{ fontSize: 16 }}>🏷️</span>
+          Bugünün İlaçları
+        </h2>
+      </div>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-base" style={{ color: "var(--text-primary)" }}>
+      {/* ── MEDICINE CARDS ───────────────────────────── */}
+      <div className="flex flex-col gap-4 px-4">
+        {medicines.length === 0 ? (
+          <div
+            className="flex flex-col items-center gap-4 py-16"
+            style={{
+              background: "#181a20",
+              border: "1px dashed rgba(255,255,255,0.15)",
+              borderRadius: "16px",
+            }}
+          >
+            <span className="text-4xl">💊</span>
+            <p className="text-[15px]" style={{ color: "rgba(255,255,255,0.5)" }}>
+              Bugün için aktif ilaç yok
+            </p>
+          </div>
+        ) : (
+          medicines.map((medicine) => {
+            const medTimes = Array.isArray(medicine.times) && medicine.times.length > 0
+              ? medicine.times.map((t) => t.substring(0, 5))
+              : [medicine.time ? medicine.time.substring(0, 5) : "08:00"];
+
+            return (
+              <motion.div
+                key={medicine.id}
+                layout
+                className="w-full overflow-hidden"
+                style={{
+                  background: "#181a20",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "16px",
+                }}
+              >
+                <div className="flex flex-col p-5 gap-4">
+                  {/* Header */}
+                  <div>
+                    <p className="font-bold text-[26px] tracking-tight leading-none" style={{ color: "#ffffff" }}>
                       {medicine.name}
                     </p>
-                    <p className="text-xs font-medium mt-0.5" style={{ color: "var(--text-tertiary)" }}>
+                    <p className="text-[13px] mt-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>
                       Günde {medTimes.length} kez ({medTimes.join(", ")})
                     </p>
                   </div>
-                </div>
 
-                {/* Dose Slots List */}
-                <div className="flex flex-col gap-3">
-                  {medTimes.map((slotTime, idx) => {
-                    const key = `${medicine.id}_${slotTime}`;
-                    const status = logs[key] || "PENDING";
-                    const isDrank = status === "DRANK";
-                    const isMissed = status === "MISSED";
-                    const isLoading = loadingSlot === key;
-                    const isTimePassed = currentTimeStr >= slotTime;
+                  {/* Dose Slots */}
+                  <div className="flex flex-col gap-3">
+                    {medTimes.map((slotTime, idx) => {
+                      const key = `${medicine.id}_${slotTime}`;
+                      const status = logs[key] || "PENDING";
+                      const isDrank = status === "DRANK";
+                      const isMissed = status === "MISSED";
+                      const isLoading = loadingSlot === key;
+                      const isTimePassed = currentTimeStr >= slotTime;
 
-                    return (
-                      <div
-                        key={slotTime}
-                        className="flex flex-col gap-2 p-3 rounded-[14px]"
-                        style={{
-                          background: isDrank
-                            ? "rgba(34,197,94,0.08)"
-                            : isMissed
-                              ? "rgba(248,113,113,0.07)"
-                              : "var(--surface-3)",
-                          border: `1px solid ${
-                            isDrank
-                              ? "rgba(34,197,94,0.2)"
-                              : isMissed
-                                ? "rgba(248,113,113,0.18)"
-                                : "var(--border-subtle)"
-                          }`,
-                        }}
-                      >
-                        {/* Slot info header */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Clock size={13} style={{ color: "var(--gs-gold)" }} />
-                            <span className="text-xs font-bold text-white">
-                              {medTimes.length > 1 ? `${idx + 1}. Doz (${slotTime})` : `Saat ${slotTime}`}
-                            </span>
+                      return (
+                        <div
+                          key={slotTime}
+                          className="flex items-center justify-between w-full gap-3"
+                        >
+                          {/* Check icon circle */}
+                          <div
+                            className="flex items-center justify-center shrink-0"
+                            style={{
+                              width: 44,
+                              height: 44,
+                              borderRadius: "50%",
+                              border: isDrank
+                                ? "2px solid #22C55E"
+                                : isMissed
+                                  ? "2px solid #D84257"
+                                  : "2px solid rgba(255,255,255,0.15)",
+                              background: isDrank
+                                ? "rgba(34, 197, 94, 0.1)"
+                                : isMissed
+                                  ? "rgba(216, 66, 87, 0.1)"
+                                  : "rgba(255,255,255,0.03)",
+                            }}
+                          >
+                            {isDrank ? (
+                              <Check size={22} color="#22C55E" strokeWidth={3} />
+                            ) : isMissed ? (
+                              <X size={22} color="#D84257" strokeWidth={3} />
+                            ) : (
+                              <Check size={22} color="rgba(255,255,255,0.2)" strokeWidth={2} />
+                            )}
                           </div>
 
-                          {isDrank ? (
-                            <span className="text-[11px] font-bold text-green-400 flex items-center gap-1">
-                              <Check size={12} /> Alındı
-                            </span>
-                          ) : isMissed ? (
-                            <span className="text-[11px] font-bold text-red-400 flex items-center gap-1">
-                              <X size={12} /> Atlandı
-                            </span>
-                          ) : !isTimePassed ? (
-                            <span className="text-[11px] font-semibold text-yellow-400 flex items-center gap-1">
-                              <Lock size={11} /> Bekliyor
-                            </span>
-                          ) : (
-                            <span className="text-[11px] font-semibold text-white/60">
-                              Vakti Geldi
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Action controls */}
-                        <div className="w-full mt-1">
-                          {isLoading ? (
-                            <div className="py-2 flex items-center justify-center rounded-[10px] bg-white/5">
+                          {/* Action button / Status */}
+                          <div className="flex-1">
+                            {isLoading ? (
+                              <div className="py-3 px-4 flex items-center justify-center rounded-xl bg-white/5">
+                                <div
+                                  className="w-5 h-5 border-2 rounded-full animate-spin"
+                                  style={{ borderColor: "rgba(255,255,255,0.2)", borderTopColor: "#fff" }}
+                                />
+                              </div>
+                            ) : isDrank ? (
                               <div
-                                className="w-4 h-4 border-2 rounded-full animate-spin"
-                                style={{ borderColor: "var(--border-default)", borderTopColor: "var(--gs-gold)" }}
-                              />
-                            </div>
-                          ) : isDrank ? (
-                            <div
-                              className="flex items-center justify-center gap-2 py-2 rounded-[10px]"
-                              style={{ background: "rgba(34,197,94,0.12)", color: "#4ade80" }}
-                            >
-                              <Check size={15} strokeWidth={2.5} />
-                              <span className="font-bold text-xs">DOZ ALINDI 🔒</span>
-                            </div>
-                          ) : isMissed ? (
-                            <div
-                              className="flex items-center justify-center gap-2 py-2 rounded-[10px]"
-                              style={{ background: "rgba(248,113,113,0.12)", color: "#f87171" }}
-                            >
-                              <X size={15} strokeWidth={2.5} />
-                              <span className="font-bold text-xs">DOZ ATLANDI</span>
-                            </div>
-                          ) : !isTimePassed ? (
-                            <p className="text-[11px] text-center font-semibold py-1.5 rounded-[10px] bg-white/5" style={{ color: "var(--gs-gold)" }}>
-                              Saat {slotTime}'dan sonra açılacak 🔒
-                            </p>
-                          ) : (
-                            <div className="grid grid-cols-2 gap-2">
-                              <button
-                                onClick={() => handleMarkDrank(medicine.id, slotTime)}
-                                className="flex items-center justify-center gap-1.5 py-2.5 rounded-[12px] font-bold text-xs transition-all active:scale-95"
-                                style={{
-                                  background: "rgba(34,197,94,0.15)",
-                                  border: "1px solid rgba(34,197,94,0.3)",
-                                  color: "#4ade80",
-                                }}
+                                className="flex items-center justify-center py-3 px-4 rounded-xl"
+                                style={{ background: "#22C55E", color: "#ffffff" }}
                               >
-                                <Check size={16} strokeWidth={2.5} />
-                                İçtim
-                              </button>
+                                <span className="font-bold text-[14px]">✓ DOZ ALINDI 🔒</span>
+                              </div>
+                            ) : isMissed ? (
+                              <div
+                                className="flex items-center justify-center py-3 px-4 rounded-xl"
+                                style={{ background: "#D84257", color: "#ffffff" }}
+                              >
+                                <span className="font-bold text-[14px]">DOZ ATLANDI</span>
+                              </div>
+                            ) : !isTimePassed ? (
+                              <p
+                                className="text-[13px] font-medium py-3 px-4 rounded-xl bg-white/5 inline-block"
+                                style={{ color: "rgba(255,255,255,0.5)" }}
+                              >
+                                {slotTime} 🔒
+                              </p>
+                            ) : (
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => handleMarkDrank(medicine.id, slotTime)}
+                                  className="flex items-center justify-center py-3 px-5 rounded-xl font-bold text-[14px] transition-all active:scale-95"
+                                  style={{ background: "#22C55E", color: "#ffffff" }}
+                                >
+                                  İçtim
+                                </button>
+                                <button
+                                  onClick={() => handleMarkMissed(medicine.id, slotTime)}
+                                  className="flex items-center justify-center py-3 px-5 rounded-xl font-bold text-[14px] transition-all active:scale-95"
+                                  style={{ background: "#D84257", color: "#ffffff" }}
+                                >
+                                  Atla
+                                </button>
+                              </div>
+                            )}
+                          </div>
 
-                              <button
-                                onClick={() => handleMarkMissed(medicine.id, slotTime)}
-                                className="flex items-center justify-center gap-1.5 py-2.5 rounded-[12px] font-bold text-xs transition-all active:scale-95"
-                                style={{
-                                  background: "rgba(248,113,113,0.12)",
-                                  border: "1px solid rgba(248,113,113,0.25)",
-                                  color: "#f87171",
-                                }}
-                              >
-                                <X size={16} strokeWidth={2.5} />
-                                Atladım
-                              </button>
-                            </div>
+                          {/* Sağdaki status text */}
+                          {isDrank && (
+                            <span className="text-[12px] font-medium shrink-0" style={{ color: "#22C55E" }}>
+                              ✓Alındı
+                            </span>
+                          )}
+                          {isMissed && (
+                            <span className="text-[12px] font-medium shrink-0" style={{ color: "#D84257" }}>
+                              ✗Atlandı
+                            </span>
                           )}
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          );
-        })
-      )}
+              </motion.div>
+            );
+          })
+        )}
+      </div>
 
-      {/* Historical Logs */}
-      {historyDates.length > 0 && (
-        <div className="mt-1">
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-2 w-full py-3 px-4 rounded-[14px] font-semibold text-sm transition-all"
-            style={{
-              background: "var(--surface-2)",
-              border: "1px solid var(--border-subtle)",
-              color: "var(--text-secondary)",
-            }}
-          >
-            <Calendar size={14} />
-            Geçmiş Kayıtlar
-            {showHistory ? <ChevronUp size={14} className="ml-auto" /> : <ChevronDown size={14} className="ml-auto" />}
-          </button>
+      {/* ── GEÇMIŞ KAYITLAR ──────────────────────────── */}
+      {(() => {
+        const historyByDate: Record<string, MedicineLog[]> = {};
+        historicalLogs.forEach((log) => {
+          if (!historyByDate[log.date]) historyByDate[log.date] = [];
+          historyByDate[log.date].push(log);
+        });
+        const historyDates = Object.keys(historyByDate).sort((a, b) => b.localeCompare(a)).slice(0, 9);
+        const getMedName = (id: number) => medicines.find((m) => m.id === id)?.name ?? "İlaç";
 
-          <AnimatePresence>
-            {showHistory && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden mt-2 flex flex-col gap-2"
-              >
-                {historyDates.map((date) => {
-                  const dayLogs = historyByDate[date];
-                  const drankLogsCount = dayLogs.filter((l) => l.status === "DRANK").length;
-                  const allDrank = dayLogs.every((l) => l.status === "DRANK");
-                  const anyMissed = dayLogs.some((l) => l.status === "MISSED");
-                  const dateLabel = new Date(date + "T00:00:00").toLocaleDateString("tr-TR", {
-                    day: "numeric",
-                    month: "long",
-                    weekday: "short",
-                  });
+        if (historyDates.length === 0) return null;
 
-                  return (
+        return (
+          <div className="mt-6 px-4">
+            <div className="flex items-center gap-1.5 mb-3">
+              <span style={{ fontSize: 16 }}>🕒</span>
+              <h2 className="font-normal text-[15px]" style={{ color: "rgba(255,255,255,0.8)" }}>
+                Geçmiş Kayıtlar
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2.5 overflow-y-auto max-h-[260px]" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.1) transparent" }}>
+              {historyDates.map((date) => {
+                const dayLogs = historyByDate[date];
+                const drankLogsCount = dayLogs.filter((l) => l.status === "DRANK").length;
+                const dateObj = new Date(date + "T00:00:00");
+                const dayName = dateObj.toLocaleDateString("tr-TR", { weekday: "short" });
+                const dayNum = dateObj.getDate();
+                const monthName = dateObj.toLocaleDateString("tr-TR", { month: "long" });
+                const dateLabel = `${dayNum} ${monthName} ${dayName}`;
+
+                return (
+                  <div
+                    key={date}
+                    className="p-2.5 rounded-[12px] flex flex-col gap-2 items-center text-center justify-between"
+                    style={{
+                      background: "#181a20",
+                      border: "1px solid rgba(232, 0, 45, 0.6)",
+                      minHeight: 100,
+                    }}
+                  >
+                    <p className="font-normal text-[11px]" style={{ color: "#ffffff" }}>
+                      {dateLabel}
+                    </p>
+                    <p className="text-[12px] font-normal" style={{ color: "#E8002D", lineHeight: 1.2 }}>
+                      {Array.from(new Set(dayLogs.map((l) => getMedName(l.medicine_id)))).join(", ")}
+                    </p>
                     <div
-                      key={date}
-                      className="p-3 rounded-[12px] flex items-center gap-3"
+                      className="px-2.5 py-0.5 mt-auto rounded-full text-[10px] font-medium"
                       style={{
-                        background: allDrank
-                          ? "rgba(34,197,94,0.06)"
-                          : anyMissed
-                            ? "rgba(248,113,113,0.06)"
-                            : "var(--surface-2)",
-                        border: `1px solid ${
-                          allDrank
-                            ? "rgba(34,197,94,0.14)"
-                            : anyMissed
-                              ? "rgba(248,113,113,0.12)"
-                              : "var(--border-subtle)"
-                        }`,
+                        background: drankLogsCount === dayLogs.length ? "#22C55E" : "#E8002D",
+                        color: "#ffffff",
                       }}
                     >
-                      <span style={{ fontSize: 18, flexShrink: 0 }}>
-                        {allDrank ? "✅" : anyMissed ? "❌" : "⏳"}
-                      </span>
-                      <div className="flex-1">
-                        <p className="font-semibold text-xs" style={{ color: "var(--text-primary)" }}>
-                          {dateLabel}
-                        </p>
-                        <p className="text-[11px] mt-0.5" style={{ color: "var(--text-tertiary)" }}>
-                          {Array.from(new Set(dayLogs.map((l) => getMedName(l.medicine_id)))).join(", ")}
-                        </p>
-                      </div>
-                      <span
-                        className="font-bold text-xs"
-                        style={{
-                          color: allDrank ? "#4ade80" : anyMissed ? "#f87171" : "var(--text-tertiary)",
-                        }}
-                      >
-                        {drankLogsCount}/{dayLogs.length} Doz
-                      </span>
+                      {drankLogsCount}/{dayLogs.length} Doz
                     </div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

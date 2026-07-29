@@ -88,39 +88,42 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
         }}
       >
         {/* Logo */}
-        <Link href="/home" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-          <Heart size={18} fill="#E8002D" color="#E8002D" />
+        <Link href="/home" className="flex items-center gap-1.5 transition-opacity hover:opacity-80">
+          <span style={{ fontSize: 16 }}>❤️</span>
           <span
-            className="font-display text-gradient font-bold"
-            style={{ fontSize: 17 }}
+            className="font-display font-bold"
+            style={{
+              fontSize: 18,
+              color: "#ffffff"
+            }}
           >
-            Emirhan & Öykü
+            Emirhan &amp; Öykü
           </span>
-          <span style={{ fontSize: 15 }}>💕</span>
+          <span style={{ fontSize: 16 }}>❤️</span>
         </Link>
 
         {/* Right side */}
         <div className="flex items-center gap-3">
+          {/* Profil İsmi (3 çizginin solunda) */}
           <span
-            className="text-xs font-semibold"
-            style={{ color: "rgba(255,255,255,0.4)" }}
+            className="text-[14px] font-semibold"
+            style={{ color: "rgba(255,255,255,0.9)" }}
           >
             {displayName}
           </span>
 
+          {/* 3 Çizgi Menü Butonu (Büyütülmüş) */}
           <button
             onClick={() => setIsOpen(true)}
-            className="flex items-center justify-center rounded-[14px] transition-all"
+            className="flex items-center justify-center p-1 transition-all active:scale-95"
             style={{
-              width: 56,
-              height: 56,
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.09)",
-              color: "rgba(255,255,255,0.8)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
             }}
             aria-label="Menüyü aç"
           >
-            <Menu size={40} strokeWidth={2} />
+            <Menu size={34} strokeWidth={2.5} style={{ color: "#D84257" }} />
           </button>
         </div>
       </header>

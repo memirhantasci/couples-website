@@ -22,9 +22,16 @@ export function PendingLettersCard({ letters }: { letters: PendingLetter[] }) {
   if (pendingLetters.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-3">
-      <h2 className="section-title flex items-center gap-2">
-        <Lock size={16} style={{ color: "var(--gs-gold)" }} />
+    <div
+      className="flex flex-col gap-4"
+      style={{
+        background: "#181a20",
+        border: "1px solid rgba(255,255,255,0.05)",
+        borderRadius: "16px",
+        padding: "20px",
+      }}
+    >
+      <h2 className="text-xl font-bold" style={{ color: "#ffffff" }}>
         Bekleyen Mektuplar
       </h2>
       <div className="flex flex-col gap-2">

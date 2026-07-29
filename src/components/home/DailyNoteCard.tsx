@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { upsertDailyNoteAction } from "@/actions/notes";
-import { BookOpen, Lock, Send } from "lucide-react";
 import { toast } from "sonner";
 
 interface DailyNoteCardProps {
@@ -10,7 +9,6 @@ interface DailyNoteCardProps {
 }
 
 export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
-  const [isEditing, setIsEditing] = useState(!existingNote);
   const [content, setContent] = useState(existingNote || "");
   const [saved, setSaved] = useState(!!existingNote);
   const [submitting, setSubmitting] = useState(false);
@@ -26,98 +24,84 @@ export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
       toast.error(result.error);
     } else {
       toast.success("Notun kaydedildi! 📝");
-      setIsEditing(false);
       setSaved(true);
     }
   }
 
   return (
-    <div className="card p-5">
+    <div
+      style={{
+        background: "#181a20",
+        border: "1px solid rgba(255,255,255,0.05)",
+        borderRadius: "16px",
+        padding: "20px",
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 rounded-[10px] flex items-center justify-center"
-            style={{ background: "rgba(245,200,66,0.12)", color: "var(--gs-gold)" }}
-          >
-            <BookOpen size={16} />
-          </div>
-          <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
-            Günlük Notum
-          </span>
-        </div>
-
-        {saved && (
-          <div
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg"
-            style={{
-              background: "var(--surface-3)",
-              border: "1px solid var(--border-subtle)",
-            }}
-          >
-            <Lock size={10} style={{ color: "var(--text-tertiary)" }} />
-            <span className="text-[10px] font-semibold" style={{ color: "var(--text-tertiary)" }}>
-              Bugün için kaydedildi
-            </span>
-          </div>
-        )}
-      </div>
+      <h2 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>
+        Günlük Notum
+      </h2>
 
       {saved ? (
-        /* Read-only display */
         <div
-          className="p-4 rounded-[14px]"
           style={{
-            background: "rgba(245,200,66,0.05)",
-            border: "1px solid rgba(245,200,66,0.12)",
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.05)",
+            borderRadius: "12px",
+            padding: "16px",
           }}
         >
           <p
-            className="text-sm leading-relaxed"
-            style={{ color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}
+            className="text-[15px] leading-relaxed"
+            style={{ color: "rgba(255,255,255,0.8)", whiteSpace: "pre-wrap" }}
           >
             {content}
           </p>
-          <p className="text-xs mt-3" style={{ color: "var(--text-tertiary)" }}>
+          <p className="text-[12px] mt-4" style={{ color: "rgba(255,255,255,0.3)" }}>
             Yarın yeni bir not yazabilirsin 🌙
           </p>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <textarea
             name="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Bugün nasıldı? Ne hissediyorsun?..."
             rows={4}
-            className="input-glass resize-none"
-            style={{ borderRadius: 14, lineHeight: 1.6 }}
+            className="w-full resize-none"
+            style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.05)",
+              borderRadius: "12px",
+              color: "#ffffff",
+              fontSize: "15px",
+              lineHeight: 1.6,
+              padding: "16px",
+              outline: "none",
+              fontFamily: "inherit",
+              transition: "border-color 0.15s ease",
+            }}
             maxLength={2000}
             required
           />
-          <div className="flex items-center justify-between">
-            <span className="text-[11px]" style={{ color: "var(--text-tertiary)" }}>
-              {content.length}/2000
-            </span>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn-primary"
-              style={{ padding: "10px 18px", fontSize: 13, borderRadius: 12 }}
-            >
-              {submitting ? (
-                <div
-                  className="w-4 h-4 border-2 border-t-white rounded-full animate-spin"
-                  style={{ borderColor: "rgba(255,255,255,0.25)", borderTopColor: "white" }}
-                />
-              ) : (
-                <>
-                  <Send size={13} />
-                  Kaydet
-                </>
-              )}
-            </button>
-          </div>
+          
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full flex items-center justify-center font-bold text-[15px] transition-all"
+            style={{
+              background: "#D84257",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "12px",
+              padding: "14px",
+              cursor: submitting ? "not-allowed" : "pointer",
+              opacity: submitting ? 0.7 : 1,
+            }}
+          >
+            {submitting ? "Kaydediliyor..." : "Kaydet"}
+          </button>
         </form>
       )}
     </div>

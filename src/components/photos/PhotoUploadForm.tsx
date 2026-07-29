@@ -37,15 +37,15 @@ export function PhotoUploadForm() {
 
     try {
       const exifr = (await import("exifr")).default;
-      const exif = await exifr.parse(file); // parse all basic tags
+      const exif = await exifr.parse(file);
 
       const dateValue = exif?.DateTimeOriginal || exif?.DateTime || exif?.CreateDate || exif?.ModifyDate;
 
       if (dateValue) {
         const d = new Date(dateValue);
         if (!isNaN(d.getTime())) {
-          const localDate = d.toLocaleDateString("en-CA"); // YYYY-MM-DD
-          const localTime = d.toTimeString().slice(0, 5); // HH:MM
+          const localDate = d.toLocaleDateString("en-CA");
+          const localTime = d.toTimeString().slice(0, 5);
           setTakenDate(localDate);
           setTakenTime(localTime);
           setExifFound(true);
@@ -57,7 +57,6 @@ export function PhotoUploadForm() {
       // Fallback
     }
 
-    // Fallback to file.lastModified (WhatsApp/Screenshots)
     if (file.lastModified) {
       const d = new Date(file.lastModified);
       if (!isNaN(d.getTime())) {
@@ -73,7 +72,7 @@ export function PhotoUploadForm() {
   }, []);
 
   return (
-    <form action={formAction} className="flex flex-col gap-6">
+    <form action={formAction} className="flex flex-col gap-5">
       <input type="hidden" name="exif_found" value={String(exifFound)} />
       <input type="hidden" name="taken_date" value={takenDate} />
       <input type="hidden" name="taken_time" value={takenTime} />
@@ -92,17 +91,18 @@ export function PhotoUploadForm() {
         <motion.button
           type="button"
           onClick={() => fileRef.current?.click()}
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.99 }}
-          className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl transition-all"
+          whileHover={{ scale: 1.005 }}
+          whileTap={{ scale: 0.995 }}
+          className="w-full flex flex-col items-center justify-center gap-4 transition-all"
           style={{
-            border: preview ? "2px solid rgba(232,0,45,0.4)" : "2px dashed rgba(255,255,255,0.12)",
-            background: preview ? "rgba(232,0,45,0.04)" : "rgba(255,255,255,0.02)",
-            minHeight: 180,
-            padding: 20,
+            border: preview ? "2px solid rgba(232,0,45,0.4)" : "2px dashed rgba(255,255,255,0.18)",
+            background: preview ? "rgba(232,0,45,0.04)" : "rgba(255,255,255,0.03)",
+            minHeight: 200,
+            padding: 24,
             cursor: "pointer",
             overflow: "hidden",
             position: "relative",
+            borderRadius: 20,
           }}
         >
           <AnimatePresence mode="wait">
@@ -117,7 +117,7 @@ export function PhotoUploadForm() {
                   src={preview}
                   alt="Önizleme"
                   className="w-full rounded-xl object-cover"
-                  style={{ maxHeight: 300 }}
+                  style={{ maxHeight: 320 }}
                 />
                 <div
                   className="absolute top-2 right-2 px-3 py-1.5 rounded-xl text-xs font-semibold"
@@ -131,37 +131,40 @@ export function PhotoUploadForm() {
                 key="placeholder"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex flex-col items-center gap-3"
+                className="flex flex-col items-center gap-4"
               >
                 <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center"
-                  style={{ background: "rgba(232,0,45,0.1)" }}
+                  className="flex items-center justify-center"
+                  style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: 18,
+                    background: "rgba(232,0,45,0.12)",
+                  }}
                 >
-                  <ImageIcon size={28} style={{ color: "var(--gs-red)" }} />
+                  <ImageIcon size={32} style={{ color: "var(--gs-red)" }} />
                 </div>
                 <div className="text-center">
-                  <p className="font-semibold text-white text-sm">Fotoğraf Seç</p>
-                  <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 12, marginTop: 4 }}>
+                  <p className="font-bold text-white text-base">Fotoğraf Seç</p>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginTop: 4 }}>
                     Galerinizden bir fotoğraf seçin
                   </p>
                 </div>
                 <div
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl"
-                  style={{ background: "rgba(232,0,45,0.15)", color: "var(--gs-red)" }}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-[50px] font-bold text-sm"
+                  style={{
+                    background: "linear-gradient(135deg, #E8002D 0%, #C4001F 100%)",
+                    color: "#ffffff",
+                    boxShadow: "0 4px 16px rgba(232,0,45,0.35)",
+                  }}
                 >
-                  <Upload size={14} />
-                  <span className="text-xs font-bold">Galeriyi Aç</span>
+                  <Upload size={15} />
+                  Galeriyi Aç
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </motion.button>
-
-        {fileName && (
-          <p className="mt-2 text-xs truncate" style={{ color: "rgba(255,255,255,0.3)" }}>
-            📎 {fileName}
-          </p>
-        )}
       </div>
 
       {/* EXIF status */}
@@ -187,17 +190,14 @@ export function PhotoUploadForm() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="flex items-center gap-3 px-4 py-3 rounded-xl"
-            style={{
-              background: "rgba(34, 197, 94, 0.08)",
-              border: "1px solid rgba(34, 197, 94, 0.2)",
-            }}
+            style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)" }}
           >
             <CheckCircle size={16} style={{ color: "#22c55e", flexShrink: 0 }} />
             <div>
               <p className="text-sm font-semibold" style={{ color: "#22c55e" }}>
                 Çekim bilgileri bulundu
               </p>
-              <p className="text-xs mt-0.5" style={{ color: "rgba(34, 197, 94, 0.7)" }}>
+              <p className="text-xs mt-0.5" style={{ color: "rgba(34,197,94,0.7)" }}>
                 {takenDate} {takenTime && `saat ${takenTime}`} — İsterseniz düzenleyebilirsiniz.
               </p>
             </div>
@@ -210,10 +210,7 @@ export function PhotoUploadForm() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="flex items-start gap-3 px-4 py-3 rounded-xl"
-            style={{
-              background: "rgba(245, 158, 11, 0.08)",
-              border: "1px solid rgba(245, 158, 11, 0.2)",
-            }}
+            style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}
           >
             <AlertCircle size={16} style={{ color: "#f59e0b", flexShrink: 0, marginTop: 2 }} />
             <p className="text-sm" style={{ color: "#f59e0b" }}>
@@ -223,7 +220,7 @@ export function PhotoUploadForm() {
         )}
       </AnimatePresence>
 
-      {/* Date + Time fields (show if EXIF found for editing, or if not found for manual entry) */}
+      {/* Date + Time */}
       <AnimatePresence>
         {(exifStatus === "found" || exifStatus === "not_found") && (
           <motion.div
@@ -232,7 +229,6 @@ export function PhotoUploadForm() {
             exit={{ opacity: 0, height: 0 }}
             className="flex flex-col gap-4 overflow-hidden"
           >
-            {/* Taken Date */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>
                 <Calendar size={12} />
@@ -247,7 +243,6 @@ export function PhotoUploadForm() {
               />
             </div>
 
-            {/* Taken Time */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>
                 <Clock size={12} />
@@ -266,22 +261,20 @@ export function PhotoUploadForm() {
 
       {/* Title */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <Type size={12} />
+        <label className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>
           Başlık (isteğe bağlı)
         </label>
         <input
           name="title"
           type="text"
           placeholder="Fotoğrafınıza bir başlık verin..."
-          className="input-glass text-sm"
+          className="input-glass"
         />
       </div>
 
       {/* Description */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>
-          <AlignLeft size={12} />
+        <label className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>
           Açıklama *
         </label>
         <textarea
@@ -289,24 +282,15 @@ export function PhotoUploadForm() {
           rows={4}
           required
           placeholder="Bu anı anlatın... Neredeydiniz, ne hissettiniz?"
-          className="input-glass text-sm resize-none"
+          className="input-glass resize-none"
           style={{ lineHeight: 1.7 }}
         />
       </div>
 
       {/* Info */}
-      <div
-        className="flex items-start gap-3 px-4 py-3 rounded-[12px]"
-        style={{
-          background: "var(--surface-2)",
-          border: "1px solid var(--border-subtle)",
-        }}
-      >
-        <Info size={14} style={{ color: "var(--text-tertiary)", flexShrink: 0, marginTop: 2 }} />
-        <p className="text-xs" style={{ color: "var(--text-tertiary)", lineHeight: 1.6 }}>
-          Yüklenen fotoğraflar kalıcı olarak saklanır ve silinemez. Her iki kullanıcı da tüm fotoğrafları görebilir.
-        </p>
-      </div>
+      <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)", lineHeight: 1.6 }}>
+        Yüklenen fotoğraflar kalıcı olarak saklanır ve silinemez. Her iki kullanıcı da tüm fotoğrafları görebilir.
+      </p>
 
       {/* Error */}
       {state?.error && (
@@ -329,14 +313,15 @@ export function PhotoUploadForm() {
         disabled={isPending || !preview || !takenDate}
         whileHover={{ scale: (isPending || !preview || !takenDate) ? 1 : 1.01 }}
         whileTap={{ scale: (isPending || !preview || !takenDate) ? 1 : 0.99 }}
-        className="w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
+        className="w-full py-4 rounded-[50px] font-bold text-base flex items-center justify-center gap-2 transition-all"
         style={{
           background:
             isPending || !preview || !takenDate
               ? "rgba(255,255,255,0.08)"
-              : "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
+              : "linear-gradient(135deg, #E8002D 0%, #C4001F 100%)",
           color: isPending || !preview || !takenDate ? "rgba(255,255,255,0.3)" : "white",
           cursor: isPending || !preview || !takenDate ? "not-allowed" : "pointer",
+          boxShadow: isPending || !preview || !takenDate ? "none" : "0 4px 20px rgba(232,0,45,0.35)",
         }}
       >
         {isPending ? (
@@ -346,17 +331,11 @@ export function PhotoUploadForm() {
           </>
         ) : (
           <>
-            <Camera size={16} />
+            <Camera size={18} />
             Fotoğrafı Kaydet
           </>
         )}
       </motion.button>
-
-      {!preview && (
-        <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
-          Kaydetmek için önce bir fotoğraf seçin
-        </p>
-      )}
     </form>
   );
 }
