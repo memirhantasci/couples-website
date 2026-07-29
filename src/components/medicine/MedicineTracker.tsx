@@ -31,7 +31,7 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
   const [logs, setLogs] = useState<Record<string, "DRANK" | "MISSED" | "PENDING">>(
     () => {
       const map: Record<string, "DRANK" | "MISSED" | "PENDING"> = {};
-      
+
       todayLogs.forEach((log) => {
         const timeKey = log.time ? log.time.substring(0, 5) : "";
         if (timeKey) {
@@ -124,11 +124,11 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
 
       {/* ── CIRCULAR STAT BADGES ──────────────────────── */}
       <div
-        className="mx-4 mb-5 py-6 px-4 flex justify-between"
+        className="mx-4 mb-6 py-8 px-5 flex justify-between"
         style={{
           background: "linear-gradient(135deg, #181a20 0%, #151012 100%)",
           border: "1px solid rgba(255,255,255,0.05)",
-          borderRadius: "20px",
+          borderRadius: "24px",
         }}
       >
         {/* Toplam Doz */}
@@ -136,17 +136,18 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
           <div
             className="flex flex-col items-center justify-center relative"
             style={{
-              width: 96,
-              height: 96,
+              width: 116,
+              height: 116,
               borderRadius: "50%",
-              border: "8px solid #E8002D",
+              border: "3px solid #E8002D",
+              boxShadow: "0 0 20px rgba(232, 0, 45, 0.6), inset 0 0 12px rgba(232, 0, 45, 0.4)",
               background: "transparent",
             }}
           >
-            <span className="font-medium text-[28px]" style={{ color: "#E8002D", lineHeight: 1.1, marginTop: "4px" }}>
+            <span className="font-medium text-[34px]" style={{ color: "#E8002D", lineHeight: 1.1, marginTop: "4px" }}>
               {totalDoses}
             </span>
-            <span className="text-[10px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
+            <span className="text-[12px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
               Toplam Doz
             </span>
           </div>
@@ -157,17 +158,18 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
           <div
             className="flex flex-col items-center justify-center relative"
             style={{
-              width: 96,
-              height: 96,
+              width: 116,
+              height: 116,
               borderRadius: "50%",
-              border: "8px solid #22C55E",
+              border: "3px solid #22C55E",
+              boxShadow: "0 0 20px rgba(34, 197, 94, 0.6), inset 0 0 12px rgba(34, 197, 94, 0.4)",
               background: "transparent",
             }}
           >
-            <span className="font-medium text-[28px]" style={{ color: "#22C55E", lineHeight: 1.1, marginTop: "4px" }}>
+            <span className="font-medium text-[34px]" style={{ color: "#22C55E", lineHeight: 1.1, marginTop: "4px" }}>
               {drankCount}
             </span>
-            <span className="text-[10px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
+            <span className="text-[12px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
               Alındı
             </span>
           </div>
@@ -178,17 +180,18 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
           <div
             className="flex flex-col items-center justify-center relative"
             style={{
-              width: 96,
-              height: 96,
+              width: 116,
+              height: 116,
               borderRadius: "50%",
-              border: "8px solid #D8A030",
+              border: "3px solid #D8A030",
+              boxShadow: "0 0 20px rgba(216, 160, 48, 0.6), inset 0 0 12px rgba(216, 160, 48, 0.4)",
               background: "transparent",
             }}
           >
-            <span className="font-medium text-[28px]" style={{ color: "rgba(255,255,255,0.9)", lineHeight: 1.1, marginTop: "4px" }}>
+            <span className="font-medium text-[34px]" style={{ color: "rgba(255,255,255,0.9)", lineHeight: 1.1, marginTop: "4px" }}>
               {pendingCount}
             </span>
-            <span className="text-[10px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
+            <span className="text-[12px] font-normal mt-1" style={{ color: "rgba(255,255,255,0.8)" }}>
               Bekliyor
             </span>
           </div>
@@ -236,19 +239,19 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
                   borderRadius: "16px",
                 }}
               >
-                <div className="flex flex-col p-5 gap-4">
-                  {/* Header */}
-                  <div>
-                    <p className="font-bold text-[26px] tracking-tight leading-none" style={{ color: "#ffffff" }}>
-                      {medicine.name}
-                    </p>
-                    <p className="text-[13px] mt-1.5" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      Günde {medTimes.length} kez ({medTimes.join(", ")})
-                    </p>
-                  </div>
+                <div className="flex flex-col items-center justify-evenly py-3.5 px-4 min-h-[130px] text-center w-full gap-2.5">
+                  {/* Title */}
+                  <p className="font-bold text-[17px] tracking-tight leading-tight text-white text-center">
+                    {medicine.name}
+                  </p>
 
-                  {/* Dose Slots */}
-                  <div className="flex flex-col gap-3">
+                  {/* Subtitle */}
+                  <p className="text-[11px] text-center text-neutral-400">
+                    Günde {medTimes.length} kez ({medTimes.join(", ")})
+                  </p>
+
+                  {/* Dose Slots / Button */}
+                  <div className="flex flex-col gap-2 w-full items-center justify-center">
                     {medTimes.map((slotTime, idx) => {
                       const key = `${medicine.id}_${slotTime}`;
                       const status = logs[key] || "PENDING";
@@ -260,96 +263,61 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
                       return (
                         <div
                           key={slotTime}
-                          className="flex items-center justify-between w-full gap-3"
+                          className="flex items-center justify-center w-full"
                         >
-                          {/* Check icon circle */}
-                          <div
-                            className="flex items-center justify-center shrink-0"
-                            style={{
-                              width: 44,
-                              height: 44,
-                              borderRadius: "50%",
-                              border: isDrank
-                                ? "2px solid #22C55E"
-                                : isMissed
-                                  ? "2px solid #D84257"
-                                  : "2px solid rgba(255,255,255,0.15)",
-                              background: isDrank
-                                ? "rgba(34, 197, 94, 0.1)"
-                                : isMissed
-                                  ? "rgba(216, 66, 87, 0.1)"
-                                  : "rgba(255,255,255,0.03)",
-                            }}
-                          >
-                            {isDrank ? (
-                              <Check size={22} color="#22C55E" strokeWidth={3} />
-                            ) : isMissed ? (
-                              <X size={22} color="#D84257" strokeWidth={3} />
-                            ) : (
-                              <Check size={22} color="rgba(255,255,255,0.2)" strokeWidth={2} />
-                            )}
-                          </div>
-
-                          {/* Action button / Status */}
-                          <div className="flex-1">
-                            {isLoading ? (
-                              <div className="py-3 px-4 flex items-center justify-center rounded-xl bg-white/5">
-                                <div
-                                  className="w-5 h-5 border-2 rounded-full animate-spin"
-                                  style={{ borderColor: "rgba(255,255,255,0.2)", borderTopColor: "#fff" }}
-                                />
-                              </div>
-                            ) : isDrank ? (
+                          {isLoading ? (
+                            <div className="py-2 px-3.5 flex items-center justify-center rounded-lg bg-white/5">
                               <div
-                                className="flex items-center justify-center py-3 px-4 rounded-xl"
+                                className="w-4 h-4 border-2 rounded-full animate-spin"
+                                style={{ borderColor: "rgba(255,255,255,0.2)", borderTopColor: "#fff" }}
+                              />
+                            </div>
+                          ) : isDrank ? (
+                            <div className="flex items-center justify-center w-full">
+                              {/* Solid green DOZ ALINDI button */}
+                              <div
+                                className="py-2.5 px-5 rounded-xl flex items-center justify-center shadow-[0_0_12px_rgba(34,197,94,0.35)]"
                                 style={{ background: "#22C55E", color: "#ffffff" }}
                               >
-                                <span className="font-bold text-[14px]">✓ DOZ ALINDI 🔒</span>
+                                <span className="font-bold text-[15px] tracking-wide flex items-center gap-1.5 justify-center text-center">
+                                  ✓ DOZ ALINDI 🔒
+                                </span>
                               </div>
-                            ) : isMissed ? (
+                            </div>
+                          ) : isMissed ? (
+                            <div className="flex items-center justify-center w-full">
                               <div
-                                className="flex items-center justify-center py-3 px-4 rounded-xl"
+                                className="py-2.5 px-5 rounded-xl flex items-center justify-center shadow-[0_0_12px_rgba(216,66,87,0.35)]"
                                 style={{ background: "#D84257", color: "#ffffff" }}
                               >
-                                <span className="font-bold text-[14px]">DOZ ATLANDI</span>
+                                <span className="font-bold text-[15px] tracking-wide justify-center text-center">
+                                  DOZ ATLANDI
+                                </span>
                               </div>
-                            ) : !isTimePassed ? (
-                              <p
-                                className="text-[13px] font-medium py-3 px-4 rounded-xl bg-white/5 inline-block"
-                                style={{ color: "rgba(255,255,255,0.5)" }}
-                              >
+                            </div>
+                          ) : !isTimePassed ? (
+                            <div className="flex items-center justify-center w-full">
+                              <div className="py-2.5 px-5 rounded-xl flex items-center justify-center bg-white/5 text-white/50 text-[12px] font-medium text-center">
                                 {slotTime} 🔒
-                              </p>
-                            ) : (
-                              <div className="flex gap-3">
-                                <button
-                                  onClick={() => handleMarkDrank(medicine.id, slotTime)}
-                                  className="flex items-center justify-center py-3 px-5 rounded-xl font-bold text-[14px] transition-all active:scale-95"
-                                  style={{ background: "#22C55E", color: "#ffffff" }}
-                                >
-                                  İçtim
-                                </button>
-                                <button
-                                  onClick={() => handleMarkMissed(medicine.id, slotTime)}
-                                  className="flex items-center justify-center py-3 px-5 rounded-xl font-bold text-[14px] transition-all active:scale-95"
-                                  style={{ background: "#D84257", color: "#ffffff" }}
-                                >
-                                  Atla
-                                </button>
                               </div>
-                            )}
-                          </div>
-
-                          {/* Sağdaki status text */}
-                          {isDrank && (
-                            <span className="text-[12px] font-medium shrink-0" style={{ color: "#22C55E" }}>
-                              ✓Alındı
-                            </span>
-                          )}
-                          {isMissed && (
-                            <span className="text-[12px] font-medium shrink-0" style={{ color: "#D84257" }}>
-                              ✗Atlandı
-                            </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center gap-2.5 w-full">
+                              <button
+                                onClick={() => handleMarkDrank(medicine.id, slotTime)}
+                                className="flex-1 max-w-[110px] py-2.5 px-4 rounded-xl font-bold text-[13px] transition-all active:scale-95 flex items-center justify-center text-center"
+                                style={{ background: "#22C55E", color: "#ffffff" }}
+                              >
+                                İçtim
+                              </button>
+                              <button
+                                onClick={() => handleMarkMissed(medicine.id, slotTime)}
+                                className="flex-1 max-w-[110px] py-2.5 px-4 rounded-xl font-bold text-[13px] transition-all active:scale-95 flex items-center justify-center text-center"
+                                style={{ background: "#D84257", color: "#ffffff" }}
+                              >
+                                Atla
+                              </button>
+                            </div>
                           )}
                         </div>
                       );
@@ -383,7 +351,7 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId }
               </h2>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5 overflow-y-auto max-h-[260px]" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.1) transparent" }}>
+            <div className="grid grid-cols-3 gap-[10px] p-0.5" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.1) transparent" }}>
               {historyDates.map((date) => {
                 const dayLogs = historyByDate[date];
                 const drankLogsCount = dayLogs.filter((l) => l.status === "DRANK").length;

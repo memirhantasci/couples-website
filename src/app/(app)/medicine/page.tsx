@@ -92,11 +92,18 @@ export default async function MedicinePage() {
   const dateLabel = dayjs().locale("tr").tz("Europe/Istanbul").format("D MMMM YYYY, dddd");
 
   return (
-    <div className="flex flex-col max-w-lg mx-auto" style={{ paddingBottom: 64, backgroundColor: "#0c0c0c", minHeight: "100vh" }}>
+    <div
+      className="flex flex-col max-w-lg mx-auto pb-24 min-h-[100dvh]"
+      style={{
+        backgroundColor: "#0c0c0c",
+        backgroundImage: "radial-gradient(circle at 50% 0%, rgba(232, 0, 45, 0.05) 0%, transparent 50%), linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+        backgroundSize: "100% 100%, 20px 20px, 20px 20px"
+      }}
+    >
       {/* ── PAGE HEADER ─────────────────────────────────── */}
       <div className="px-4 pt-4 pb-4 flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold" style={{ color: "#d4a373" }}>
+          <h1 className="text-[31px] font-extrabold tracking-tight leading-tight" style={{ color: "#d4a373" }}>
             İlaç Takibi
           </h1>
           <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>

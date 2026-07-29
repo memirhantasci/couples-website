@@ -94,7 +94,8 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
             className="font-display font-bold"
             style={{
               fontSize: 18,
-              color: "#ffffff"
+              color: "#ffffff",
+              textShadow: "0 0 12px rgba(255, 105, 180, 0.8), 0 0 20px rgba(255, 105, 180, 0.4)"
             }}
           >
             Emirhan &amp; Öykü
