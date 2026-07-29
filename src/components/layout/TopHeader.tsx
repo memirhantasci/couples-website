@@ -146,120 +146,174 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
 
             {/* Slide-over Drawer */}
             <motion.div
-              initial={{ x: "100%" }}
+              initial={{ x: role === "ADMIN" ? "100%" : "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              exit={{ x: role === "ADMIN" ? "100%" : "-100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 220 }}
-              className="fixed top-0 right-0 h-[100dvh] w-[90vw] sm:w-[460px] z-[101] flex flex-col"
-              style={{
+              className={cn(
+                "fixed top-0 h-[100dvh] z-[101] flex flex-col",
+                role === "ADMIN" ? "right-0 w-[90vw] sm:w-[460px]" : "left-0 w-[85vw] sm:w-[320px]"
+              )}
+              style={role === "ADMIN" ? {
                 background: "#1a1a1e",
                 borderLeft: "1px solid rgba(255,255,255,0.08)",
                 boxShadow: "-16px 0 48px rgba(0,0,0,0.55)",
+              } : {
+                background: "rgba(20, 20, 24, 0.45)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+                borderRight: "1px solid rgba(255,255,255,0.08)",
+                borderTopRightRadius: 24,
+                borderBottomRightRadius: 24,
+                boxShadow: "16px 0 48px rgba(0,0,0,0.3)",
               }}
             >
-              <div className="flex items-center justify-between px-6 py-6 border-b shrink-0" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                <span className="font-bold text-white text-[32px]">Menü</span>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center rounded-[14px] transition-all hover:bg-white/10"
-                  style={{
-                    width: 48,
-                    height: 48,
-                    color: "rgba(255,255,255,0.55)",
-                  }}
-                >
-                  <X size={32} strokeWidth={2} />
-                </button>
-              </div>
+              {role === "ADMIN" ? (
+                <>
+                  <div className="flex items-center justify-between px-6 py-6 border-b shrink-0" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                    <span className="font-bold text-white text-[32px]">Menü</span>
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center rounded-[14px] transition-all hover:bg-white/10"
+                      style={{ width: 48, height: 48, color: "rgba(255,255,255,0.55)" }}
+                    >
+                      <X size={32} strokeWidth={2} />
+                    </button>
+                  </div>
+                  <div className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto min-h-0 pb-16" style={{ WebkitOverflowScrolling: "touch" }}>
+                    {visibleItems.map((item) => {
+                      const isAppReturn = item.href === "/home" && role === "ADMIN";
+                      const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
+                      
+                      return (
+                        <div key={item.href} className="flex flex-col">
+                          <div className="flex items-stretch gap-1">
+                            <Link
+                              href={item.href}
+                              className="flex-1 flex items-center gap-5 px-5 py-4 rounded-[16px] font-semibold transition-all text-[28px]"
+                              style={{
+                                background: isActive ? "rgba(232, 0, 45, 0.12)" : "transparent",
+                                color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.75)",
+                                border: isActive ? "1px solid rgba(232, 0, 45, 0.22)" : "1px solid transparent",
+                              }}
+                            >
+                              <span style={{ opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
+                              <span>{item.label}</span>
+                            </Link>
+                            {isAppReturn && (
+                              <button
+                                onClick={() => setIsAppMenuExpanded(!isAppMenuExpanded)}
+                                className="px-4 rounded-[16px] transition-all flex items-center justify-center active:scale-95"
+                                style={{ 
+                                  background: isAppMenuExpanded ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+                                  color: "rgba(255,255,255,0.85)" 
+                                }}
+                              >
+                                {isAppMenuExpanded ? <ChevronUp size={34} /> : <ChevronDown size={34} />}
+                              </button>
+                            )}
+                          </div>
 
-              {/* Drawer Links */}
-              <div 
-                className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto min-h-0 pb-16"
-                style={{ WebkitOverflowScrolling: "touch" }}
-              >
-                {visibleItems.map((item) => {
-                  const isAppReturn = item.href === "/home" && role === "ADMIN";
-                  const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
-                  
-                  return (
-                    <div key={item.href} className="flex flex-col">
-                      <div className="flex items-stretch gap-1">
-                        <Link
-                          href={item.href}
-                          className="flex-1 flex items-center gap-5 px-5 py-4 rounded-[16px] font-semibold transition-all text-[28px]"
+                          {isAppReturn && (
+                            <AnimatePresence>
+                              {isAppMenuExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="overflow-hidden flex flex-col pl-4 pr-1 gap-1 mt-2"
+                                >
+                                  <div className="pl-6 border-l-2 border-white/10 py-2 flex flex-col gap-2">
+                                    {navItems.filter(i => !i.adminOnly && i.href !== "/home").map(subItem => (
+                                      <Link
+                                        key={subItem.href}
+                                        href={subItem.href}
+                                        className="flex items-center gap-4 px-4 py-3 rounded-[14px] font-semibold transition-all text-[24px] active:bg-white/5"
+                                        style={{ color: "rgba(255,255,255,0.65)" }}
+                                      >
+                                        <span style={{ opacity: 0.7, transform: "scale(0.85)" }}>{subItem.icon}</span>
+                                        <span>{subItem.label}</span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          )}
+                        </div>
+                      );
+                    })}
+                    <div className="mt-8 pt-4 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
+                      <form action={logoutAction}>
+                        <button
+                          type="submit"
+                          className="w-full flex items-center justify-center gap-4 py-4 rounded-[16px] font-bold text-[24px] transition-all"
                           style={{
-                            background: isActive ? "rgba(232, 0, 45, 0.12)" : "transparent",
-                            color: isActive ? "var(--gs-red)" : "rgba(255,255,255,0.75)",
-                            border: isActive ? "1px solid rgba(232, 0, 45, 0.22)" : "1px solid transparent",
+                            background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
+                            color: "#ffffff",
+                            boxShadow: "0 4px 16px rgba(232, 0, 45, 0.3)",
                           }}
                         >
-                          <span style={{ opacity: isActive ? 1 : 0.7 }}>{item.icon}</span>
-                          <span>{item.label}</span>
-                        </Link>
-                        {isAppReturn && (
-                          <button
-                            onClick={() => setIsAppMenuExpanded(!isAppMenuExpanded)}
-                            className="px-4 rounded-[16px] transition-all flex items-center justify-center active:scale-95"
-                            style={{ 
-                              background: isAppMenuExpanded ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
-                              color: "rgba(255,255,255,0.85)" 
+                          <LogOut size={28} />
+                          <span>Çıkış Yap</span>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* User Drawer New Design */}
+                  <div className="flex flex-col pt-10 pb-6 px-4 h-full">
+                    <h2
+                      className="text-center font-serif text-[28px] font-bold mb-8"
+                      style={{ color: "#e3ba74" }}
+                    >
+                      🤎Emirhan &amp; Öykü🤎
+                    </h2>
+
+                    <div className="flex flex-col gap-2 flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" }}>
+                      {visibleItems.map((item) => {
+                        const isActive = pathname === item.href || (item.href !== "/home" && pathname.startsWith(item.href));
+                        
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setIsOpen(false)}
+                            className="flex items-center gap-4 px-4 py-3 rounded-[12px] transition-all text-[18px]"
+                            style={{
+                              background: isActive ? "rgba(232, 0, 45, 0.15)" : "transparent",
+                              color: isActive ? "#E8002D" : "#ffffff",
                             }}
                           >
-                            {isAppMenuExpanded ? <ChevronUp size={34} /> : <ChevronDown size={34} />}
-                          </button>
-                        )}
-                      </div>
-
-                      {isAppReturn && (
-                        <AnimatePresence>
-                          {isAppMenuExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden flex flex-col pl-4 pr-1 gap-1 mt-2"
-                            >
-                              <div className="pl-6 border-l-2 border-white/10 py-2 flex flex-col gap-2">
-                                {navItems.filter(i => !i.adminOnly && i.href !== "/home").map(subItem => (
-                                  <Link
-                                    key={subItem.href}
-                                    href={subItem.href}
-                                    className="flex items-center gap-4 px-4 py-3 rounded-[14px] font-semibold transition-all text-[24px] active:bg-white/5"
-                                    style={{
-                                      color: "rgba(255,255,255,0.65)",
-                                    }}
-                                  >
-                                    <span style={{ opacity: 0.7, transform: "scale(0.85)" }}>{subItem.icon}</span>
-                                    <span>{subItem.label}</span>
-                                  </Link>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      )}
+                            <span style={{ opacity: isActive ? 1 : 0.8, transform: "scale(0.85)" }}>
+                              {item.icon}
+                            </span>
+                            <span style={{ fontWeight: isActive ? 600 : 400 }}>{item.label}</span>
+                          </Link>
+                        );
+                      })}
                     </div>
-                  );
-                })}
 
-                {/* Logout Button in Scrollable Area */}
-                <div className="mt-8 pt-4 border-t" style={{ borderColor: "rgba(255,255,255,0.07)" }}>
-                  <form action={logoutAction}>
-                    <button
-                      type="submit"
-                      className="w-full flex items-center justify-center gap-4 py-4 rounded-[16px] font-bold text-[24px] transition-all"
-                      style={{
-                        background: "linear-gradient(135deg, var(--gs-red) 0%, #B5001F 100%)",
-                        color: "#ffffff",
-                        boxShadow: "0 4px 16px rgba(232, 0, 45, 0.3)",
-                      }}
-                    >
-                      <LogOut size={28} />
-                      <span>Çıkış Yap</span>
-                    </button>
-                  </form>
-                </div>
-              </div>
+                    <div className="mt-6 pt-4">
+                      <form action={logoutAction}>
+                        <button
+                          type="submit"
+                          className="w-full flex items-center justify-center gap-3 py-3.5 rounded-full font-bold text-[17px] transition-all active:scale-95"
+                          style={{
+                            background: "#E8002D",
+                            color: "#ffffff",
+                          }}
+                        >
+                          <LogOut size={20} style={{ transform: "rotate(180deg)" }} />
+                          <span>Çıkış Yap</span>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </>
+              )}
             </motion.div>
           </>
         )}
