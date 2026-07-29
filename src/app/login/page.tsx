@@ -14,7 +14,7 @@ const initialState: LoginState = {};
 function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, initialState);
   const [forgotState, forgotAction, isForgotPending] = useActionState(changePasswordAction, initialState);
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const searchParams = useSearchParams();
@@ -33,6 +33,12 @@ function LoginForm() {
       className="min-h-dvh flex items-center justify-center relative overflow-hidden bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: "url('/couple-bg.jpg')", backgroundColor: "#0a0a0f" }}
     >
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-placeholder::placeholder {
+          color: rgba(255, 255, 255, 0.7) !important;
+          opacity: 1 !important;
+        }
+      `}} />
       {/* Dark overlay */}
       <div className="absolute inset-0 z-0 pointer-events-none" style={{ background: "rgba(0,0,0,0.55)" }} />
 
@@ -63,7 +69,7 @@ function LoginForm() {
               transition={{ duration: 0.25 }}
             >
               {/* Header with plenty of spacing */}
-              <div className="text-center mb-10">
+              <div className="text-center mb-16">
                 <motion.div
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -91,19 +97,12 @@ function LoginForm() {
               </div>
 
               {/* Form elements with more gap */}
-              <form action={formAction} className="flex flex-col gap-6">
-                
+              <form action={formAction} className="flex flex-col gap-6" style={{ marginTop: "48px" }}>
+
                 {/* Inputs wrapper */}
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col" style={{ gap: "24px" }}>
                   {/* Username */}
                   <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="username"
-                      className="text-[13px] font-semibold tracking-wide uppercase"
-                      style={{ color: "rgba(255,255,255,0.6)" }}
-                    >
-                      Kullanıcı Adı
-                    </label>
                     <div className="relative">
                       <div
                         className="absolute left-4 top-1/2 -translate-y-1/2"
@@ -117,7 +116,7 @@ function LoginForm() {
                         type="text"
                         placeholder="Kullanıcı adınızı girin"
                         required
-                        className="w-full"
+                        className="w-full custom-placeholder"
                         style={{
                           paddingLeft: 46,
                           paddingRight: 16,
@@ -142,13 +141,6 @@ function LoginForm() {
 
                   {/* Password */}
                   <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="password"
-                      className="text-[13px] font-semibold tracking-wide uppercase"
-                      style={{ color: "rgba(255,255,255,0.6)" }}
-                    >
-                      Şifre
-                    </label>
                     <div className="relative">
                       <div
                         className="absolute left-4 top-1/2 -translate-y-1/2"
@@ -162,7 +154,7 @@ function LoginForm() {
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         required
-                        className="w-full"
+                        className="w-full custom-placeholder"
                         style={{
                           paddingLeft: 46,
                           paddingRight: 50,
@@ -185,7 +177,7 @@ function LoginForm() {
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-4 top-1/2 -translate-y-1/2 transition-all"
-                        style={{ color: "rgba(255,255,255,0.5)" }}
+                        style={{ color: "rgba(255,255,255,0.5)", background: "none", border: "none", cursor: "pointer" }}
                         tabIndex={-1}
                       >
                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -211,7 +203,7 @@ function LoginForm() {
                   </motion.div>
                 )}
 
-                <div className="flex flex-col gap-3 mt-4">
+                <div className="flex flex-col" style={{ gap: "12px", marginTop: "16px" }}>
                   {/* Giriş Yap */}
                   <motion.button
                     type="submit"
@@ -322,19 +314,16 @@ function LoginForm() {
                 <ArrowLeft size={18} /> Geri Dön
               </button>
 
-              <div className="mb-8">
+              <div className="mb-16 text-center">
                 <h2 className="text-3xl font-bold mb-3 text-white">Şifremi Unuttum</h2>
                 <p className="text-[15px] leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
                   Kullanıcı adınızı ve yeni şifrenizi girerek sıfırlayabilirsiniz.
                 </p>
               </div>
 
-              <form action={forgotAction} className="flex flex-col gap-6">
-                <div className="flex flex-col gap-4">
+              <form action={forgotAction} className="flex flex-col gap-6" style={{ marginTop: "48px" }}>
+                <div className="flex flex-col" style={{ gap: "24px" }}>
                   <div className="flex flex-col gap-2">
-                    <label htmlFor="forgot-username" className="text-[13px] font-semibold tracking-wide uppercase" style={{ color: "rgba(255,255,255,0.6)" }}>
-                      Kullanıcı Adı
-                    </label>
                     <div className="relative">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "rgba(255,255,255,0.45)" }}>
                         <User size={18} />
@@ -345,7 +334,7 @@ function LoginForm() {
                         type="text"
                         placeholder="Kullanıcı adınız"
                         required
-                        className="w-full"
+                        className="w-full custom-placeholder"
                         style={{
                           paddingLeft: 46,
                           paddingRight: 16,
@@ -368,9 +357,6 @@ function LoginForm() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label htmlFor="new-password" className="text-[13px] font-semibold tracking-wide uppercase" style={{ color: "rgba(255,255,255,0.6)" }}>
-                      Yeni Şifre
-                    </label>
                     <div className="relative">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "rgba(255,255,255,0.45)" }}>
                         <Lock size={18} />
@@ -381,7 +367,7 @@ function LoginForm() {
                         type={showPassword ? "text" : "password"}
                         placeholder="Yeni şifreniz"
                         required
-                        className="w-full"
+                        className="w-full custom-placeholder"
                         style={{
                           paddingLeft: 46,
                           paddingRight: 50,
@@ -427,10 +413,11 @@ function LoginForm() {
                   </motion.div>
                 )}
 
-                <motion.button
-                  type="submit"
-                  disabled={isForgotPending}
-                  className="w-full flex items-center justify-center gap-2 font-bold mt-2"
+                <div className="flex flex-col" style={{ marginTop: "16px" }}>
+                  <motion.button
+                    type="submit"
+                    disabled={isForgotPending}
+                    className="w-full flex items-center justify-center gap-2 font-bold"
                   style={{
                     padding: "16px 24px",
                     borderRadius: 20,
@@ -446,7 +433,8 @@ function LoginForm() {
                   whileTap={{ scale: isForgotPending ? 1 : 0.99 }}
                 >
                   {isForgotPending ? "Güncelleniyor..." : "Şifreyi Değiştir"}
-                </motion.button>
+                  </motion.button>
+                </div>
               </form>
             </motion.div>
           )}
