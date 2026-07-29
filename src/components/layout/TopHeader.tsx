@@ -80,7 +80,7 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
   return (
     <>
       <header
-        className="sticky top-0 z-50 flex items-center justify-between px-5 py-3"
+        className="w-full sticky top-0 z-50 flex items-center justify-between px-6 py-4"
         style={{
           background: "rgba(17, 17, 20, 0.96)",
           borderBottom: "1px solid rgba(255,255,255,0.07)",
@@ -89,26 +89,26 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
       >
         {/* Logo */}
         <Link href="/home" className="flex items-center gap-1.5 transition-opacity hover:opacity-80">
-          <span style={{ fontSize: 16 }}>❤️</span>
+          <span style={{ fontSize: 18 }}>❤️</span>
           <span
             className="font-display font-bold"
             style={{
-              fontSize: 18,
+              fontSize: 20,
               color: "#ffffff",
               textShadow: "0 0 12px rgba(255, 105, 180, 0.8), 0 0 20px rgba(255, 105, 180, 0.4)"
             }}
           >
             Emirhan &amp; Öykü
           </span>
-          <span style={{ fontSize: 16 }}>❤️</span>
+          <span style={{ fontSize: 18 }}>❤️</span>
         </Link>
 
         {/* Right side */}
         <div className="flex items-center gap-3">
           {/* Profil İsmi (3 çizginin solunda) */}
           <span
-            className="text-[14px] font-semibold"
-            style={{ color: "rgba(255,255,255,0.9)" }}
+            className="font-semibold"
+            style={{ fontSize: 16, color: "rgba(255,255,255,0.9)" }}
           >
             {displayName}
           </span>
@@ -124,7 +124,7 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
             }}
             aria-label="Menüyü aç"
           >
-            <Menu size={34} strokeWidth={2.5} style={{ color: "#D84257" }} />
+            <Menu size={38} strokeWidth={2.5} style={{ color: "#D84257" }} />
           </button>
         </div>
       </header>
@@ -264,7 +264,24 @@ export function TopHeader({ role, displayName }: TopHeaderProps) {
               ) : (
                 <>
                   {/* User Drawer New Design */}
-                  <div className="flex flex-col pt-10 pb-6 px-4 h-full">
+                  
+                  {/* Close button that perfectly overlaps the original hamburger menu */}
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="fixed flex items-center justify-center p-1 transition-all active:scale-95 z-[105]"
+                    style={{
+                      top: "16px",
+                      right: "24px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                    aria-label="Menüyü kapat"
+                  >
+                    <Menu size={38} strokeWidth={2.5} style={{ color: "#D84257", opacity: 0.8 }} />
+                  </button>
+
+                  <div className="flex flex-col pt-10 pb-6 px-4 h-full relative z-[102]">
                     <h2
                       className="text-center font-serif text-[28px] font-bold mb-8"
                       style={{ color: "#e3ba74" }}
