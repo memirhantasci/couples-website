@@ -24,30 +24,21 @@ export default async function MemoriesPage() {
     .order("date", { ascending: true });
 
   return (
-    <div className="px-4 py-5 flex flex-col gap-5 max-w-lg mx-auto">
+    <div className="px-4 pt-5 pb-2 flex flex-col max-w-lg mx-auto" style={{ minHeight: "calc(100dvh - 150px)" }}>
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-2.5 mb-1">
-          <div
-            className="w-9 h-9 rounded-[12px] flex items-center justify-center"
-            style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
-          >
-            <Camera size={18} />
-          </div>
-          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-            Özel Günlerimiz
-          </h1>
-        </div>
-        <p className="text-xs ml-[52px]" style={{ color: "var(--text-tertiary)" }}>
-          {(memories ?? []).length} özel gün • birlikte yaşananlar ❤️
-        </p>
+      <div className="text-center mb-4 mt-1 flex-shrink-0">
+        <h1 className="text-3xl font-bold text-white tracking-wide">
+          Özel Anlarımız
+        </h1>
       </div>
 
       {/* Timeline */}
-      <MemoryTimeline
-        memories={memories ?? []}
-        isAdmin={session.role === "ADMIN"}
-      />
+      <div className="flex-1 flex flex-col min-h-0">
+        <MemoryTimeline
+          memories={memories ?? []}
+          isAdmin={session.role === "ADMIN"}
+        />
+      </div>
     </div>
   );
 }
