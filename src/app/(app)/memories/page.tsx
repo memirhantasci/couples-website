@@ -26,10 +26,16 @@ export default async function MemoriesPage() {
   return (
     <div className="px-4 pt-5 pb-2 flex flex-col max-w-lg mx-auto" style={{ minHeight: "calc(100dvh - 150px)" }}>
       {/* Header */}
-      <div className="text-center mb-4 mt-1 flex-shrink-0">
-        <h1 className="text-3xl font-bold text-white tracking-wide">
-          Özel Anlarımız
-        </h1>
+      <div className="text-center mb-4 mt-2 flex-shrink-0">
+        <h2 style={{
+          fontSize: 24,
+          fontWeight: 800,
+          color: "#E8002D",
+          textAlign: "center",
+          letterSpacing: "1px",
+        }}>
+          ÖZEL GÜNLER 🥂
+        </h2>
       </div>
 
       {/* Timeline */}

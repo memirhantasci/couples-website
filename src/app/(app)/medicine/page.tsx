@@ -101,24 +101,31 @@ export default async function MedicinePage() {
       }}
     >
       {/* ── PAGE HEADER ─────────────────────────────────── */}
-      <div className="px-4 pt-4 pb-4 flex items-start justify-between">
-        <div>
-          <h1 className="text-[31px] font-extrabold tracking-tight leading-tight" style={{ color: "#d4a373" }}>
-            İlaç Takibi
-          </h1>
-          <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+      <div className="px-4 pt-6 pb-2 flex flex-col items-center">
+        <h2 style={{
+          fontSize: 24,
+          fontWeight: 800,
+          color: "#E8002D",
+          textAlign: "center",
+          letterSpacing: "1px",
+          marginBottom: 8,
+        }}>
+          İLAÇ TAKİBİ 💊
+        </h2>
+        
+        <div className="flex flex-col items-center justify-center gap-2">
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
             {dateLabel}
           </p>
+          {streakValue >= 0 && (
+            <div className="flex items-center gap-1.5">
+              <Trophy size={14} style={{ color: "#d4a373" }} />
+              <span className="font-medium text-sm" style={{ color: "#d4a373" }}>
+                {streakValue} günlük seri
+              </span>
+            </div>
+          )}
         </div>
-
-        {streakValue >= 0 && (
-          <div className="flex items-center gap-1.5 mt-2">
-            <Trophy size={14} style={{ color: "#d4a373" }} />
-            <span className="font-medium text-sm" style={{ color: "#d4a373" }}>
-              {streakValue} günlük seri
-            </span>
-          </div>
-        )}
       </div>
 
       {/* ── STAT CIRCLES & CONTENT ─────────────────────────────────── */}

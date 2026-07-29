@@ -32,17 +32,22 @@ export default async function DailyNotesUserPage() {
     >
       {/* ─── Header ─── */}
       <div style={{ marginBottom: 24 }}>
-        <h1
-          className="font-bold leading-tight"
-          style={{ fontSize: 30, color: "#ffffff", letterSpacing: "-0.3px" }}
-        >
-          Günlüğüm
-        </h1>
+        <h2 style={{
+          fontSize: 24,
+          fontWeight: 800,
+          color: "#E8002D",
+          textAlign: "center",
+          letterSpacing: "1px",
+          marginBottom: 8,
+        }}>
+          GÜNLÜĞÜM 📓
+        </h2>
         <p
           style={{
             color: "rgba(255,255,255,0.35)",
             fontSize: 14,
             marginTop: 4,
+            textAlign: "center"
           }}
         >
           Sadece senin görebildiğin notların

@@ -30,7 +30,7 @@ export default async function PeriodTrackerPage() {
 
   return (
     <div
-      className="px-4 pt-5 pb-20 flex flex-col max-w-lg mx-auto"
+      className="px-4 pt-10 pb-20 flex flex-col max-w-lg mx-auto"
       style={{ background: "#0a0a0f", minHeight: "100%" }}
     >
       <PeriodTrackerClient logs={safeLogs} isOyku={isOyku} />

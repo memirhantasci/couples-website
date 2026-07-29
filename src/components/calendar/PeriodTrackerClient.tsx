@@ -198,6 +198,19 @@ export function PeriodTrackerClient({ logs, isOyku }: PeriodTrackerClientProps) 
         }
       `}</style>
 
+      {/* Page Title */}
+      <h2 style={{
+        fontSize: 24,
+        fontWeight: 800,
+        color: "#E8002D",
+        textAlign: "center",
+        marginTop: 16,
+        marginBottom: 24,
+        letterSpacing: "1px",
+      }}>
+        REGL TAKVİMİ 🩸
+      </h2>
+
       <div
         className="period-calendar"
         style={{

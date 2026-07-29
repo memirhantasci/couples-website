@@ -49,6 +49,18 @@ export default async function LettersPage() {
       className="px-4 pt-6 pb-8 flex flex-col max-w-lg mx-auto"
       style={{ background: "#0a0a0f", minHeight: "100%", gap: 24 }}
     >
+      {/* ─── Header ─── */}
+      <h2 style={{
+        fontSize: 24,
+        fontWeight: 800,
+        color: "#E8002D",
+        textAlign: "center",
+        letterSpacing: "1px",
+        marginBottom: -8,
+      }}>
+        MEKTUPLAR 💌
+      </h2>
+
       {/* ─── Gelen Mektuplar ─── */}
       <div
         style={{
