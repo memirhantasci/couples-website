@@ -112,13 +112,14 @@ export async function loginAction(
     if (userAgent.includes("Mobi") || userAgent.includes("Android")) deviceType = "mobile";
     else if (userAgent.includes("Tablet") || userAgent.includes("iPad")) deviceType = "tablet";
 
-    // 1. Check if device is authorized
-    const { data: deviceAuth, error: devError } = await supabase
+    // 1. Check if device is authorized (matching BOTH IP and User-Agent)
+    const { data: deviceAuth } = await supabase
       .from("device_authorizations")
       .select("id, is_verified")
       .eq("user_id", user.id)
       .eq("ip_address", ipAddress)
-      .single();
+      .eq("user_agent", userAgent)
+      .maybeSingle();
 
     if (user.role !== "ADMIN" && !user.email) {
       const cookieStore = await cookies();
@@ -179,6 +180,7 @@ export async function loginAction(
         const cookieStore = await cookies();
         cookieStore.set("pending_login_user", user.id, { httpOnly: true, maxAge: 600 });
         cookieStore.set("pending_login_ip", ipAddress, { httpOnly: true, maxAge: 600 });
+        cookieStore.set("pending_login_ua", userAgent, { httpOnly: true, maxAge: 600 });
         
         nextUrl = "/login/verify-device";
       } else if (deviceAuth && deviceAuth.is_verified) {
@@ -316,6 +318,7 @@ export async function verifyDeviceAction(prevState: any, formData: FormData) {
   const cookieStore = await cookies();
   const pendingUserId = cookieStore.get("pending_login_user")?.value;
   const pendingIp = cookieStore.get("pending_login_ip")?.value;
+  const pendingUa = cookieStore.get("pending_login_ua")?.value;
 
   if (!pendingUserId || !pendingIp) {
     return { error: "Oturum süresi dolmuş. Lütfen tekrar giriş yapın." };
@@ -345,12 +348,18 @@ export async function verifyDeviceAction(prevState: any, formData: FormData) {
     return { error: "Kod hatalı." };
   }
 
-  // Mark as verified
-  await supabase
+  // Mark as verified for this exact device (IP + UA)
+  let query = supabase
     .from("device_authorizations")
     .update({ is_verified: true })
     .eq("user_id", pendingUserId)
     .eq("ip_address", pendingIp);
+
+  if (pendingUa) {
+    query = query.eq("user_agent", pendingUa);
+  }
+
+  await query;
 
   // Mark OTP used
   await supabase
@@ -383,6 +392,7 @@ export async function verifyDeviceAction(prevState: any, formData: FormData) {
 
   cookieStore.delete("pending_login_user");
   cookieStore.delete("pending_login_ip");
+  cookieStore.delete("pending_login_ua");
   
   let nextUrl = user.role === "ADMIN" ? "/admin" : "/home";
   redirect(nextUrl);
