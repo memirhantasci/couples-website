@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { SESSION_COOKIE_NAME, SESSION_MAX_AGE, type SessionCookie } from "./types";
+import { createServerClient } from "@/lib/supabase/server";
 
 /**
  * Creates a session cookie with the given session data
@@ -40,6 +41,22 @@ export async function getSession(): Promise<SessionCookie | null> {
 
     if (data.expiresAt && Date.now() > data.expiresAt) {
       return null; // Session expired
+    }
+
+    // Single Active Device Check: Invalidate session if a newer login log exists
+    if (data.loginLogId) {
+      const supabase = createServerClient();
+      const { data: latestLog } = await supabase
+        .from("login_logs")
+        .select("id")
+        .eq("user_id", data.userId)
+        .order("id", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (latestLog && latestLog.id > data.loginLogId) {
+        return null; // Another device has logged in
+      }
     }
 
     return data;
