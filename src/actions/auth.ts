@@ -121,13 +121,42 @@ export async function loginAction(
       .eq("user_agent", userAgent)
       .maybeSingle();
 
-    if (user.role !== "ADMIN" && !user.email) {
+    if (user.role === "ADMIN") {
+      // ADMIN: Bypass email setup and device OTP verification completely. Direct login.
+      const { data: loginLog } = await supabase
+        .from("login_logs")
+        .insert({
+          user_id: user.id,
+          ip_address: ipAddress,
+          browser,
+          operating_system: os,
+          device_type: deviceType,
+        })
+        .select("id")
+        .single();
+
+      const nowTR = new Date(Date.now() + 3 * 60 * 60 * 1000);
+      const today = nowTR.toISOString().slice(0, 10);
+
+      await createSession({
+        userId: user.id,
+        username: deterministicDecrypt(user.username) || user.username,
+        displayName: user.display_name || deterministicDecrypt(user.username) || user.username,
+        role: user.role as "ADMIN" | "USER",
+        loginDate: today,
+        loginLogId: loginLog?.id ?? 0,
+      });
+
+      nextUrl = "/admin";
+    } else if (!user.email) {
+      // REGULAR USER WITH NO EMAIL: Redirect to setup email
       const cookieStore = await cookies();
       cookieStore.set("pending_setup_email_user_id", user.id, { httpOnly: true, maxAge: 600 });
       cookieStore.set("pending_setup_email_ip", ipAddress, { httpOnly: true, maxAge: 600 });
       cookieStore.set("pending_setup_email_ua", userAgent, { httpOnly: true, maxAge: 600 });
       nextUrl = "/login/setup-email";
     } else {
+      // REGULAR USER WITH EMAIL: Perform Device Verification / OTP check
       if (!deviceAuth || !deviceAuth.is_verified) {
         // Create OTP
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -184,7 +213,7 @@ export async function loginAction(
         
         nextUrl = "/login/verify-device";
       } else if (deviceAuth && deviceAuth.is_verified) {
-        // 2. If device is verified, proceed to login
+        // Device is verified, proceed to login
         const { data: loginLog } = await supabase
           .from("login_logs")
           .insert({
@@ -209,7 +238,7 @@ export async function loginAction(
           loginLogId: loginLog?.id ?? 0,
         });
         
-        nextUrl = user.role === "ADMIN" ? "/admin" : "/home";
+        nextUrl = "/home";
       }
     }
   } catch (err: any) {
