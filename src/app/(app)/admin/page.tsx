@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { LayoutDashboard, Pill, Users, LineChart, CalendarDays, ChevronRight, Camera, Mail, BookOpen, Images } from "lucide-react";
+import { LayoutDashboard, Pill, Users, LineChart, CalendarDays, ChevronRight, Camera, Mail, BookOpen, Images, UserCog } from "lucide-react";
 import Link from "next/link";
 import { dayjs } from "@/lib/date";
 
@@ -41,6 +41,14 @@ export default async function AdminDashboardPage() {
   const todayLogins = todayLoginsResult.count || 0;
 
   const dashboardCards = [
+    {
+      title: "Kullanıcılar",
+      description: "Tüm kullanıcılar ve şifreleri",
+      icon: <UserCog size={24} style={{ color: "#ffffff" }} />,
+      href: "/admin/users",
+      gradient: "linear-gradient(135deg, rgba(232,0,45,0.15) 0%, rgba(232,0,45,0.05) 100%)",
+      borderColor: "rgba(232,0,45,0.2)",
+    },
     {
       title: "Buluşma Planla",
       description: `Aktif: ${activeMeeting}`,

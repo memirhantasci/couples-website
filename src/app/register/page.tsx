@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { registerAction, type LoginState } from "@/actions/auth";
-import { Heart, Lock, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Heart, Lock, User, Eye, EyeOff, ArrowLeft, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
@@ -153,6 +153,44 @@ export default function RegisterPage() {
                       transition: "all 0.2s ease",
                     }}
                     autoComplete="username"
+                    autoCapitalize="none"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="flex flex-col gap-2">
+                <div className="relative">
+                  <div
+                    className="absolute left-4 top-1/2 -translate-y-1/2"
+                    style={{ color: "rgba(255,255,255,0.45)" }}
+                  >
+                    <Mail size={18} />
+                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="E-posta adresiniz"
+                    required
+                    className="w-full custom-placeholder"
+                    style={{
+                      paddingLeft: 46,
+                      paddingRight: 16,
+                      paddingTop: 16,
+                      paddingBottom: 16,
+                      background: "rgba(0,0,0,0.25)",
+                      border: "1px solid rgba(255,255,255,0.15)",
+                      borderRadius: 20,
+                      color: "#ffffff",
+                      fontSize: 15,
+                      outline: "none",
+                      fontFamily: "inherit",
+                      WebkitAppearance: "none",
+                      appearance: "none",
+                      transition: "all 0.2s ease",
+                    }}
+                    autoComplete="email"
                     autoCapitalize="none"
                   />
                 </div>

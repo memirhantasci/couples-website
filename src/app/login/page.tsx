@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { loginAction, changePasswordAction, type LoginState } from "@/actions/auth";
-import { Heart, Lock, User, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Heart, Lock, User, Eye, EyeOff, ArrowLeft, Mail } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
@@ -317,7 +317,7 @@ function LoginForm() {
               <div className="mb-16 text-center">
                 <h2 className="text-3xl font-bold mb-3 text-white">Şifremi Unuttum</h2>
                 <p className="text-[15px] leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
-                  Kullanıcı adınızı ve yeni şifrenizi girerek sıfırlayabilirsiniz.
+                  Kullanıcı adınızı ve kayıtlı e-posta adresinizi girerek sıfırlama kodu isteyebilirsiniz.
                 </p>
               </div>
 
@@ -359,18 +359,18 @@ function LoginForm() {
                   <div className="flex flex-col gap-2">
                     <div className="relative">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: "rgba(255,255,255,0.45)" }}>
-                        <Lock size={18} />
+                        <Mail size={18} />
                       </div>
                       <input
-                        id="new-password"
-                        name="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Yeni şifreniz"
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="Kayıtlı e-posta adresiniz"
                         required
                         className="w-full custom-placeholder"
                         style={{
                           paddingLeft: 46,
-                          paddingRight: 50,
+                          paddingRight: 16,
                           paddingTop: 16,
                           paddingBottom: 16,
                           background: "rgba(0,0,0,0.25)",
@@ -384,15 +384,6 @@ function LoginForm() {
                           appearance: "none",
                         }}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 transition-all"
-                        style={{ color: "rgba(255,255,255,0.5)", background: "none", border: "none", cursor: "pointer" }}
-                        tabIndex={-1}
-                      >
-                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -432,7 +423,7 @@ function LoginForm() {
                   whileHover={{ scale: isForgotPending ? 1 : 1.01 }}
                   whileTap={{ scale: isForgotPending ? 1 : 0.99 }}
                 >
-                  {isForgotPending ? "Güncelleniyor..." : "Şifreyi Değiştir"}
+                  {isForgotPending ? "Gönderiliyor..." : "Sıfırlama Kodu Gönder"}
                   </motion.button>
                 </div>
               </form>

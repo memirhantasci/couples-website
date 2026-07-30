@@ -2,9 +2,12 @@
 
 import { z } from "zod";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { createServerClient } from "@/lib/supabase/server";
 import { createSession, destroySession, getSession } from "@/lib/auth/session";
+import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
+import { encrypt, decrypt } from "@/utils/crypto";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Kullanıcı adı gerekli"),
@@ -14,6 +17,7 @@ const loginSchema = z.object({
 const registerSchema = z.object({
   displayName: z.string().min(1, "İsim gerekli").max(50, "İsim çok uzun"),
   username: z.string().min(1, "Kullanıcı adı gerekli"),
+  email: z.string().email("Geçerli bir e-posta adresi giriniz"),
   password: z.string().min(1, "Şifre gerekli"),
 });
 
@@ -27,7 +31,7 @@ export async function loginAction(
   prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
-  let userRole: string = "USER";
+  let nextUrl = "";
   try {
     console.log("Login Attempt:", formData.get("username"));
     const parsed = loginSchema.safeParse({
@@ -45,7 +49,7 @@ export async function loginAction(
     // Find user by username
     const { data: user, error } = await supabase
       .from("users")
-      .select("id, username, password, role, display_name")
+      .select("id, username, email, password, role, display_name")
       .eq("username", username.trim().toLowerCase())
       .single();
 
@@ -54,8 +58,29 @@ export async function loginAction(
       return { error: "Kullanıcı adı veya şifre hatalı." };
     }
 
-    // Plain text password comparison
-    if (user.password !== password.trim()) {
+    // Bcrypt compare
+    let isPasswordValid = false;
+    // Check if password starts with $2 (bcrypt hash)
+    if (user.password.startsWith("$2")) {
+      isPasswordValid = await bcrypt.compare(password.trim(), user.password);
+      if (isPasswordValid && user.role !== "ADMIN") {
+         // Auto-migrate from bcrypt to encrypt
+         const newHash = encrypt(password.trim());
+         await supabase.from("users").update({ password: newHash }).eq("id", user.id);
+      }
+    } else if (user.password.startsWith("enc:")) {
+      isPasswordValid = decrypt(user.password) === password.trim();
+    } else {
+      // Fallback for unmigrated plain text passwords
+      isPasswordValid = user.password === password.trim();
+      if (isPasswordValid && user.role !== "ADMIN") {
+         // Auto-migrate from plain text to encrypt
+         const newHash = encrypt(password.trim());
+         await supabase.from("users").update({ password: newHash }).eq("id", user.id);
+      }
+    }
+
+    if (!isPasswordValid) {
       console.log("Password mismatch for:", username);
       return { error: "Kullanıcı adı veya şifre hatalı." };
     }
@@ -68,7 +93,6 @@ export async function loginAction(
       headersList.get("x-real-ip") ||
       "unknown";
 
-    // Parse user agent (simplified without ua-parser-js on server action)
     let browser = "Unknown";
     let os = "Unknown";
     let deviceType = "desktop";
@@ -82,55 +106,285 @@ export async function loginAction(
     else if (userAgent.includes("Mac")) os = "macOS";
     else if (userAgent.includes("Linux")) os = "Linux";
     else if (userAgent.includes("Android")) os = "Android";
-    else if (userAgent.includes("iOS") || userAgent.includes("iPhone") || userAgent.includes("iPad"))
-      os = "iOS";
+    else if (userAgent.includes("iOS") || userAgent.includes("iPhone") || userAgent.includes("iPad")) os = "iOS";
 
     if (userAgent.includes("Mobi") || userAgent.includes("Android")) deviceType = "mobile";
     else if (userAgent.includes("Tablet") || userAgent.includes("iPad")) deviceType = "tablet";
 
-    // Create login log entry
-    const { data: loginLog, error: logError } = await supabase
-      .from("login_logs")
-      .insert({
-        user_id: user.id,
-        ip_address: ipAddress,
-        browser,
-        operating_system: os,
-        device_type: deviceType,
-      })
-      .select("id")
+    // 1. Check if device is authorized
+    const { data: deviceAuth, error: devError } = await supabase
+      .from("device_authorizations")
+      .select("id, is_verified")
+      .eq("user_id", user.id)
+      .eq("ip_address", ipAddress)
       .single();
 
-    if (logError) {
-      console.error("Login Log Error:", logError);
+    if (user.role !== "ADMIN" && !user.email) {
+      const cookieStore = await cookies();
+      cookieStore.set("pending_setup_email_user_id", user.id, { httpOnly: true, maxAge: 600 });
+      cookieStore.set("pending_setup_email_ip", ipAddress, { httpOnly: true, maxAge: 600 });
+      cookieStore.set("pending_setup_email_ua", userAgent, { httpOnly: true, maxAge: 600 });
+      nextUrl = "/login/setup-email";
+    } else {
+      if (!deviceAuth || !deviceAuth.is_verified) {
+        // Create OTP
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+        await supabase.from("otp_codes").insert({
+          user_id: user.id,
+          code: otpCode,
+          expires_at: expiresAt.toISOString(),
+        });
+
+        if (!deviceAuth) {
+           await supabase.from("device_authorizations").insert({
+             user_id: user.id,
+             ip_address: ipAddress,
+             user_agent: userAgent,
+             is_verified: false
+           });
+        }
+
+        // Send email
+        try {
+          const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST || "smtp.gmail.com",
+            port: parseInt(process.env.SMTP_PORT || "587"),
+            secure: process.env.SMTP_SECURE === "true",
+            auth: {
+              user: process.env.SMTP_USER || "dummy",
+              pass: process.env.SMTP_PASS || "dummy",
+            },
+          });
+          
+          if (process.env.SMTP_USER) {
+              await transporter.sendMail({
+                from: process.env.SMTP_USER,
+                to: user.email,
+                subject: "Giriş Doğrulama Kodu",
+                text: `Yeni bir cihazdan giriş tespit ettik. Doğrulama kodunuz: ${otpCode}`,
+              });
+          } else {
+              console.log("NO SMTP CONFIGURED. OTP CODE IS:", otpCode);
+          }
+        } catch (e) {
+          console.error("Email send error:", e);
+          console.log("FALLBACK OTP CODE IS:", otpCode);
+        }
+
+        // Set pending auth cookie
+        const cookieStore = await cookies();
+        cookieStore.set("pending_login_user", user.id, { httpOnly: true, maxAge: 600 });
+        cookieStore.set("pending_login_ip", ipAddress, { httpOnly: true, maxAge: 600 });
+        
+        nextUrl = "/login/verify-device";
+      } else if (deviceAuth && deviceAuth.is_verified) {
+        // 2. If device is verified, proceed to login
+        const { data: loginLog } = await supabase
+          .from("login_logs")
+          .insert({
+            user_id: user.id,
+            ip_address: ipAddress,
+            browser,
+            operating_system: os,
+            device_type: deviceType,
+          })
+          .select("id")
+          .single();
+
+        const nowTR = new Date(Date.now() + 3 * 60 * 60 * 1000);
+        const today = nowTR.toISOString().slice(0, 10);
+
+        await createSession({
+          userId: user.id,
+          username: user.username,
+          displayName: user.display_name || user.username,
+          role: user.role as "ADMIN" | "USER",
+          loginDate: today,
+          loginLogId: loginLog?.id ?? 0,
+        });
+        
+        nextUrl = user.role === "ADMIN" ? "/admin" : "/home";
+      }
     }
-
-    const nowTR = new Date(Date.now() + 3 * 60 * 60 * 1000);
-    const today = nowTR.toISOString().slice(0, 10);
-
-    // Create session
-    await createSession({
-      userId: user.id,
-      username: user.username,
-      displayName: user.display_name || user.username,
-      role: user.role as "ADMIN" | "USER",
-      loginDate: today,
-      loginLogId: loginLog?.id ?? 0,
-    });
-
-    userRole = user.role;
   } catch (err: any) {
     console.error("Unexpected error in loginAction:", err);
     return { error: "Sunucu tarafında beklenmeyen bir hata oluştu." };
   }
 
-  // Next.js redirect must be outside try-catch to work properly
-  if (userRole === "ADMIN") {
-    redirect("/admin");
-  } else {
-    redirect("/home");
+  // Redirect must be outside try-catch in Next.js
+  if (nextUrl) {
+    redirect(nextUrl);
+  }
+  return prevState;
+}
+
+export async function setupEmailAction(prevState: any, formData: FormData) {
+  let nextUrl = "";
+  try {
+    const email = formData.get("email") as string;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("pending_setup_email_user_id")?.value;
+    const ipAddress = cookieStore.get("pending_setup_email_ip")?.value;
+    const userAgent = cookieStore.get("pending_setup_email_ua")?.value;
+
+    if (!userId || !ipAddress || !userAgent) {
+      return { error: "Oturum süresi dolmuş. Lütfen tekrar giriş yapın." };
+    }
+    if (!email || !email.includes("@")) {
+      return { error: "Geçerli bir e-posta giriniz." };
+    }
+
+    const supabase = createServerClient();
+    
+    // Update user's email
+    await supabase.from("users").update({ email: email.trim().toLowerCase() }).eq("id", userId);
+
+    // Create OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await supabase.from("otp_codes").insert({
+      user_id: userId,
+      code: otpCode,
+      expires_at: expiresAt.toISOString(),
+    });
+
+    // Ensure device auth row exists
+    const { data: dev } = await supabase.from("device_authorizations")
+      .select("id")
+      .eq("user_id", userId).eq("ip_address", ipAddress).single();
+    if (!dev) {
+       await supabase.from("device_authorizations").insert({
+         user_id: userId,
+         ip_address: ipAddress,
+         user_agent: userAgent,
+         is_verified: false
+       });
+    }
+
+    // Send email
+    try {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || "smtp.gmail.com",
+        port: parseInt(process.env.SMTP_PORT || "587"),
+        secure: process.env.SMTP_SECURE === "true",
+        auth: {
+          user: process.env.SMTP_USER || "dummy",
+          pass: process.env.SMTP_PASS || "dummy",
+        },
+      });
+      
+      if (process.env.SMTP_USER) {
+          await transporter.sendMail({
+            from: process.env.SMTP_USER,
+            to: email,
+            subject: "Giriş Doğrulama Kodu",
+            text: `Yeni bir cihazdan giriş tespit ettik. Doğrulama kodunuz: ${otpCode}`,
+          });
+      } else {
+          console.log("NO SMTP CONFIGURED. OTP CODE IS:", otpCode);
+      }
+    } catch (e) {
+      console.error("Email send error:", e);
+    }
+
+    // Clean up setup cookies and set verify cookies
+    cookieStore.delete("pending_setup_email_user_id");
+    cookieStore.delete("pending_setup_email_ip");
+    cookieStore.delete("pending_setup_email_ua");
+    
+    cookieStore.set("pending_login_user", userId, { httpOnly: true, maxAge: 600 });
+    cookieStore.set("pending_login_ip", ipAddress, { httpOnly: true, maxAge: 600 });
+    
+    nextUrl = "/login/verify-device";
+  } catch (err: any) {
+    console.error("Error in setupEmailAction:", err);
+    return { error: "Bir hata oluştu." };
+  }
+  if (nextUrl) {
+    redirect(nextUrl);
   }
 }
+
+export async function verifyDeviceAction(prevState: any, formData: FormData) {
+  const code = formData.get("code") as string;
+  const cookieStore = await cookies();
+  const pendingUserId = cookieStore.get("pending_login_user")?.value;
+  const pendingIp = cookieStore.get("pending_login_ip")?.value;
+
+  if (!pendingUserId || !pendingIp) {
+    return { error: "Oturum süresi dolmuş. Lütfen tekrar giriş yapın." };
+  }
+  if (!code || code.length !== 6) {
+    return { error: "Geçersiz kod." };
+  }
+
+  const supabase = createServerClient();
+  
+  // Check OTP
+  const { data: otpRecords } = await supabase
+    .from("otp_codes")
+    .select("*")
+    .eq("user_id", pendingUserId)
+    .eq("is_used", false)
+    .gte("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+
+  if (!otpRecords || otpRecords.length === 0) {
+    return { error: "Geçersiz veya süresi dolmuş kod." };
+  }
+
+  const isValidCode = otpRecords.some(r => r.code === code);
+  
+  if (!isValidCode) {
+    return { error: "Kod hatalı." };
+  }
+
+  // Mark as verified
+  await supabase
+    .from("device_authorizations")
+    .update({ is_verified: true })
+    .eq("user_id", pendingUserId)
+    .eq("ip_address", pendingIp);
+
+  // Mark OTP used
+  await supabase
+    .from("otp_codes")
+    .update({ is_used: true })
+    .eq("id", otpRecords[0].id);
+
+  // Get user to login
+  const { data: user } = await supabase.from("users").select("*").eq("id", pendingUserId).single();
+  if (!user) return { error: "Kullanıcı bulunamadı." };
+
+  // Create session
+  const { data: loginLog } = await supabase
+    .from("login_logs")
+    .insert({ user_id: user.id, ip_address: pendingIp })
+    .select("id")
+    .single();
+
+  const nowTR = new Date(Date.now() + 3 * 60 * 60 * 1000);
+  const today = nowTR.toISOString().slice(0, 10);
+
+  await createSession({
+    userId: user.id,
+    username: user.username,
+    displayName: user.display_name || user.username,
+    role: user.role as "ADMIN" | "USER",
+    loginDate: today,
+    loginLogId: loginLog?.id ?? 0,
+  });
+
+  cookieStore.delete("pending_login_user");
+  cookieStore.delete("pending_login_ip");
+  
+  let nextUrl = user.role === "ADMIN" ? "/admin" : "/home";
+  redirect(nextUrl);
+}
+
 
 export async function logoutAction(): Promise<void> {
   const session = await getSession();
@@ -139,7 +393,6 @@ export async function logoutAction(): Promise<void> {
     const supabase = createServerClient();
     const loginAt = new Date();
 
-    // Update logout time and session duration
     const { data: log } = await supabase
       .from("login_logs")
       .select("login_at")
@@ -171,6 +424,7 @@ export async function registerAction(
   const parsed = registerSchema.safeParse({
     displayName: formData.get("displayName"),
     username: formData.get("username"),
+    email: formData.get("email"),
     password: formData.get("password"),
   });
 
@@ -180,16 +434,15 @@ export async function registerAction(
 
   const displayName = parsed.data.displayName.trim();
   const username = parsed.data.username.trim().toLowerCase();
+  const email = parsed.data.email.trim().toLowerCase();
   const password = parsed.data.password.trim();
 
-  // Prevent registration of 'adminadmin'
   if (username === "adminadmin") {
     return { error: "Bu kullanıcı adı yönetici için ayrılmıştır." };
   }
 
   const supabase = createServerClient();
 
-  // Check if username exists
   const { data: existing } = await supabase
     .from("users")
     .select("id")
@@ -200,13 +453,16 @@ export async function registerAction(
     return { error: "Bu kullanıcı adı zaten alınmış." };
   }
 
-  // Insert user
+  // Encrypt password
+  const hashedPassword = encrypt(password);
+
   const { error: insertError } = await supabase
     .from("users")
     .insert({
       display_name: displayName,
       username,
-      password,
+      email,
+      password: hashedPassword,
       role: "USER"
     });
 
@@ -217,22 +473,13 @@ export async function registerAction(
 
   redirect("/login");
 }
+export async function changePasswordAction(prevState: LoginState, formData: FormData): Promise<LoginState> {
+  const username = formData.get("username") as string;
+  const email = formData.get("email") as string;
 
-export async function changePasswordAction(
-  prevState: LoginState,
-  formData: FormData
-): Promise<LoginState> {
-  const parsed = loginSchema.safeParse({
-    username: formData.get("username"),
-    password: formData.get("password"),
-  });
-
-  if (!parsed.success) {
-    return { error: parsed.error.errors[0].message };
+  if (!username || !email) {
+    return { error: "Lütfen kullanıcı adı ve e-posta adresinizi girin." };
   }
-
-  const username = parsed.data.username.trim().toLowerCase();
-  const password = parsed.data.password.trim();
 
   if (username === "adminadmin") {
     return { error: "Admin şifresi sadece veritabanından değiştirilebilir." };
@@ -242,22 +489,124 @@ export async function changePasswordAction(
   
   const { data: user, error: checkError } = await supabase
     .from("users")
-    .select("id")
+    .select("id, email")
     .eq("username", username)
     .single();
 
   if (checkError || !user) {
     return { error: "Kullanıcı bulunamadı." };
   }
-
-  const { error: updateError } = await supabase
-    .from("users")
-    .update({ password })
-    .eq("username", username);
-
-  if (updateError) {
-    return { error: "Şifre güncellenirken hata oluştu." };
+  
+  if (!user.email) {
+    return { error: "Şifrenizi sıfırlamak için kayıtlı bir e-postanız bulunmuyor. Lütfen destek ile iletişime geçin." };
   }
 
-  return { success: true };
+  if (user.email !== email.trim().toLowerCase()) {
+    return { error: "Girdiğiniz e-posta adresi sistemdeki kayıtla eşleşmiyor." };
+  }
+
+  // Generate OTP
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+  await supabase.from("otp_codes").insert({
+    user_id: user.id,
+    code: otpCode,
+    expires_at: expiresAt.toISOString(),
+  });
+
+  // Send email
+  try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(process.env.SMTP_PORT || "587"),
+      secure: process.env.SMTP_SECURE === "true",
+      auth: {
+        user: process.env.SMTP_USER || "dummy",
+        pass: process.env.SMTP_PASS || "dummy",
+      },
+    });
+    
+    if (process.env.SMTP_USER) {
+        await transporter.sendMail({
+          from: process.env.SMTP_USER,
+          to: user.email,
+          subject: "Şifre Sıfırlama Kodu",
+          text: `Şifrenizi sıfırlamak için doğrulama kodunuz: ${otpCode}`,
+        });
+    } else {
+        console.log("NO SMTP CONFIGURED. OTP CODE IS:", otpCode);
+    }
+  } catch (e) {
+    console.error("Email send error:", e);
+    console.log("FALLBACK OTP CODE IS:", otpCode);
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set("pending_reset_user_id", user.id, { httpOnly: true, maxAge: 600 });
+
+  redirect("/login/verify-reset");
+}
+
+
+
+export async function verifyResetAction(prevState: any, formData: FormData) {
+  const code = formData.get("code") as string;
+  const password = formData.get("password") as string;
+  
+  const cookieStore = await cookies();
+  const userId = cookieStore.get("pending_reset_user_id")?.value;
+
+  if (!userId) {
+    return { error: "Oturum süresi dolmuş. Lütfen şifre sıfırlama işlemini baştan başlatın." };
+  }
+  if (!code || code.length !== 6) {
+    return { error: "Geçersiz kod." };
+  }
+  if (!password || password.length < 4) {
+    return { error: "Şifreniz en az 4 karakter olmalıdır." };
+  }
+
+  const supabase = createServerClient();
+  
+  const { data: otpRecords } = await supabase
+    .from("otp_codes")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("is_used", false)
+    .gte("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+
+  if (!otpRecords || otpRecords.length === 0) {
+    return { error: "Geçersiz veya süresi dolmuş kod." };
+  }
+
+  const isValidCode = otpRecords.some((r: any) => r.code === code);
+  
+  if (!isValidCode) {
+    return { error: "Kod hatalı." };
+  }
+
+  // Encrypt new password
+  const newHash = encrypt(password);
+
+  // Update Password
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ password: newHash })
+    .eq("id", userId);
+
+  if (updateError) {
+    return { error: "Şifre güncellenirken bir hata oluştu." };
+  }
+
+  // Mark OTP used
+  await supabase
+    .from("otp_codes")
+    .update({ is_used: true })
+    .eq("id", otpRecords[0].id);
+
+  cookieStore.delete("pending_reset_user_id");
+  
+  redirect("/login?reset=success");
 }

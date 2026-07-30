@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Home, Pill, Camera, Calendar, LayoutDashboard, Mail, BookText, Images, Upload, CalendarDays, LineChart, Users, BookOpen, Activity } from "lucide-react";
+import { Menu, X, Home, Pill, Camera, Calendar, LayoutDashboard, Mail, BookText, Images, Upload, CalendarDays, LineChart, Users, BookOpen, Activity, UserCog } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -73,6 +73,11 @@ const adminNavItems: NavItem[] = [
     href: "/admin",
     label: "Admin Ana Sayfa",
     icon: <LayoutDashboard size={34} strokeWidth={2} />,
+  },
+  {
+    href: "/admin/users",
+    label: "Kullanıcılar",
+    icon: <UserCog size={34} strokeWidth={2} />,
   },
   {
     href: "/admin/meetings",
