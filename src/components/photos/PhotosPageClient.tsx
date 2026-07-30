@@ -50,7 +50,6 @@ export function PhotosPageClient({ photos, currentUserId, currentUsername }: Pho
             moods={[]}
             currentUsername={currentUsername}
             photoDates={photoDates}
-            disableNotes={true}
           />
           <div className="mt-4 text-center text-xs opacity-50">
             Fotoğraf bulunan günleri görmek için takvimde gezinebilir, günlerin üzerine tıklayarak fotoğrafları görebilirsiniz.

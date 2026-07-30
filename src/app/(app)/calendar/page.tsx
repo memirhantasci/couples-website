@@ -3,9 +3,8 @@ import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { CalendarPageClient } from "@/components/calendar/CalendarPageClient";
-import { Calendar, Upload } from "lucide-react";
-import Link from "next/link";
 import { dayjs } from "@/lib/date";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Takvim — Emirhan & Öykü 💕",
@@ -48,62 +47,67 @@ export default async function CalendarPage() {
 
   const notes = (notesResult.data as any) ?? [];
   const moods = moodsResult.data ?? [];
-  const photoDates = [...new Set((photosResult.data ?? []).map((p: any) => p.taken_date))] as string[];
 
   return (
-    <div className="px-4 py-5 flex flex-col gap-4 max-w-lg mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        padding: "16px 16px 100px 16px",
+        maxWidth: "512px",
+        margin: "0 auto",
+        background: "#0a0a0f",
+        minHeight: "100%",
+      }}
+    >
+      {/* ── HEADER ─── */}
+      <div style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        marginTop: 8,
+      }}>
         <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            <div
-              className="w-9 h-9 rounded-[12px] flex items-center justify-center"
-              style={{ background: "rgba(232,0,45,0.12)", color: "var(--gs-red)" }}
-            >
-              <Calendar size={18} />
-            </div>
-            <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Takvim & Fotoğraflar
-            </h1>
-          </div>
-          <p className="text-xs ml-[52px]" style={{ color: "var(--text-tertiary)" }}>
-            Notlar, ruh halleri ve anılar tek yerde
+          <h1 style={{
+            fontSize: 28,
+            fontWeight: 800,
+            color: "#ffffff",
+            margin: 0,
+            lineHeight: 1.2,
+          }}>
+            Takvim
+          </h1>
+          <p style={{
+            fontSize: 12,
+            color: "rgba(255,255,255,0.4)",
+            marginTop: 4,
+          }}>
+            Notlar, ruh halleri ve anılar
           </p>
         </div>
+
         <Link
           href="/photos/upload"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-[12px] font-semibold text-sm transition-all active:scale-95"
           style={{
-            background: "linear-gradient(135deg, var(--gs-red) 0%, #C4001F 100%)",
-            color: "white",
-            boxShadow: "0 3px 12px rgba(232,0,45,0.30)",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "10px 18px",
+            borderRadius: 14,
+            background: "#E8002D",
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: 13,
+            textDecoration: "none",
+            boxShadow: "0 4px 16px rgba(232,0,45,0.3)",
           }}
         >
-          <Upload size={14} />
-          Yükle
+          📤 Yükle
         </Link>
       </div>
 
-      {/* Legend */}
-      <div className="flex items-center gap-4 flex-wrap px-1">
-        {[
-          { color: "rgba(232,0,45,0.35)", label: "Not" },
-          { color: "rgba(245,200,66,0.30)", label: "Ruh Hali" },
-          { color: "rgba(34,197,94,0.30)", label: "📷 Fotoğraf" },
-        ].map(item => (
-          <div key={item.label} className="flex items-center gap-1.5">
-            <div
-              className="w-3 h-3 rounded-[3px]"
-              style={{ background: item.color }}
-            />
-            <span className="text-[11px] font-medium" style={{ color: "var(--text-tertiary)" }}>
-              {item.label}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Client Component for View Toggling */}
+      {/* ── CLIENT COMPONENT (Tabs + Calendar + Photos) ─── */}
       <CalendarPageClient
         notes={notes}
         moods={moods}

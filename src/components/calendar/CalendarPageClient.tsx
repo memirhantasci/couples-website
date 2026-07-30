@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutGrid, Calendar as CalendarIcon } from "lucide-react";
 import { PhotoGrid } from "@/components/photos/PhotoGrid";
 import dynamic from "next/dynamic";
 const CalendarView = dynamic(
@@ -24,43 +23,74 @@ export function CalendarPageClient({ notes, moods, photos, currentUserId, curren
   const photoDates = [...new Set(photos.map((p) => p.taken_date))];
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Toggle View */}
-      <div className="flex bg-white/5 p-1 rounded-xl w-full max-w-[240px] mx-auto mb-2">
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* ── Tab Switcher ─── */}
+      <div style={{
+        display: "flex",
+        background: "rgba(255,255,255,0.05)",
+        borderRadius: 14,
+        padding: 4,
+        width: "100%",
+        maxWidth: 260,
+        margin: "0 auto",
+      }}>
         <button
           onClick={() => setViewMode("calendar")}
-          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all"
           style={{
-            background: viewMode === "calendar" ? "var(--gs-red)" : "transparent",
-            color: viewMode === "calendar" ? "white" : "rgba(255,255,255,0.5)",
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            padding: "10px 0",
+            borderRadius: 12,
+            border: "none",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 700,
+            transition: "all 0.2s ease",
+            background: viewMode === "calendar" ? "#E8002D" : "transparent",
+            color: viewMode === "calendar" ? "#fff" : "rgba(255,255,255,0.45)",
           }}
         >
-          <CalendarIcon size={16} /> Takvim
+          Takvim
         </button>
         <button
           onClick={() => setViewMode("grid")}
-          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all"
           style={{
-            background: viewMode === "grid" ? "var(--gs-red)" : "transparent",
-            color: viewMode === "grid" ? "white" : "rgba(255,255,255,0.5)",
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            padding: "10px 0",
+            borderRadius: 12,
+            border: "none",
+            cursor: "pointer",
+            fontSize: 13,
+            fontWeight: 700,
+            transition: "all 0.2s ease",
+            background: viewMode === "grid" ? "#E8002D" : "transparent",
+            color: viewMode === "grid" ? "#fff" : "rgba(255,255,255,0.45)",
           }}
         >
-          <LayoutGrid size={16} /> Fotoğraflar
+          Fotoğraflar
         </button>
       </div>
 
+      {/* ── Content ─── */}
       {viewMode === "calendar" ? (
-        <div className="animate-in fade-in zoom-in-95 duration-200">
+        <div>
           <CalendarView
             notes={notes}
             moods={moods}
+            photos={photos}
             currentUsername={currentUsername}
             photoDates={photoDates}
-            disableNotes={false}
           />
         </div>
       ) : (
-        <div className="animate-in fade-in zoom-in-95 duration-200">
+        <div>
           <PhotoGrid
             photos={photos}
             currentUserId={currentUserId}

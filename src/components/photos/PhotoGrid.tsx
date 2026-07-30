@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, ImageOff, X } from "lucide-react";
-import { PhotoCard, type Photo } from "./PhotoCard";
+import { Search, X, Edit2 } from "lucide-react";
+import { type Photo } from "./PhotoCard";
+import { PhotoEditModal } from "./PhotoEditModal";
 import { Lightbox } from "./Lightbox";
 
 interface PhotoGridProps {
@@ -27,6 +27,7 @@ export function PhotoGrid({
   const [filter, setFilter] = useState<FilterType>("newest");
   const [customDate, setCustomDate] = useState("");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
 
   const filtered = useMemo(() => {
     let result = [...photos];
@@ -89,126 +90,300 @@ export function PhotoGrid({
   ];
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Search + Filters */}
-      {(showSearch || showFilters) && (
-        <div className="flex flex-col gap-3">
-          {showSearch && (
-            <div className="relative">
-              <Search
-                size={16}
-                className="absolute left-4 top-1/2 -translate-y-1/2"
-                style={{ color: "rgba(255,255,255,0.3)" }}
-              />
-              <input
-                type="text"
-                placeholder="Başlık, açıklama veya tarih ara..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-glass text-sm"
-                style={{ paddingLeft: 44 }}
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
-                  style={{ color: "rgba(255,255,255,0.3)" }}
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          )}
-
-          {showFilters && (
-            <div className="flex flex-col gap-2">
-              {/* Filter pills */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-                <SlidersHorizontal size={14} style={{ color: "rgba(255,255,255,0.35)", flexShrink: 0 }} />
-                {filterLabels.map(({ key, label }) => (
-                  <button
-                    key={key}
-                    onClick={() => { setFilter(key); setCustomDate(""); }}
-                    className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
-                    style={
-                      filter === key && !customDate
-                        ? {
-                            background: "var(--gs-red)",
-                            color: "white",
-                          }
-                        : {
-                            background: "rgba(255,255,255,0.06)",
-                            color: "rgba(255,255,255,0.5)",
-                            border: "1px solid rgba(255,255,255,0.08)",
-                          }
-                    }
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              {/* Custom date */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={customDate}
-                  onChange={(e) => setCustomDate(e.target.value)}
-                  className="input-glass text-xs flex-1"
-                  style={{ colorScheme: "dark", padding: "8px 12px" }}
-                />
-                {customDate && (
-                  <button
-                    onClick={() => setCustomDate("")}
-                    className="px-3 py-2 rounded-xl text-xs font-semibold"
-                    style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)" }}
-                  >
-                    Temizle
-                  </button>
-                )}
-              </div>
-            </div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {/* ── Search ─── */}
+      {showSearch && (
+        <div style={{ position: "relative" }}>
+          <Search
+            size={16}
+            style={{
+              position: "absolute",
+              left: 14,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "rgba(255,255,255,0.3)",
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Başlık, açıklama veya tarih ara..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "12px 40px 12px 42px",
+              borderRadius: 14,
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.9)",
+              fontSize: 13,
+              outline: "none",
+              fontFamily: "inherit",
+              boxSizing: "border-box",
+            }}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              style={{
+                position: "absolute",
+                right: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "transparent",
+                border: "none",
+                color: "rgba(255,255,255,0.3)",
+                cursor: "pointer",
+                padding: 4,
+              }}
+            >
+              <X size={14} />
+            </button>
           )}
         </div>
       )}
 
-      {/* Count */}
-      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>
-        {filtered.length} fotoğraf {filtered.length !== photos.length ? `(${photos.length} toplamdan)` : ""}
+      {/* ── Filter Pills ─── */}
+      {showFilters && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              overflowX: "auto",
+              paddingBottom: 2,
+              scrollbarWidth: "none",
+            }}
+          >
+            {filterLabels.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => { setFilter(key); setCustomDate(""); }}
+                style={{
+                  flexShrink: 0,
+                  padding: "7px 14px",
+                  borderRadius: 20,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  border: "none",
+                  ...(filter === key && !customDate
+                    ? {
+                        background: "#E8002D",
+                        color: "#fff",
+                      }
+                    : {
+                        background: "rgba(255,255,255,0.06)",
+                        color: "rgba(255,255,255,0.5)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                      }),
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Date picker */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <input
+              type="date"
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              style={{
+                flex: 1,
+                padding: "8px 12px",
+                borderRadius: 12,
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.6)",
+                fontSize: 12,
+                outline: "none",
+                fontFamily: "inherit",
+                colorScheme: "dark",
+              }}
+            />
+            {customDate && (
+              <button
+                onClick={() => setCustomDate("")}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 12,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: "rgba(255,255,255,0.06)",
+                  color: "rgba(255,255,255,0.5)",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Temizle
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Photo Count ─── */}
+      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, margin: 0 }}>
+        {filtered.length} fotoğraf
+        {filtered.length !== photos.length ? ` (${photos.length} toplamdan)` : ""}
       </p>
 
-      {/* Grid */}
+      {/* ── Photo Cards ─── */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <ImageOff size={40} style={{ color: "rgba(255,255,255,0.15)" }} />
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "60px 0",
+          gap: 12,
+        }}>
+          <span style={{ fontSize: 40, opacity: 0.2 }}>📷</span>
           <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
-            {searchQuery || customDate ? "Aramanıza uygun fotoğraf bulunamadı." : "Henüz fotoğraf yüklenmemiş."}
+            {searchQuery || customDate
+              ? "Aramanıza uygun fotoğraf bulunamadı."
+              : "Henüz fotoğraf yüklenmemiş."}
           </p>
         </div>
       ) : (
-        <div
-          className="grid gap-4"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          }}
-        >
-          {filtered.map((photo, idx) => (
-            <PhotoCard
-              key={photo.id}
-              photo={photo}
-              currentUserId={currentUserId}
-              onClick={() => setLightboxIndex(idx)}
-              onUpdated={onRefresh}
-            />
-          ))}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {filtered.map((photo, idx) => {
+            const uploaderName = photo.uploader?.display_name || photo.uploader?.username || "?";
+            const time = photo.taken_time ? photo.taken_time.substring(0, 5) : null;
+            const dateFormatted = new Date(photo.taken_date + "T00:00:00").toLocaleDateString("tr-TR", {
+              day: "numeric", month: "long", year: "numeric",
+            });
+            const isOwner = photo.user_id === currentUserId;
+
+            return (
+              <div
+                key={photo.id}
+                style={{
+                  borderRadius: 20,
+                  overflow: "hidden",
+                  background: "#181a20",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  cursor: "pointer",
+                }}
+                onClick={() => setLightboxIndex(idx)}
+              >
+                {/* Image with overlay description */}
+                <div style={{ position: "relative", width: "100%", aspectRatio: "16/10", overflow: "hidden" }}>
+                  <img
+                    src={photo.image_url}
+                    alt={photo.title || photo.description}
+                    loading="lazy"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                  {/* Gradient overlay */}
+                  <div style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 40%, transparent 60%)",
+                  }} />
+
+                  {/* Edit button */}
+                  {isOwner && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingPhoto(photo);
+                      }}
+                      style={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        padding: 8,
+                        borderRadius: 10,
+                        background: "rgba(232,0,45,0.85)",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        color: "#fff",
+                        cursor: "pointer",
+                      }}
+                      title="Düzenle"
+                    >
+                      <Edit2 size={13} />
+                    </button>
+                  )}
+
+                  {/* Title overlaid on image */}
+                  {photo.title && (
+                    <p style={{
+                      position: "absolute",
+                      bottom: 12,
+                      left: 14,
+                      right: 14,
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: "#fff",
+                      lineHeight: 1.3,
+                      margin: 0,
+                      textShadow: "0 1px 6px rgba(0,0,0,0.7)",
+                    }}>
+                      {photo.title}
+                    </p>
+                  )}
+                </div>
+
+                {/* Meta bar */}
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "10px 14px",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 12, color: "#E8002D" }}>👤</span>
+                    <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>
+                      {uploaderName}
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
+                      📅 {dateFormatted}
+                    </span>
+                    {time && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>🕐</span>
+                        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
+                          {time}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Lightbox */}
+      {/* ── Lightbox ─── */}
       {lightboxIndex !== null && (
         <Lightbox
           photos={filtered}
           initialIndex={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
+        />
+      )}
+
+      {/* ── Edit Modal ─── */}
+      {editingPhoto && (
+        <PhotoEditModal
+          photo={editingPhoto}
+          onClose={() => setEditingPhoto(null)}
+          onSuccess={() => {
+            setEditingPhoto(null);
+            onRefresh?.();
+          }}
         />
       )}
     </div>
