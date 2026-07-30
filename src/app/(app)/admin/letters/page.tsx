@@ -23,8 +23,8 @@ export default async function AdminLettersPage() {
     .from("letters")
     .select(`
       *,
-      sender:users!letters_sender_id_fkey(username),
-      receiver:users!letters_receiver_id_fkey(username)
+      sender:users!letters_sender_id_fkey(username, display_name),
+      receiver:users!letters_receiver_id_fkey(username, display_name)
     `)
     .order("created_at", { ascending: false });
 
@@ -49,8 +49,8 @@ export default async function AdminLettersPage() {
         <AdminLetterList letters={(letters || []).map(l => ({
           ...l,
           content: decrypt(l.content),
-          sender: { username: deterministicDecrypt(l.sender?.username) || l.sender?.username },
-          receiver: { username: deterministicDecrypt(l.receiver?.username) || l.receiver?.username }
+          sender: { username: l.sender?.display_name || deterministicDecrypt(l.sender?.username) || l.sender?.username },
+          receiver: { username: l.receiver?.display_name || deterministicDecrypt(l.receiver?.username) || l.receiver?.username }
         }))} />
       </div>
     </div>

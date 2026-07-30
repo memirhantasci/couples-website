@@ -55,3 +55,26 @@ export async function deleteLetterAction(id: number) {
   revalidatePath("/admin/letters");
   return { success: true };
 }
+
+export async function editLetterAdminAction(id: number, content: string) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
+
+  if (!content.trim()) {
+    return { error: "Mektup içeriği boş olamaz." };
+  }
+
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from("letters")
+    .update({ content: encrypt(content.trim()) })
+    .eq("id", id);
+
+  if (error) {
+    return { error: "Mektup güncellenirken hata oluştu." };
+  }
+
+  revalidatePath("/letters");
+  revalidatePath("/admin/letters");
+  return { success: true };
+}

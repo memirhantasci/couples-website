@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MailOpen, ChevronDown } from "lucide-react";
-import { DeleteLetterButton } from "@/components/admin/AdminActionButtons";
+import { DeleteLetterButton, EditLetterModal } from "@/components/admin/AdminActionButtons";
 import { dayjs } from "@/lib/date";
 
 interface Letter {
@@ -31,7 +31,7 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {letters.map(letter => {
         const senderName = letter.sender?.username === "emirhan" ? "Emirhan" : letter.sender?.username === "oyku" ? "Öykü" : letter.sender?.username || "Gizli Biri";
         const receiverName = letter.receiver?.username === "emirhan" ? "Emirhan" : letter.receiver?.username === "oyku" ? "Öykü" : letter.receiver?.username || "Bilinmiyor";
@@ -92,7 +92,14 @@ export function AdminLetterList({ letters }: { letters: Letter[] }) {
                     Yazılma Tarihi: {dayjs(letter.created_at).tz("Europe/Istanbul").format("DD MMMM YYYY HH:mm")}
                   </span>
                 </div>
-                <DeleteLetterButton id={letter.id} />
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <EditLetterModal id={letter.id} currentContent={letter.content} />
+                  </div>
+                  <div className="flex-1">
+                    <DeleteLetterButton id={letter.id} />
+                  </div>
+                </div>
               </div>
             )}
           </div>

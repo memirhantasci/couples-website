@@ -175,3 +175,26 @@ export async function deleteCalendarNoteAdminAction(id: number) {
   revalidatePath("/admin/calendar-events");
   return { success: true };
 }
+
+export async function editCalendarNoteAdminAction(id: number, note: string) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
+
+  if (!note.trim()) {
+    return { error: "Not içeriği boş olamaz." };
+  }
+
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from("calendar_notes")
+    .update({ note: note.trim() })
+    .eq("id", id);
+
+  if (error) {
+    return { error: "Not güncellenirken hata oluştu." };
+  }
+
+  revalidatePath("/calendar");
+  revalidatePath("/admin/calendar-events");
+  return { success: true };
+}

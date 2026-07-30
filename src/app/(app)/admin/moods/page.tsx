@@ -30,7 +30,7 @@ export default async function AdminMoodsPage() {
       .order("date"),
     supabase
       .from("users")
-      .select("id, username"),
+      .select("id, username, display_name"),
   ]);
 
   const moods = moodsResult.data ?? [];

@@ -4,7 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ArrowLeft, CalendarDays, User } from "lucide-react";
 import Link from "next/link";
-import { DeleteCalendarEventButton } from "@/components/admin/AdminActionButtons";
+import { DeleteCalendarEventButton, EditCalendarEventModal } from "@/components/admin/AdminActionButtons";
 import { dayjs } from "@/lib/date";
 
 
@@ -22,7 +22,7 @@ export default async function AdminCalendarEventsPage() {
 
   const { data: eventsResult } = await supabase
     .from("calendar_notes")
-    .select("*, user:users(username)")
+    .select("*, user:users(username, display_name)")
     .order("date", { ascending: false });
 
   const events = (eventsResult as any) ?? [];
@@ -49,9 +49,10 @@ export default async function AdminCalendarEventsPage() {
         {!events?.length ? (
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Hiç etkinlik bulunamadı.</p>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             {events.map((event: any) => {
-              const username = Array.isArray(event.user) ? event.user[0]?.username : event.user?.username;
+              const userObj = Array.isArray(event.user) ? event.user[0] : event.user;
+              const username = userObj?.display_name || userObj?.username;
               return (
               <div 
                 key={event.id}
@@ -81,7 +82,14 @@ export default async function AdminCalendarEventsPage() {
                 <p className="text-sm text-white/80 whitespace-pre-wrap leading-relaxed">
                   {event.note || "Açıklama yok."}
                 </p>
-                <DeleteCalendarEventButton id={event.id} />
+                <div className="flex items-center gap-3 mt-2">
+                  <div className="flex-1">
+                    <EditCalendarEventModal id={event.id} currentContent={event.note || ""} />
+                  </div>
+                  <div className="flex-1">
+                    <DeleteCalendarEventButton id={event.id} />
+                  </div>
+                </div>
               </div>
             )})}
           </div>

@@ -4,7 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ArrowLeft, BookOpen, User } from "lucide-react";
 import Link from "next/link";
-import { DeleteDailyNoteButton } from "@/components/admin/AdminActionButtons";
+import { DeleteDailyNoteButton, EditDailyNoteModal } from "@/components/admin/AdminActionButtons";
 import { dayjs } from "@/lib/date";
 import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 
@@ -24,7 +24,7 @@ export default async function AdminDailyNotesPage() {
     .from("daily_notes")
     .select(`
       *,
-      user:users(username)
+      user:users(username, display_name)
     `)
     .order("date", { ascending: false });
 
@@ -50,7 +50,7 @@ export default async function AdminDailyNotesPage() {
         {!notes?.length ? (
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Hiç not bulunamadı.</p>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             {notes.map((note) => (
               <div 
                 key={note.id}
@@ -71,7 +71,7 @@ export default async function AdminDailyNotesPage() {
                   <div className="flex items-center gap-1.5 px-2 py-1 rounded-md" style={{ background: "rgba(255,255,255,0.05)" }}>
                     <User size={12} style={{ color: "rgba(255,255,255,0.5)" }} />
                     <span className="text-xs font-semibold text-white/80 uppercase">
-                      {deterministicDecrypt(note.user?.username) || note.user?.username || "Bilinmiyor"}
+                      {note.user?.display_name || deterministicDecrypt(note.user?.username) || note.user?.username || "Bilinmiyor"}
                     </span>
                   </div>
                 </div>
@@ -86,7 +86,14 @@ export default async function AdminDailyNotesPage() {
                   </span>
                 </div>
                 
-                <DeleteDailyNoteButton id={note.id} />
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <EditDailyNoteModal id={note.id} currentContent={decrypt(note.content) || ""} />
+                  </div>
+                  <div className="flex-1">
+                    <DeleteDailyNoteButton id={note.id} />
+                  </div>
+                </div>
               </div>
             ))}
           </div>

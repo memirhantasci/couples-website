@@ -37,6 +37,7 @@ interface Mood {
 interface User {
   id: number;
   username: string;
+  display_name?: string;
 }
 
 interface MoodChartProps {
@@ -62,7 +63,8 @@ export function MoodChart({ moods, users }: MoodChartProps) {
       }),
     };
     users.forEach((u) => {
-      entry[u.username] = MOOD_SCORES[dateMap[date][u.id] ?? ""] ?? 0;
+      const name = u.display_name || u.username;
+      entry[name] = MOOD_SCORES[dateMap[date][u.id] ?? ""] ?? 0;
     });
     return entry;
   });
@@ -118,35 +120,41 @@ export function MoodChart({ moods, users }: MoodChartProps) {
                   return [emoji ? `${emoji} ${MOOD_LABELS[emoji]}` : "-", name];
                 }}
               />
-              {users.map((u, i) => (
-                <Line
-                  key={u.id}
-                  type="monotone"
-                  dataKey={u.username}
-                  stroke={COLORS[i % COLORS.length]}
-                  strokeWidth={2.5}
-                  dot={{ fill: COLORS[i % COLORS.length], r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              ))}
+              {users.map((u, i) => {
+                const name = u.display_name || u.username;
+                return (
+                  <Line
+                    key={u.id}
+                    type="monotone"
+                    dataKey={name}
+                    stroke={COLORS[i % COLORS.length]}
+                    strokeWidth={2.5}
+                    dot={{ fill: COLORS[i % COLORS.length], r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                );
+              })}
             </LineChart>
           </ResponsiveContainer>
 
           {/* Legend */}
           <div className="flex gap-4 mt-3">
-            {users.map((u, i) => (
-              <div key={u.id} className="flex items-center gap-1.5">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ background: COLORS[i % COLORS.length] }}
-                />
-                <span
-                  style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}
-                >
-                  {u.username === "emirhan" ? "Emirhan" : "Öykü"}
-                </span>
-              </div>
-            ))}
+            {users.map((u, i) => {
+              const name = u.display_name || u.username;
+              return (
+                <div key={u.id} className="flex items-center gap-1.5">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ background: COLORS[i % COLORS.length] }}
+                  />
+                  <span
+                    style={{ color: "rgba(255,255,255,0.5)", fontSize: 12, textTransform: "capitalize" }}
+                  >
+                    {name}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </>
       )}

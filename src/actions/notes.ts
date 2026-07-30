@@ -61,6 +61,29 @@ export async function deleteDailyNoteAction(id: number) {
   return { success: true };
 }
 
+export async function editDailyNoteAdminAction(id: number, content: string) {
+  const session = await getSession();
+  if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
+
+  const parsed = z.string().min(1, "Not boş olamaz").max(2000, "En fazla 2000 karakter").safeParse(content);
+  if (!parsed.success) {
+    return { error: parsed.error.errors[0].message };
+  }
+
+  const supabase = createServerClient();
+  const { error } = await supabase
+    .from("daily_notes")
+    .update({ content: encrypt(parsed.data) })
+    .eq("id", id);
+
+  if (error) {
+    return { error: "Not güncellenirken hata oluştu." };
+  }
+
+  revalidatePath("/admin/daily-notes");
+  return { success: true };
+}
+
 const moodSchema = z.object({
   mood_type: z.enum(["😍", "😊", "😐", "😔", "😢", "😴"]),
 });
