@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth/session";
 import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getTodayHitap, daysSince, getLoveMeter, dayOfYear, todayString, dayjs } from "@/lib/date";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 import { getQuoteForDay } from "@/lib/quotes";
 import { MeetingCountdown } from "@/components/home/MeetingCountdown";
 import { LoveMeter } from "@/components/home/LoveMeter";
@@ -58,9 +59,12 @@ export default async function HomePage() {
   const loveMeter = getLoveMeter();
   const quote = getQuoteForDay(doy);
   const currentMood = moodResult.data?.mood_type ?? null;
-  const currentNote = noteResult.data?.content ?? null;
+  const currentNote = noteResult.data?.content ? decrypt(noteResult.data.content) : null;
   const activeMeeting = meetingResult.data;
-  const pendingLetters = (pendingLettersResult.data as any[]) ?? [];
+  const pendingLetters = ((pendingLettersResult.data as any[]) ?? []).map(l => ({
+    ...l,
+    sender: { ...l.sender, username: deterministicDecrypt(l.sender?.username) || l.sender?.username }
+  }));
   const dateStr = dayjs().locale("tr").format("DD MMMM dddd").toUpperCase();
 
   return (

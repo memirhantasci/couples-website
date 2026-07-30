@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { PhotoGrid } from "@/components/photos/PhotoGrid";
 import { BackButton } from "@/components/ui/BackButton";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 
 interface Props {
   params: Promise<{ date: string }>;
@@ -40,7 +41,12 @@ export default async function PhotoDayPage({ params }: Props) {
 
   if (error) console.error("Photos fetch error:", error);
 
-  const photoList = (photos as any[]) ?? [];
+  const photoList = ((photos as any[]) ?? []).map(p => ({
+    ...p,
+    title: p.title ? decrypt(p.title) : null,
+    description: decrypt(p.description),
+    uploader: { ...p.uploader, username: deterministicDecrypt(p.uploader?.username) || p.uploader?.username }
+  }));
 
   const d = new Date(date + "T00:00:00");
   const label = d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });

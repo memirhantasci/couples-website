@@ -7,7 +7,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { createSession, destroySession, getSession } from "@/lib/auth/session";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
-import { encrypt, decrypt } from "@/utils/crypto";
+import { encrypt, decrypt, deterministicEncrypt, deterministicDecrypt } from "@/utils/crypto";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Kullanıcı adı gerekli"),
@@ -45,12 +45,13 @@ export async function loginAction(
 
     const { username, password } = parsed.data;
     const supabase = createServerClient();
+    const encryptedUsername = deterministicEncrypt(username.trim().toLowerCase());
 
     // Find user by username
     const { data: user, error } = await supabase
       .from("users")
       .select("id, username, email, password, role, display_name")
-      .eq("username", username.trim().toLowerCase())
+      .eq("username", encryptedUsername)
       .single();
 
     if (error || !user) {
@@ -159,9 +160,10 @@ export async function loginAction(
           });
           
           if (process.env.SMTP_USER) {
+              const decryptedEmail = deterministicDecrypt(user.email);
               await transporter.sendMail({
                 from: process.env.SMTP_USER,
-                to: user.email,
+                to: decryptedEmail,
                 subject: "Giriş Doğrulama Kodu",
                 text: `Yeni bir cihazdan giriş tespit ettik. Doğrulama kodunuz: ${otpCode}`,
               });
@@ -198,8 +200,8 @@ export async function loginAction(
 
         await createSession({
           userId: user.id,
-          username: user.username,
-          displayName: user.display_name || user.username,
+          username: deterministicDecrypt(user.username) || user.username,
+          displayName: user.display_name || deterministicDecrypt(user.username) || user.username,
           role: user.role as "ADMIN" | "USER",
           loginDate: today,
           loginLogId: loginLog?.id ?? 0,
@@ -239,7 +241,8 @@ export async function setupEmailAction(prevState: any, formData: FormData) {
     const supabase = createServerClient();
     
     // Update user's email
-    await supabase.from("users").update({ email: email.trim().toLowerCase() }).eq("id", userId);
+    const encryptedEmail = deterministicEncrypt(email.trim().toLowerCase());
+    await supabase.from("users").update({ email: encryptedEmail }).eq("id", userId);
 
     // Create OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -371,8 +374,8 @@ export async function verifyDeviceAction(prevState: any, formData: FormData) {
 
   await createSession({
     userId: user.id,
-    username: user.username,
-    displayName: user.display_name || user.username,
+    username: deterministicDecrypt(user.username) || user.username,
+    displayName: user.display_name || deterministicDecrypt(user.username) || user.username,
     role: user.role as "ADMIN" | "USER",
     loginDate: today,
     loginLogId: loginLog?.id ?? 0,
@@ -442,11 +445,12 @@ export async function registerAction(
   }
 
   const supabase = createServerClient();
+  const encryptedUsername = deterministicEncrypt(username);
 
   const { data: existing } = await supabase
     .from("users")
     .select("id")
-    .eq("username", username)
+    .eq("username", encryptedUsername)
     .single();
 
   if (existing) {
@@ -460,8 +464,8 @@ export async function registerAction(
     .from("users")
     .insert({
       display_name: displayName,
-      username,
-      email,
+      username: encryptedUsername,
+      email: deterministicEncrypt(email),
       password: hashedPassword,
       role: "USER"
     });
@@ -490,7 +494,7 @@ export async function changePasswordAction(prevState: LoginState, formData: Form
   const { data: user, error: checkError } = await supabase
     .from("users")
     .select("id, email")
-    .eq("username", username)
+    .eq("username", deterministicEncrypt(username.trim().toLowerCase()))
     .single();
 
   if (checkError || !user) {
@@ -501,7 +505,7 @@ export async function changePasswordAction(prevState: LoginState, formData: Form
     return { error: "Şifrenizi sıfırlamak için kayıtlı bir e-postanız bulunmuyor. Lütfen destek ile iletişime geçin." };
   }
 
-  if (user.email !== email.trim().toLowerCase()) {
+  if (deterministicDecrypt(user.email) !== email.trim().toLowerCase()) {
     return { error: "Girdiğiniz e-posta adresi sistemdeki kayıtla eşleşmiyor." };
   }
 
@@ -530,7 +534,7 @@ export async function changePasswordAction(prevState: LoginState, formData: Form
     if (process.env.SMTP_USER) {
         await transporter.sendMail({
           from: process.env.SMTP_USER,
-          to: user.email,
+          to: deterministicDecrypt(user.email),
           subject: "Şifre Sıfırlama Kodu",
           text: `Şifrenizi sıfırlamak için doğrulama kodunuz: ${otpCode}`,
         });

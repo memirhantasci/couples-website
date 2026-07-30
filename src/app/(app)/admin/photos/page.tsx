@@ -6,6 +6,7 @@ import { Images, ArrowLeft, TrendingUp, Calendar, ScanLine, Edit } from "lucide-
 import Link from "next/link";
 import dayjs from "dayjs";
 import { AdminPhotoGrid } from "@/components/admin/AdminPhotoGrid";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 
 export const metadata: Metadata = {
   title: "Tüm Fotoğraflar — Admin Paneli",
@@ -35,7 +36,12 @@ export default async function AdminPhotosPage() {
       .gte("uploaded_at", thisMonthStart),
   ]);
 
-  const photos = (photosResult.data as any[]) ?? [];
+  const photos = ((photosResult.data as any[]) ?? []).map(p => ({
+    ...p,
+    title: p.title ? decrypt(p.title) : null,
+    description: decrypt(p.description),
+    uploader: { ...p.uploader, username: deterministicDecrypt(p.uploader?.username) || p.uploader?.username }
+  }));
   const thisMonthCount = thisMonthResult.count ?? 0;
   const exifFoundCount = photos.filter((p) => p.exif_found).length;
   const exifManualCount = photos.length - exifFoundCount;

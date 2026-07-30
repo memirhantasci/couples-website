@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
 import { AdminLetterList } from "@/components/admin/AdminLetterList";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 
 export const metadata: Metadata = {
   title: "Tüm Mektuplar — Admin",
@@ -45,7 +46,12 @@ export default async function AdminLettersPage() {
 
       <div className="card p-5">
         <h2 className="font-bold text-white text-base mb-4">Sistemdeki Tüm Mektuplar</h2>
-        <AdminLetterList letters={letters || []} />
+        <AdminLetterList letters={(letters || []).map(l => ({
+          ...l,
+          content: decrypt(l.content),
+          sender: { username: deterministicDecrypt(l.sender?.username) || l.sender?.username },
+          receiver: { username: deterministicDecrypt(l.receiver?.username) || l.receiver?.username }
+        }))} />
       </div>
     </div>
   );

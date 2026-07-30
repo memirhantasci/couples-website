@@ -3,6 +3,7 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/session";
 import { revalidatePath } from "next/cache";
+import { encrypt } from "@/utils/crypto";
 
 export async function createLetterAction(
   prevState: { error?: string; success?: boolean },
@@ -26,7 +27,7 @@ export async function createLetterAction(
     sender_id: session.userId,
     receiver_id: parseInt(receiver_id),
     title,
-    content,
+    content: encrypt(content),
     unlock_date,
   });
 

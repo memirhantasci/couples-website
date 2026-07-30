@@ -4,7 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Users, Key, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { decrypt } from "@/utils/crypto";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 
 export const metadata: Metadata = {
   title: "Kullanıcılar — Admin Paneli",
@@ -70,11 +70,11 @@ export default async function AdminUsersPage() {
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex flex-col">
                   <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Kullanıcı Adı</span>
-                  <span className="text-white mt-1">{u.username}</span>
+                  <span className="text-white mt-1">{deterministicDecrypt(u.username) || u.username}</span>
                 </div>
                 <div className="flex flex-col">
                   <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12 }}>E-posta</span>
-                  <span className="text-white mt-1">{u.email || "-"}</span>
+                  <span className="text-white mt-1">{u.email ? (deterministicDecrypt(u.email) || u.email) : "-"}</span>
                 </div>
                 <div className="flex flex-col col-span-2 mt-2">
                   <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, display: "flex", alignItems: "center", gap: 6 }}>

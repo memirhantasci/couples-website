@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { CalendarPageClient } from "@/components/calendar/CalendarPageClient";
 import { dayjs } from "@/lib/date";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -45,8 +46,22 @@ export default async function CalendarPage() {
       .order("taken_time", { ascending: false }),
   ]);
 
-  const notes = (notesResult.data as any) ?? [];
-  const moods = moodsResult.data ?? [];
+  const notes = ((notesResult.data as any) ?? []).map((n: any) => ({
+    ...n,
+    user: { ...n.user, username: deterministicDecrypt(n.user?.username) || n.user?.username }
+  }));
+  
+  const moods = (moodsResult.data ?? []).map((m: any) => ({
+    ...m,
+    user: { ...m.user, username: deterministicDecrypt(m.user?.username) || m.user?.username }
+  }));
+
+  const photos = ((photosResult.data as any[]) ?? []).map(p => ({
+    ...p,
+    title: p.title ? decrypt(p.title) : null,
+    description: decrypt(p.description),
+    uploader: { ...p.uploader, username: deterministicDecrypt(p.uploader?.username) || p.uploader?.username }
+  }));
 
   return (
     <div
@@ -111,7 +126,7 @@ export default async function CalendarPage() {
       <CalendarPageClient
         notes={notes}
         moods={moods}
-        photos={(photosResult.data as any[]) ?? []}
+        photos={photos}
         currentUserId={session.userId}
         currentUsername={session.username}
       />

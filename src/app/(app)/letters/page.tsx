@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { LetterList } from "@/components/letters/LetterList";
 import { WriteLetterForm } from "@/components/letters/WriteLetterForm";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 
 export const metadata: Metadata = {
   title: "Mektuplar — Zaman Kapsülü",
@@ -35,6 +36,18 @@ export default async function LettersPage() {
     .eq("sender_id", session.userId)
     .order("created_at", { ascending: false });
 
+  const decryptedReceived = (receivedLetters || []).map((l: any) => ({
+    ...l,
+    content: decrypt(l.content),
+    sender: { ...l.sender, username: deterministicDecrypt(l.sender?.username) || l.sender?.username }
+  }));
+
+  const decryptedSent = (sentLetters || []).map((l: any) => ({
+    ...l,
+    content: decrypt(l.content),
+    receiver: { ...l.receiver, username: deterministicDecrypt(l.receiver?.username) || l.receiver?.username }
+  }));
+
   const { data: users, error: usersError } = await supabase
     .from("users")
     .select("id, username, role, display_name")
@@ -42,7 +55,9 @@ export default async function LettersPage() {
 
   if (usersError) console.error("Kullanıcıları çekerken hata:", usersError);
 
-  const availableUsers = (users || []).filter(u => u.username !== "admin" && u.username !== "adminadmin");
+  const availableUsers = (users || [])
+    .map(u => ({ ...u, username: deterministicDecrypt(u.username) || u.username }))
+    .filter(u => u.username !== "admin" && u.username !== "adminadmin");
 
   return (
     <div
@@ -77,7 +92,7 @@ export default async function LettersPage() {
           </h2>
         </div>
 
-        <LetterList letters={receivedLetters || []} type="received" />
+        <LetterList letters={decryptedReceived} type="received" />
       </div>
 
       {/* ─── Gönderdiğim Mektuplar ─── */}
@@ -96,7 +111,7 @@ export default async function LettersPage() {
           </h2>
         </div>
 
-        <LetterList letters={sentLetters || []} type="sent" />
+        <LetterList letters={decryptedSent} type="sent" />
       </div>
 
       {/* ─── Yeni Mektup Yaz ─── */}

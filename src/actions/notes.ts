@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/session";
 import { todayString } from "@/lib/date";
+import { encrypt } from "@/utils/crypto";
 
 const noteSchema = z.object({
   content: z.string().min(1, "Not boş olamaz").max(2000, "En fazla 2000 karakter"),
@@ -29,7 +30,7 @@ export async function upsertDailyNoteAction(
     {
       user_id: session.userId,
       date: today,
-      content: parsed.data.content,
+      content: encrypt(parsed.data.content),
     },
     {
       onConflict: "user_id,date",

@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { encrypt, encryptBuffer } from "@/utils/crypto";
 
 export interface PhotoActionState {
   error?: string;
@@ -46,12 +47,15 @@ export async function uploadPhotoAction(
 
   // Upload to Supabase Storage
   const arrayBuffer = await file.arrayBuffer();
-  const fileBuffer = new Uint8Array(arrayBuffer);
+  const fileBuffer = Buffer.from(arrayBuffer);
+  
+  // Encrypt the file buffer
+  const encryptedFileBuffer = encryptBuffer(fileBuffer);
 
   const { error: uploadError } = await supabase.storage
     .from("photos")
-    .upload(storagePath, fileBuffer, {
-      contentType: file.type,
+    .upload(storagePath, encryptedFileBuffer, {
+      contentType: "application/octet-stream", // It's encrypted binary now
       upsert: false,
     });
 
@@ -60,29 +64,29 @@ export async function uploadPhotoAction(
     return { error: "Fotoğraf yüklenirken hata oluştu: " + uploadError.message };
   }
 
-  // Get public URL
-  const { data: urlData } = supabase.storage.from("photos").getPublicUrl(storagePath);
-  const imageUrl = urlData.publicUrl;
-
-  // Save to database
-  const { error: dbError } = await supabase.from("photo_archive").insert({
+  // Save to database, leaving image_url temporary empty or placeholder
+  const { data: dbData, error: dbError } = await supabase.from("photo_archive").insert({
     user_id: session.userId,
-    image_url: imageUrl,
+    image_url: "", // Will update in a second
     storage_path: storagePath,
-    title: title || null,
-    description,
+    title: title ? encrypt(title) : null,
+    description: encrypt(description),
     taken_date: takenDate,
     taken_time: takenTime || null,
     exif_found: exifFound,
     file_size: file.size,
-  });
+  }).select("id").single();
 
-  if (dbError) {
+  if (dbError || !dbData) {
     console.error("DB insert error:", dbError);
-    // Try to clean up uploaded file
     await supabase.storage.from("photos").remove([storagePath]);
-    return { error: "Veritabanına kaydedilirken hata oluştu: " + dbError.message };
+    return { error: "Veritabanına kaydedilirken hata oluştu: " + (dbError?.message || "") };
   }
+
+  // Update image_url
+  await supabase.from("photo_archive").update({
+    image_url: `/api/photos/${dbData.id}`
+  }).eq("id", dbData.id);
 
   revalidatePath("/photos");
   revalidatePath("/calendar");
@@ -122,8 +126,8 @@ export async function updatePhotoAction(
   const { error } = await supabase
     .from("photo_archive")
     .update({
-      title: title || null,
-      description,
+      title: title ? encrypt(title) : null,
+      description: encrypt(description),
       taken_date: takenDate,
       taken_time: takenTime || null,
     })

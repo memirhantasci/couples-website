@@ -6,6 +6,7 @@ import { ArrowLeft, BookOpen, User } from "lucide-react";
 import Link from "next/link";
 import { DeleteDailyNoteButton } from "@/components/admin/AdminActionButtons";
 import { dayjs } from "@/lib/date";
+import { decrypt, deterministicDecrypt } from "@/utils/crypto";
 
 export const metadata: Metadata = {
   title: "Günlük Notlar — Admin",
@@ -70,13 +71,13 @@ export default async function AdminDailyNotesPage() {
                   <div className="flex items-center gap-1.5 px-2 py-1 rounded-md" style={{ background: "rgba(255,255,255,0.05)" }}>
                     <User size={12} style={{ color: "rgba(255,255,255,0.5)" }} />
                     <span className="text-xs font-semibold text-white/80 uppercase">
-                      {note.user?.username || "Bilinmiyor"}
+                      {deterministicDecrypt(note.user?.username) || note.user?.username || "Bilinmiyor"}
                     </span>
                   </div>
                 </div>
                 
                 <p className="text-sm text-white/80 whitespace-pre-wrap leading-relaxed mt-1">
-                  {note.content || "Açıklama yok."}
+                  {decrypt(note.content) || "Açıklama yok."}
                 </p>
                 
                 <div className="text-right mt-1">

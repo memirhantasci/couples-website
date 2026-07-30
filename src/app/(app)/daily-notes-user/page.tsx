@@ -4,6 +4,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import dayjs from "dayjs";
 import "dayjs/locale/tr";
+import { decrypt } from "@/utils/crypto";
 
 export const metadata: Metadata = {
   title: "Günlüğüm — Emirhan & Öykü 💕",
@@ -23,7 +24,10 @@ export default async function DailyNotesUserPage() {
     .eq("user_id", session.userId)
     .order("date", { ascending: false });
 
-  const notes = notesResult ?? [];
+  const notes = (notesResult ?? []).map((n: any) => ({
+    ...n,
+    content: decrypt(n.content),
+  }));
 
   return (
     <div
