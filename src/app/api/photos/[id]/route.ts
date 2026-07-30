@@ -55,7 +55,8 @@ export async function GET(
     else if (ext === 'webp') contentType = 'image/webp';
     else if (ext === 'heic') contentType = 'image/heic';
 
-    return new NextResponse(decryptedBuffer, {
+    // NextResponse requires standard web types like Uint8Array instead of Node.js Buffer
+    return new NextResponse(new Uint8Array(decryptedBuffer), {
       status: 200,
       headers: {
         "Content-Type": contentType,
