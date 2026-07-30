@@ -388,12 +388,12 @@ export async function verifyDeviceAction(prevState: any, formData: FormData) {
   redirect(nextUrl);
 }
 
-export async function resetEmailAction() {
+export async function resetEmailAction(formData: FormData) {
   const cookieStore = await cookies();
   const pendingUserId = cookieStore.get("pending_login_user")?.value;
 
   if (!pendingUserId) {
-    return { error: "Oturum süresi dolmuş." };
+    redirect("/login");
   }
 
   const supabase = createServerClient();
@@ -406,7 +406,8 @@ export async function resetEmailAction() {
     .eq("is_verified", true);
 
   if (devices && devices.length > 0) {
-    return { error: "Hesabınız daha önce doğrulandığı için güvenlik gereği e-posta adresinizi buradan değiştiremezsiniz." };
+    // Güvenlik gereği e-posta adresini buradan değiştiremez
+    redirect("/login?error=CihazDogrulanmis");
   }
 
   // E-postayı null yap
