@@ -241,10 +241,8 @@ export async function setupEmailAction(prevState: any, formData: FormData) {
     }
 
     const supabase = createServerClient();
-    
-    // Update user's email
     const encryptedEmail = deterministicEncrypt(email.trim().toLowerCase());
-    await supabase.from("users").update({ email: encryptedEmail }).eq("id", userId);
+    // Do NOT update database here yet! Store it in a pending cookie until OTP is verified.
 
     // Create OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -302,6 +300,7 @@ export async function setupEmailAction(prevState: any, formData: FormData) {
     
     cookieStore.set("pending_login_user", userId, { httpOnly: true, maxAge: 600 });
     cookieStore.set("pending_login_ip", ipAddress, { httpOnly: true, maxAge: 600 });
+    cookieStore.set("pending_setup_email_value", encryptedEmail, { httpOnly: true, maxAge: 600 });
     
     nextUrl = "/login/verify-device";
   } catch (err: any) {
@@ -360,6 +359,13 @@ export async function verifyDeviceAction(prevState: any, formData: FormData) {
   }
 
   await query;
+
+  // If this was an initial email setup, write the verified email to DB now
+  const pendingEmailValue = cookieStore.get("pending_setup_email_value")?.value;
+  if (pendingEmailValue) {
+    await supabase.from("users").update({ email: pendingEmailValue }).eq("id", pendingUserId);
+    cookieStore.delete("pending_setup_email_value");
+  }
 
   // Mark OTP used
   await supabase
