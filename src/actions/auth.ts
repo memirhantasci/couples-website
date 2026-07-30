@@ -388,6 +388,36 @@ export async function verifyDeviceAction(prevState: any, formData: FormData) {
   redirect(nextUrl);
 }
 
+export async function resetEmailAction() {
+  const cookieStore = await cookies();
+  const pendingUserId = cookieStore.get("pending_login_user")?.value;
+
+  if (!pendingUserId) {
+    return { error: "Oturum süresi dolmuş." };
+  }
+
+  const supabase = createServerClient();
+
+  // Yalnızca hiç doğrulanmış cihazı yoksa e-posta sıfırlamaya izin ver (Güvenlik)
+  const { data: devices } = await supabase
+    .from("device_authorizations")
+    .select("id")
+    .eq("user_id", pendingUserId)
+    .eq("is_verified", true);
+
+  if (devices && devices.length > 0) {
+    return { error: "Hesabınız daha önce doğrulandığı için güvenlik gereği e-posta adresinizi buradan değiştiremezsiniz." };
+  }
+
+  // E-postayı null yap
+  await supabase.from("users").update({ email: null }).eq("id", pendingUserId);
+
+  // Oturum çerezlerini sil
+  cookieStore.delete("pending_login_user");
+  cookieStore.delete("pending_login_ip");
+
+  redirect("/login");
+}
 
 export async function logoutAction(): Promise<void> {
   const session = await getSession();

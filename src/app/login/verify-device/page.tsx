@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { verifyDeviceAction } from "@/actions/auth";
-import { ShieldCheck, ArrowLeft } from "lucide-react";
+import { verifyDeviceAction, resetEmailAction } from "@/actions/auth";
+import { ShieldCheck, ArrowLeft, MailWarning } from "lucide-react";
 import { motion } from "framer-motion";
 
 const initialState = {};
@@ -134,6 +134,16 @@ export default function VerifyDevicePage() {
           >
             {isPending ? "Doğrulanıyor..." : "Doğrula ve Giriş Yap"}
           </motion.button>
+        </form>
+
+        <form action={resetEmailAction} className="mt-4 flex justify-center">
+           <button 
+             type="submit"
+             className="flex items-center gap-2 text-xs transition-opacity hover:opacity-100 opacity-60"
+             style={{ color: "var(--text-tertiary)" }}
+           >
+             <MailWarning size={14} /> E-posta adresimi yanlış girdim
+           </button>
         </form>
       </motion.div>
     </div>
