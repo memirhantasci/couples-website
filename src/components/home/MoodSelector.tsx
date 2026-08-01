@@ -5,12 +5,12 @@ import { upsertMoodAction } from "@/actions/notes";
 import { toast } from "sonner";
 
 const MOODS = [
-  { emoji: "😄", label: "Çok Mutlu" },
-  { emoji: "😃", label: "Mutlu" },
+  { emoji: "😍", label: "Çok Mutlu" },
+  { emoji: "😊", label: "Mutlu" },
   { emoji: "😐", label: "Normal" },
   { emoji: "😢", label: "Üzgün" },
-  { emoji: "😣", label: "Kızgın" },
-  { emoji: "😔", label: "Yorgun" },
+  { emoji: "😡", label: "Kızgın" },
+  { emoji: "😴", label: "Yorgun" },
 ] as const;
 
 interface MoodSelectorProps {

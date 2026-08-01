@@ -85,7 +85,7 @@ export async function editDailyNoteAdminAction(id: number, content: string) {
 }
 
 const moodSchema = z.object({
-  mood_type: z.enum(["😍", "😊", "😐", "😔", "😢", "😴"]),
+  mood_type: z.enum(["😍", "😊", "😐", "😔", "😢", "😴", "😄", "😃", "😣", "😡", "😠"]),
 });
 
 export async function upsertMoodAction(moodType: string) {
