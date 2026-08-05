@@ -15,16 +15,38 @@ export const dynamic = "force-dynamic";
 
 async function calculateStreak(
   supabase: ReturnType<typeof createServerClient>,
-  userId: number,
-  activeMeds: { id: number; time: string; times?: string[] }[]
+  userId: number
 ): Promise<number> {
-  if (activeMeds.length === 0) return 0;
+  const { data: allMeds } = await supabase
+    .from("medicines")
+    .select("id, time, times, start_date, end_date")
+    .eq("user_id", userId);
+
+  if (!allMeds || allMeds.length === 0) return 0;
+
   let streak = 0;
-  let checkDate = dayjs().tz("Europe/Istanbul").subtract(1, "day").startOf("day");
-  const medIds = activeMeds.map((m) => m.id);
+  let checkDate = dayjs().tz("Europe/Istanbul").startOf("day");
 
   for (let i = 0; i < 180; i++) {
     const dateStr = checkDate.tz("Europe/Istanbul").format("YYYY-MM-DD");
+    const isToday = i === 0;
+    
+    // Find medicines active on this day
+    const activeMedsForDay = allMeds.filter(med => {
+      return med.start_date <= dateStr && med.end_date >= dateStr;
+    });
+
+    if (activeMedsForDay.length === 0) {
+      if (isToday) {
+        checkDate = checkDate.subtract(1, "day");
+        continue;
+      } else {
+        break; // Streak breaks if there are no active meds on a past day
+      }
+    }
+
+    const medIds = activeMedsForDay.map((m) => m.id);
+
     const { data: logs } = await supabase
       .from("medicine_logs")
       .select("medicine_id, status, time")
@@ -32,20 +54,33 @@ async function calculateStreak(
       .eq("date", dateStr)
       .in("medicine_id", medIds);
 
-    if (!logs || logs.length === 0) break;
-
     let allDosesDrank = true;
-    for (const med of activeMeds) {
-      const medLogs = logs.filter((l) => l.medicine_id === med.id);
-      const hasDrank = medLogs.some((l) => l.status === "DRANK");
+    for (const med of activeMedsForDay) {
+      const medLogs = logs ? logs.filter((l) => l.medicine_id === med.id) : [];
+      
+      const expectedDosesCount = Array.isArray(med.times) && med.times.length > 0 
+        ? med.times.length 
+        : 1;
+        
+      const drankCount = medLogs.filter((l) => l.status === "DRANK").length;
       const hasMissed = medLogs.some((l) => l.status === "MISSED");
-      if (!hasDrank || hasMissed) {
+
+      if (drankCount < expectedDosesCount || hasMissed) {
         allDosesDrank = false;
         break;
       }
     }
 
-    if (!allDosesDrank) break;
+    if (!allDosesDrank) {
+      if (isToday) {
+        // If today is incomplete, we don't break the streak, we just don't increment it yet.
+        checkDate = checkDate.subtract(1, "day");
+        continue;
+      } else {
+        break;
+      }
+    }
+    
     streak++;
     checkDate = checkDate.subtract(1, "day");
   }
@@ -87,7 +122,7 @@ export default async function MedicinePage() {
   const todayLogs = todayLogsResult.data ?? [];
   const historicalLogs = historicalLogsResult.data ?? [];
 
-  const streakValue = await calculateStreak(supabase, session.userId, medicines);
+  const streakValue = await calculateStreak(supabase, session.userId);
 
   const dateLabel = dayjs().locale("tr").tz("Europe/Istanbul").format("D MMMM YYYY, dddd");
 
