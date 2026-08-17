@@ -8,7 +8,7 @@ import { todayString } from "@/lib/date";
 import { encrypt } from "@/utils/crypto";
 
 const noteSchema = z.object({
-  content: z.string().min(1, "Not boş olamaz").max(2000, "En fazla 2000 karakter"),
+  content: z.string().min(1, "Not boş olamaz").max(4500, "En fazla 4500 karakter"),
 });
 
 export async function upsertDailyNoteAction(
@@ -65,7 +65,7 @@ export async function editDailyNoteAdminAction(id: number, content: string) {
   const session = await getSession();
   if (!session || session.role !== "ADMIN") return { error: "Yetkisiz erişim." };
 
-  const parsed = z.string().min(1, "Not boş olamaz").max(2000, "En fazla 2000 karakter").safeParse(content);
+  const parsed = z.string().min(1, "Not boş olamaz").max(4500, "En fazla 4500 karakter").safeParse(content);
   if (!parsed.success) {
     return { error: parsed.error.errors[0].message };
   }

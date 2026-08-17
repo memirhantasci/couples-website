@@ -75,7 +75,7 @@ export function DailyNoteCard({ existingNote }: DailyNoteCardProps) {
               fontFamily: "inherit",
               boxSizing: "border-box",
             }}
-            maxLength={2000}
+            maxLength={4500}
             required
           />
           <button
