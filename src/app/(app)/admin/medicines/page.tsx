@@ -30,8 +30,8 @@ export default async function AdminMedicinesPage() {
       .order("date", { ascending: false }), // Fixed order to use date since taken_at doesn't exist
     supabase
       .from("users")
-      .select("id, username")
-      .eq("role", "USER")
+      .select("id, username, display_name")
+      .order("display_name", { ascending: true })
   ]);
 
   return (

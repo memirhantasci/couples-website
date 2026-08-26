@@ -169,6 +169,7 @@ export default async function MedicinePage() {
         todayLogs={todayLogs}
         historicalLogs={historicalLogs}
         userId={session.userId}
+        currentStreak={streakValue}
       />
     </div>
   );

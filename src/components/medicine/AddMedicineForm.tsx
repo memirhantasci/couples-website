@@ -6,7 +6,7 @@ import { createMedicineAction } from "@/actions/medicine";
 import { toast } from "sonner";
 import { Plus, X, Trash2, Clock } from "lucide-react";
 
-export function AddMedicineForm({ users }: { users: { id: number; username: string }[] }) {
+export function AddMedicineForm({ users }: { users: { id: number; username: string; display_name?: string }[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [times, setTimes] = useState<string[]>(["08:00"]);
 
@@ -81,7 +81,9 @@ export function AddMedicineForm({ users }: { users: { id: number; username: stri
           <select name="user_id" required className="input-glass w-full" defaultValue="">
             <option value="" disabled style={{ background: "#1f1f23" }}>Seçiniz...</option>
             {users.map(u => (
-              <option key={u.id} value={u.id} style={{ background: "#1f1f23", color: "#f4f4f5" }}>{u.username}</option>
+              <option key={u.id} value={u.id} style={{ background: "#1f1f23", color: "#f4f4f5" }}>
+                {u.display_name || u.username}
+              </option>
             ))}
           </select>
         </div>

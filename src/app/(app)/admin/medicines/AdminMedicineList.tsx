@@ -56,9 +56,16 @@ export function AdminMedicineList({ medicines, logs, users }: { medicines: any[]
             {/* Header / Info */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col gap-1.5">
-                <h3 className="font-bold text-white text-xl leading-tight">
-                  {med.name}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-white text-xl leading-tight">
+                    {med.name}
+                  </h3>
+                  {med.end_date < todayStr && (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-400">
+                      Süresi Bitti
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center mt-2">
                   <span className="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ background: "rgba(255,215,0,0.15)", color: "var(--gs-gold)" }}>
                     <User size={14} />
@@ -91,12 +98,12 @@ export function AdminMedicineList({ medicines, logs, users }: { medicines: any[]
                 disabled={loading === med.id}
                 className="flex-1 py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2"
                 style={{
-                  background: med.is_active ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.1)",
-                  color: med.is_active ? "#4ade80" : "rgba(255,255,255,0.6)",
+                  background: med.end_date < todayStr ? "rgba(255,255,255,0.05)" : (med.is_active ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.1)"),
+                  color: med.end_date < todayStr ? "rgba(255,255,255,0.3)" : (med.is_active ? "#4ade80" : "rgba(255,255,255,0.6)"),
                 }}
               >
                 <Power size={18} />
-                {med.is_active ? "Aktif" : "Pasif"}
+                {med.end_date < todayStr ? "Süresi Bitti" : (med.is_active ? "Aktif" : "Pasif")}
               </button>
 
               <button

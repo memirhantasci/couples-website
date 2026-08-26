@@ -317,7 +317,7 @@ export function EditMedicineModal({
               <option value="">Seçiniz</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>
-                  {u.username}
+                  {u.display_name || u.username}
                 </option>
               ))}
             </select>
