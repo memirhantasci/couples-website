@@ -321,7 +321,7 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId, 
               >
                 <span className="text-2xl block mb-1 animate-bounce">❤️</span>
                 <p className="text-white text-lg font-black tracking-wide leading-snug" style={{ textShadow: "0 2px 12px rgba(232,0,45,0.8)" }}>
-                  öykü seni çok seviyorum
+                  seni çok seviyorum
                 </p>
                 <p className="text-red-200/90 text-xs font-medium mt-1">
                   bunu ne zaman okursan oku ✨
