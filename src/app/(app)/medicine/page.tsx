@@ -24,6 +24,24 @@ async function calculateStreak(
 
   if (!allMeds || allMeds.length === 0) return 0;
 
+  const checkDateStart = dayjs().tz("Europe/Istanbul").subtract(180, "day").format("YYYY-MM-DD");
+  const checkDateEnd = dayjs().tz("Europe/Istanbul").format("YYYY-MM-DD");
+
+  // Fetch all logs for the last 180 days in a SINGLE query
+  const { data: allLogs } = await supabase
+    .from("medicine_logs")
+    .select("medicine_id, status, time, date")
+    .eq("user_id", userId)
+    .gte("date", checkDateStart)
+    .lte("date", checkDateEnd);
+
+  // Group logs by date for fast lookup
+  const logsByDate = (allLogs || []).reduce((acc: Record<string, any[]>, log) => {
+    if (!acc[log.date]) acc[log.date] = [];
+    acc[log.date].push(log);
+    return acc;
+  }, {});
+
   let streak = 0;
   let checkDate = dayjs().tz("Europe/Istanbul").startOf("day");
 
@@ -45,18 +63,11 @@ async function calculateStreak(
       }
     }
 
-    const medIds = activeMedsForDay.map((m) => m.id);
-
-    const { data: logs } = await supabase
-      .from("medicine_logs")
-      .select("medicine_id, status, time")
-      .eq("user_id", userId)
-      .eq("date", dateStr)
-      .in("medicine_id", medIds);
+    const logs = logsByDate[dateStr] || [];
 
     let allDosesDrank = true;
     for (const med of activeMedsForDay) {
-      const medLogs = logs ? logs.filter((l) => l.medicine_id === med.id) : [];
+      const medLogs = logs.filter((l) => l.medicine_id === med.id);
       
       const expectedDosesCount = Array.isArray(med.times) && med.times.length > 0 
         ? med.times.length 
