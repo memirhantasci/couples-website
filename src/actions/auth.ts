@@ -177,11 +177,8 @@ export async function loginAction(
            });
         }
 
-        // Send email (GECICI OLARAK DEVRE DISI BIRAKILDI)
+        // Send email
         try {
-          console.log("TEST ORTAMI: MAIL GÖNDERIMI DEVRE DISI. OTP KODU:", otpCode);
-          /* 
-          // Orijinal mail gönderme kodu
           const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || "smtp.gmail.com",
             port: parseInt(process.env.SMTP_PORT || "587"),
@@ -200,8 +197,9 @@ export async function loginAction(
                 subject: "Giriş Doğrulama Kodu",
                 text: `Yeni bir cihazdan giriş tespit ettik. Doğrulama kodunuz: ${otpCode}`,
               });
+          } else {
+              console.log("NO SMTP CONFIGURED. OTP CODE IS:", otpCode);
           }
-          */
         } catch (e) {
           console.error("Email send error:", e);
           console.log("FALLBACK OTP CODE IS:", otpCode);
