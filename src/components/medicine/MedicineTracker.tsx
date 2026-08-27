@@ -27,9 +27,10 @@ interface MedicineTrackerProps {
   historicalLogs: MedicineLog[];
   userId: number;
   currentStreak?: number;
+  userName?: string;
 }
 
-export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId, currentStreak = 0 }: MedicineTrackerProps) {
+export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId, currentStreak = 0, userName = "" }: MedicineTrackerProps) {
   const [logs, setLogs] = useState<Record<string, "DRANK" | "MISSED" | "PENDING">>(
     () => {
       const map: Record<string, "DRANK" | "MISSED" | "PENDING"> = {};
@@ -320,7 +321,7 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId, 
               >
                 <span className="text-2xl block mb-1 animate-bounce">❤️</span>
                 <p className="text-white text-lg font-black tracking-wide leading-snug" style={{ textShadow: "0 2px 12px rgba(232,0,45,0.8)" }}>
-                  emirhan seni çok seviyor
+                  öykü seni çok seviyorum
                 </p>
                 <p className="text-red-200/90 text-xs font-medium mt-1">
                   bunu ne zaman okursan oku ✨
@@ -424,19 +425,24 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId, 
             const isUnlocked = streak >= trophy.target;
             const progress = Math.min(100, Math.round((streak / trophy.target) * 100));
 
+            // Kazanıldıysa altın rengi parlasın, kazanılmadıysa kendi orijinal pasif renginde kalsın
+            const displayColor = isUnlocked ? "#FFD700" : trophy.color;
+            const displayBgGlow = isUnlocked ? "rgba(255, 215, 0, 0.22)" : trophy.bgGlow;
+            const displayBorder = isUnlocked ? "rgba(255, 215, 0, 0.6)" : trophy.border;
+
             return (
               <div
                 key={trophy.target}
                 className="flex flex-col items-center justify-between p-3.5 rounded-2xl min-w-[130px] max-w-[130px] shrink-0 snap-start transition-all relative overflow-hidden"
                 style={{
                   background: isUnlocked
-                    ? `linear-gradient(135deg, ${trophy.bgGlow} 0%, #181a20 100%)`
+                    ? `linear-gradient(135deg, ${displayBgGlow} 0%, #181a20 100%)`
                     : "#14161a",
                   border: isUnlocked
-                    ? `1.5px solid ${trophy.border}`
+                    ? `1.5px solid ${displayBorder}`
                     : "1px solid rgba(255,255,255,0.06)",
                   boxShadow: isUnlocked
-                    ? `0 0 16px ${trophy.bgGlow}`
+                    ? `0 0 16px ${displayBgGlow}`
                     : "none",
                   opacity: isUnlocked ? 1 : 0.75,
                 }}
@@ -462,7 +468,7 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId, 
                   <span
                     className={`text-3xl transition-transform ${isUnlocked ? "scale-110" : "grayscale opacity-50"}`}
                     style={{
-                      textShadow: isUnlocked ? `0 0 15px ${trophy.color}` : "none",
+                      textShadow: isUnlocked ? `0 0 15px ${displayColor}` : "none",
                     }}
                   >
                     {trophy.icon}
@@ -472,7 +478,7 @@ export function MedicineTracker({ medicines, todayLogs, historicalLogs, userId, 
                 {/* Label */}
                 <span
                   className="text-[12px] font-bold text-center mt-1 leading-tight"
-                  style={{ color: isUnlocked ? trophy.color : "rgba(255,255,255,0.6)" }}
+                  style={{ color: isUnlocked ? displayColor : "rgba(255,255,255,0.6)" }}
                 >
                   {trophy.label}
                 </span>
